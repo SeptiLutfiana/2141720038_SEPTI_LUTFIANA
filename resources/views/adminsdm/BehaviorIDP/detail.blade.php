@@ -1,0 +1,224 @@
+@extends('layouts.app')
+
+@section('title', 'Detail IDP Karyawan')
+
+@section('main')
+    <style>
+        .accordion {
+            border-bottom: 1px solid #dee2e6;
+            padding: 10px 0;
+        }
+
+        .accordion-button {
+            background: none;
+            border: none;
+            font-weight: 600;
+            font-size: 12px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            background: transparent;
+            padding: 0;
+        }
+
+        .accordion-button:focus {
+            outline: none;
+        }
+
+        .accordion-content {
+            display: none;
+            padding-top: 10px;
+            padding-left: 20px;
+        }
+
+        .accordion.open .accordion-content {
+            display: block;
+            font-size: 12px;
+
+        }
+
+        .accordion-icon {
+            transition: transform 0.2s ease;
+            font-size: 16px;
+            display: inline-block;
+            width: 14px;
+            text-align: center;
+        }
+
+        .accordion.open .accordion-icon {
+            transform: rotate(90deg);
+            font-size: 12px;
+
+        }
+
+        .kompetensi-nama {
+            flex: 1;
+        }
+
+        .card-header h4,
+        .card-header h5 {
+            margin-bottom: 0.25rem !important;
+        }
+
+        .accordion-content p {
+            margin-bottom: 0.5rem !important;
+        }
+
+        .accordion {
+            padding-bottom: 0.25rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+    </style>
+
+    <div class="main-content">
+        <section class="section">
+            <div class="section-header">
+                <h1>Detail IDP Karyawan</h1>
+                <div class="section-header-breadcrumb">
+                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.index') }}">Data IDP</a></div>
+                    <div class="breadcrumb-item">Detail IDP</div>
+                </div>
+            </div>
+
+            <div class="section-body">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Informasi IDP - {{ $idps->karyawan->name }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label>Proyeksi Karir</label>
+                                <input readonly type="text" class="form-control" value="{{ $idps->proyeksi_karir }}">
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label>Deskripsi</label>
+                                <input readonly type="text" class="form-control" value="{{ $idps->deskripsi_idp }}">
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label>Mentor</label>
+                                <input readonly type="text" class="form-control"
+                                    value="{{ $idps->mentor->name ?? '-' }}">
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label>Supervisor</label>
+                                <input readonly type="text" class="form-control"
+                                    value="{{ $idps->supervisor->name ?? '-' }}">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Waktu Mulai</label>
+                                <input readonly type="text" class="form-control"
+                                    value="{{ \Carbon\Carbon::parse($idps->waktu_mulai)->format('d-m-Y') }}">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Waktu Selesai</label>
+                                <input readonly type="text" class="form-control"
+                                    value="{{ \Carbon\Carbon::parse($idps->waktu_selesai)->format('d-m-Y') }}">
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label>Status Approval Mentor</label>
+                                <input readonly type="text" class="form-control"
+                                    value="{{ $idps->status_approval_mentor }}">
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label>Status Pengajuan IDP</label>
+                                <input readonly type="text" class="form-control"
+                                    value="{{ $idps->status_pengajuan_idp }}">
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label>Status Pengerjaan IDP</label>
+                                <input readonly type="text" class="form-control" value="{{ $idps->status_pengerjaan }}">
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label>Saran Pengajuan IDP</label>
+                                <input readonly type="text" class="form-control" value="{{ $idps->saran_idp}}">
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label>Daftar Kompetensi</label> <br>
+                                <label> Soft Kompetensi</label>
+                                @foreach ($idps->idpKompetensis->where('kompetensi.jenis_kompetensi', 'Soft Kompetensi') as $kom)
+                                    <div class="accordion border-bottom mb-2 pb-2">
+                                        <button class="accordion-button text-start w-100 d-flex align-items-center"
+                                            onclick="toggleAccordion(this)"
+                                            style="border: none; background: none; padding: 0;">
+                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="kompetensi-nama">{{ $kom->kompetensi->nama_kompetensi }}</span>
+                                        </button>
+
+                                        <div class="accordion-content ps-4 mt-2" style="display: none;">
+                                            <p><span>{{ $kom->kompetensi->keterangan }}</span></p>
+                                            <p><strong>Metode Belajar:</strong>
+                                                @foreach ($kom->metodeBelajars as $metode)
+                                                    <span class="badge badge-info">{{ $metode->nama_metodeBelajar }}</span>
+                                                @endforeach
+                                            </p>
+                                            <p><strong>Sasaran:</strong> <br></span>{!! nl2br(e($kom->sasaran)) !!}</p>
+                                            <p><strong>Aksi:</strong> <br> {!! nl2br(e($kom->aksi)) !!}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label> Hard Kompetensi</label>
+                                @foreach ($idps->idpKompetensis->where('kompetensi.jenis_kompetensi', 'Hard Kompetensi') as $kom)
+                                    <div class="accordion border-bottom mb-2 pb-2">
+                                        <button class="accordion-button text-start w-100 d-flex align-items-center"
+                                            onclick="toggleAccordion(this)"
+                                            style="border: none; background: none; padding: 0;">
+                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="kompetensi-nama">{{ $kom->kompetensi->nama_kompetensi }}</span>
+                                        </button>
+
+                                        <div class="accordion-content ps-4 mt-2" style="display: none;">
+                                            <p><span>{{ $kom->kompetensi->keterangan }}</span></p>
+                                            <p><strong>Metode Belajar:</strong>
+                                                @foreach ($kom->metodeBelajars as $metode)
+                                                    <span class="badge badge-info">{{ $metode->nama_metodeBelajar }}</span>
+                                                @endforeach
+                                            </p>
+                                            <p><strong>Sasaran:</strong> <br></span>{!! nl2br(e($kom->sasaran)) !!}</p>
+                                            <p><strong>Aksi:</strong> <br> {!! nl2br(e($kom->aksi)) !!}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <a class="btn btn-primary" href="{{ route('adminsdm.BehaviorIDP.index') }}">Kembali</a>
+                    </div>
+                </div>
+            </div>
+    </div>
+    </div>
+    </section>
+    </div>
+
+    <script>
+        function toggleAccordion(button) {
+            const content = button.nextElementSibling;
+            const icon = button.querySelector('.accordion-icon');
+            if (content.style.display === "none" || content.style.display === "") {
+                content.style.display = "block";
+                icon.innerHTML = "˅";
+            } else {
+                content.style.display = "none";
+                icon.innerHTML = "›";
+            }
+        }
+    </script>
+
+@endsection
