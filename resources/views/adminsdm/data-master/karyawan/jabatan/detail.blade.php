@@ -13,7 +13,8 @@
                 <h1>Detail Jabatan</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.karyawan.jabatan.index') }}">Data Jabatan</a></div>
+                    <div class="breadcrumb-item active"><a
+                            href="{{ route('adminsdm.data-master.karyawan.jabatan.index') }}">Data Jabatan</a></div>
                     <div class="breadcrumb-item">Detail Jabatan</div>
                 </div>
             </div>
@@ -23,21 +24,23 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="form-group col-12">
-                                    <label>Id Jabatan</label>
-                                    <input readonly type="text" class="form-control"
-                                        value="{{ $jabatan->id_jabatan }}">
-                                </div>
-                                <div class="form-group col-12">
                                     <label>Nama</label>
-                                    <input readonly type="text" class="form-control" value="{{ $jabatan->nama_jabatan }}">
+                                    <input readonly type="text" class="form-control"
+                                        value="{{ $jabatan->nama_jabatan }}">
                                 </div>
                                 <div class="form-group col-12">
                                     <label>Keterangan</label>
                                     <textarea readonly class="form-control" style="height:8rem;">{{ $jabatan->keterangan }}</textarea>
                                 </div>
+                                <div class="form-group col-12">
+                                    <label>Jenjang</label>
+                                    <input readonly type="text" class="form-control"
+                                        value="{{ $jabatan->jenjang->nama_jenjang }}">
+                                </div>
                             </div>
                             <div class="card-footer text-right">
-                                <a class="btn btn-primary float-right" href="{{ route('adminsdm.data-master.karyawan.jabatan.index') }}">Kembali</a>
+                                <a class="btn btn-primary float-right"
+                                    href="{{ route('adminsdm.data-master.karyawan.jabatan.index') }}">Kembali</a>
                             </div>
                         </div>
                     </div>

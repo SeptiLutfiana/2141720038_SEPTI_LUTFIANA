@@ -7,21 +7,25 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Jenjang extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    // Nama tabelnya
-    protected $table = 'jenjangs';
+  // Nama tabelnya
+  protected $table = 'jenjangs';
 
-    // Primary key custom
-    protected $primaryKey = 'id_jenjang';
+  // Primary key custom
+  protected $primaryKey = 'id_jenjang';
 
-    // Field yang boleh diisi massal
-    protected $fillable = [
-        'nama_jenjang',
-        'keterangan',
-    ];
-    public function User()
+  // Field yang boleh diisi massal
+  protected $fillable = [
+    'nama_jenjang',
+    'keterangan',
+  ];
+  public function User()
   {
     return $this->hasOne(User::class, 'id_jenjang');
+  }
+  public function jabatans()
+  {
+    return $this->hasMany(Jabatan::class, 'id_jenjang');
   }
 }

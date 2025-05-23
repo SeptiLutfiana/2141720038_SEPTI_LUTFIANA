@@ -275,14 +275,27 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
 Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
     // SUPERVISOR
     Route::get('/supervisor/dashboard', [SupervisorDashboardController::class, 'index'])->name('supervisor.spv-dashboard');
+     // IDP
+    Route::prefix('supervisor/behavior/idp')->name('supervisor.IDP.')->group(function () {
+        Route::get('/', [IdpController::class, 'indexSupervisor'])->name('indexSupervisor');
+    });
 });
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
     // MENTOR
     Route::get('/mentor/dashboard', [MentorDashboardController::class, 'index'])->name('mentor.dashboard-mentor');
+    // IDP
+    Route::prefix('mentor/behavior/idp')->name('mentor.IDP.')->group(function () {
+        Route::get('/', [IdpController::class, 'indexMentor'])->name('indexMentor');
+    });
 });
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
     // KARYAWAN
     Route::get('/karyawan/dashboard', [KaryawanDashboardController::class, 'index'])->name('karyawan.dashboard-karyawan');
+    // IDP
+    Route::prefix('karyawan/behavior/idp')->name('karyawan.IDP.')->group(function () {
+        Route::get('/', [IdpController::class, 'indexKaryawan'])->name('indexKaryawan');
+        Route::get('/{id}/detail', [IdpController::class, 'showKaryawan'])->name('showKaryawan');
+    });
 });
 // PROFILE
 Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

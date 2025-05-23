@@ -13,6 +13,7 @@ use App\Models\Semester;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class IdpController extends Controller
 {
@@ -104,7 +105,7 @@ class IdpController extends Controller
     {
         $isTemplate = !$request->has('id_user') || empty($request->id_user);
 
-        $request->validate([
+        $commonRules = [
             'id_user' => $isTemplate ? 'nullable' : 'required|array',
             'id_user.*' => 'exists:users,id',
             'id_mentor' => 'nullable|exists:users,id',
@@ -123,121 +124,82 @@ class IdpController extends Controller
             'kompetensi.*.id_metode_belajar.*' => 'exists:metode_belajars,id_metodeBelajar',
             'kompetensi.*.sasaran' => 'required|string',
             'kompetensi.*.aksi' => 'required|string',
-
-        ]);
+        ];
 
         if ($isTemplate) {
-            $request->validate([
-                'id_jenjang' => 'required|exists:jenjangs,id',
-                'id_LG' => 'nullable|exists:learing_groups,id',
-            ]);
+            $templateRules = [
+                'id_jenjang' => 'required|exists:users,id_jenjang',
+                'id_LG' => 'nullable|exists:users,id_LG',
+            ];
+            $request->validate(array_merge($commonRules, $templateRules));
+        } else {
+            $request->validate($commonRules);
+        }
 
+        if ($isTemplate) {
             $query = User::where('id_jenjang', $request->id_jenjang);
             if ($request->filled('id_LG')) {
                 $query->where('id_LG', $request->id_LG);
             }
-
             $users = $query->get();
 
             foreach ($users as $user) {
-                $idp = IDP::create([
-                    'id_user' => $user->id,
-                    'id_mentor' => $request->id_mentor,
-                    'id_supervisor' => $request->id_supervisor,
-                    // 'id_semester' => $request->id_semester,
-                    'proyeksi_karir' => $request->proyeksi_karir,
-                    'waktu_mulai' => $request->waktu_mulai,
-                    'waktu_selesai' => $request->waktu_selesai,
-                    'status_approval_mentor' => 'Disetujui',
-                    'status_pengajuan_idp' => 'Disetujui',
-                    'status_pengerjaan' => 'Menunggu Tindakan',
-                    'is_template' => false,
-                    'saran_idp' => $request->saran_idp,
-                    'deskripsi_idp' => $request->deskripsi_idp,
-                ]);
-
-                if ($request->has('kompetensi')) {
-                    foreach ($request->kompetensi as $item) {
-                        // Validasi data kompetensi
-                        if (empty($item['id_kompetensi']) || empty($item['id_metode_belajar'])) {
-                            continue;
-                        }
-
-                        // Gunakan transaction untuk memastikan data konsisten
-                        DB::transaction(function () use ($idp, $item) {
-                            // Insert ke tabel idp_kompetensis
-                            $idpKompetensiId = DB::table('idp_kompetensis')->insertGetId([
-                                'id_idp' => $idp->id_idp,
-                                'id_kompetensi' => $item['id_kompetensi'],
-                                'sasaran' => $item['sasaran'] ?? '',
-                                'aksi' => $item['aksi'] ?? ''
-                            ]);
-
-                            // Insert metode belajar
-                            foreach ((array)$item['id_metode_belajar'] as $idMetode) {
-                                DB::table('idp_kompetensi_metode_belajars')->insert([
-                                    'id_idpKom' => $idpKompetensiId,
-                                    'id_metodeBelajar' => $idMetode
-                                ]);
-                            }
-                        });
-                    }
-                }
+                DB::transaction(function () use ($user, $request) {
+                    $this->createIdpForUser($user->id, $request);
+                });
             }
 
-            return redirect()->route('admin.BehaviorIDP.index')
+            return redirect()->route('adminsdm.BehaviorIDP.index')
                 ->with('msg-success', 'Berhasil membuat IDP berdasarkan jenjang dan learning group.');
         } else {
             foreach ($request->id_user as $idUser) {
-                $idp = IDP::create([
-                    'id_user' => $idUser,
-                    'id_mentor' => $request->id_mentor,
-                    'id_supervisor' => $request->id_supervisor,
-                    // 'id_semester' => $request->id_semester,
-                    'proyeksi_karir' => $request->proyeksi_karir,
-                    'waktu_mulai' => $request->waktu_mulai,
-                    'waktu_selesai' => $request->waktu_selesai,
-                    'status_approval_mentor' => 'Disetujui',
-                    'status_pengajuan_idp' => 'Disetujui',
-                    'status_pengerjaan' => 'Menunggu Tindakan',
-                    'is_template' => false,
-                    'saran_idp' => $request->saran_idp,
-                    'deskripsi_idp' => $request->deskripsi_idp,
-                ]);
-
-                if ($request->has('kompetensi')) {
-                    foreach ($request->kompetensi as $item) {
-                        // Validasi data kompetensi
-                        if (empty($item['id_kompetensi']) || empty($item['id_metode_belajar'])) {
-                            continue;
-                        }
-
-                        // Gunakan transaction untuk memastikan data konsisten
-                        DB::transaction(function () use ($idp, $item) {
-                            // Insert ke tabel idp_kompetensis
-                            $idpKompetensiId = DB::table('idp_kompetensis')->insertGetId([
-                                'id_idp' => $idp->id_idp,
-                                'id_kompetensi' => $item['id_kompetensi'],
-                                'sasaran' => $item['sasaran'] ?? '',
-                                'aksi' => $item['aksi'] ?? ''
-                            ]);
-
-                            // Insert metode belajar
-                            foreach ((array)$item['id_metode_belajar'] as $idMetode) {
-                                DB::table('idp_kompetensi_metode_belajars')->insert([
-                                    'id_idpKom' => $idpKompetensiId,
-                                    'id_metodeBelajar' => $idMetode
-                                ]);
-                            }
-                        });
-                    }
-                }
+                DB::transaction(function () use ($idUser, $request) {
+                    $this->createIdpForUser($idUser, $request);
+                });
             }
 
             return redirect()->route('adminsdm.BehaviorIDP.index')
                 ->with('msg-success', 'Berhasil membuat IDP untuk karyawan terpilih.');
         }
     }
+    private function createIdpForUser($userId, Request $request)
+    {
+        $idp = IDP::create([
+            'id_user' => $userId,
+            'id_mentor' => $request->id_mentor,
+            'id_supervisor' => $request->id_supervisor,
+            'proyeksi_karir' => $request->proyeksi_karir,
+            'waktu_mulai' => $request->waktu_mulai,
+            'waktu_selesai' => $request->waktu_selesai,
+            'status_approval_mentor' => 'Disetujui',
+            'status_pengajuan_idp' => 'Disetujui',
+            'status_pengerjaan' => 'Menunggu Tindakan',
+            'is_template' => false,
+            'saran_idp' => $request->saran_idp,
+            'deskripsi_idp' => $request->deskripsi_idp,
+        ]);
+
+        foreach ($request->kompetensi as $item) {
+            if (empty($item['id_kompetensi']) || empty($item['id_metode_belajar'])) {
+                continue;
+            }
+
+            $idpKompetensiId = DB::table('idp_kompetensis')->insertGetId([
+                'id_idp' => $idp->id_idp,
+                'id_kompetensi' => $item['id_kompetensi'],
+                'sasaran' => $item['sasaran'],
+                'aksi' => $item['aksi'],
+            ]);
+
+            foreach ($item['id_metode_belajar'] as $idMetode) {
+                DB::table('idp_kompetensi_metode_belajars')->insert([
+                    'id_idpKom' => $idpKompetensiId,
+                    'id_metodeBelajar' => $idMetode,
+                ]);
+            }
+        }
+    }
+
     public function show($id)
     {
         // Mengambil data Divisi berdasarkan ID
@@ -250,6 +212,78 @@ class IdpController extends Controller
         ])->findOrFail($id);
         return view('adminsdm.BehaviorIDP.detail', [
             'idps'    => $idps,
+            'type_menu' => 'idps',
+        ]);
+    }
+    public function indexKaryawan()
+    {
+        $user = Auth::user(); // Ambil user yang sedang login
+
+        $idps = IDP::with([
+            'mentor',
+            'supervisor',
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.metodeBelajars'
+        ])
+            ->where('id_user', $user->id) // Ambil IDP hanya milik user login
+            ->orderByDesc('created_at')
+            ->paginate(10);
+
+        return view('karyawan.idp.index', [
+            'idps' => $idps,
+            'type_menu' => 'idps',
+        ]);
+    }
+    public function showKaryawan($id)
+    {
+        // Mengambil data Divisi berdasarkan ID
+        $idps = IDP::with([
+            'karyawan',      // relasi banyak karyawan jika ada
+            'mentor',
+            'supervisor',
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.metodeBelajars' // relasi kompetensi beserta metode belajar
+        ])->findOrFail($id);
+        return view('karyawan.IDP.detail', [
+            'idps'    => $idps,
+            'type_menu' => 'idps',
+        ]);
+    }
+    public function indexMentor()
+    {
+        $mentorId = Auth::id();
+
+        $idps = IDP::with([
+            'mentor',
+            'supervisor',
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.metodeBelajars'
+        ])
+            ->where('id_mentor', $mentorId)  // pastikan pakai 'id_mentor' sesuai kolom di DB
+            ->orderByDesc('created_at')
+            ->paginate(10);
+
+        return view('mentor.IDP.index', [
+            'idps' => $idps,
+            'type_menu' => 'idps',
+        ]);
+    }
+    public function indexSupervisor()
+    {
+        $supervisorId = Auth::id();
+
+        $idps = IDP::with([
+            'mentor',
+            'supervisor',
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.metodeBelajars'
+        ])
+            ->where('id_supervisor', $supervisorId)  // pastikan pakai 'id_mentor' sesuai kolom di DB
+            ->orderByDesc('created_at')
+            ->paginate(10);
+
+        return view('supervisor.IDP.index', [
+            'idps' => $idps,
             'type_menu' => 'idps',
         ]);
     }

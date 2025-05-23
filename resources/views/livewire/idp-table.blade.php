@@ -18,8 +18,8 @@
                         {{ $loop->iteration + ($idps->currentPage() - 1) * $idps->perPage() }}
                     </td>
                     <td>{{ $idp->proyeksi_karir }}</td>
-                    <td>{{ $idp->karyawan->name }}</td>
-                    <td>{{ $idp->mentor->name }}</td>
+                    <td>{{ optional($idp->karyawan)->name ?? '-' }}</td>
+                    <td>{{ optional($idp->mentor)->name ?? '-' }}</td>
                     <td>{{ $idp->supervisor->name }}</td>
                     <td>{{ $idp->karyawan->learningGroup->nama_LG }}</td>
                     <td class="text-left" style="width: 120px;">
@@ -27,7 +27,8 @@
                             <i class="fas fa-edit"></i> Edit
                         </a>
                         <br>
-                        <a href="{{ route('adminsdm.BehaviorIDP.show', $idp->id_idp)}}" class="btn btn-primary btn-sm mb-1">
+                        <a href="{{ route('adminsdm.BehaviorIDP.show', $idp->id_idp) }}"
+                            class="btn btn-primary btn-sm mb-1">
                             <i class="fas fa-info-circle"></i> Detail
                         </a>
                         <br>

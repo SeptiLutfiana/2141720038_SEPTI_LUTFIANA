@@ -15,7 +15,8 @@
 
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.karyawan.jabatan.index') }}">Jabatan</a></div>
+                    <div class="breadcrumb-item"><a
+                            href="{{ route('adminsdm.data-master.karyawan.jabatan.index') }}">Jabatan</a></div>
                 </div>
             </div>
             <div class="section-body">
@@ -36,7 +37,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4>Data Jabatan</h4>
-                               <div class="card-header-action">
+                                <div class="card-header-action">
                                     <div class="dropdown mr-2">
                                         <button type="button" class="btn btn-danger rounded-pill dropdown-toggle"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -71,12 +72,30 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('adminsdm.data-master.karyawan.jabatan.index') }}" class="mb-3">
-                                    <div class="input-group w-25">
-                                        <input type="text" name="search" class="form-control" placeholder="Cari Jabatan..." value="{{ request('search') }}">
+                                <form method="GET" action="{{ route('adminsdm.data-master.karyawan.jabatan.index') }}"
+                                    class="mb-3">
+                                    <div class="form-row">
+                                        <div class="col-md-3">
+                                            <label>Cari Karyawan</label>
+                                            <input type="text" name="search" class="form-control"
+                                                placeholder="Cari nama karyawan..." value="{{ request('search') }}"
+                                                oninput="this.form.submit()">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Pilih Jenjang</label>
+                                            <select name="id_jenjang" class="form-control" onchange="this.form.submit()">
+                                                <option value="">-- Semua Jenjang --</option>
+                                                @foreach ($listJenjang as $j)
+                                                    <option value="{{ $j->id_jenjang }}"
+                                                        {{ request('id_jenjang') == $j->id_jenjang ? 'selected' : '' }}>
+                                                        {{ $j->nama_jenjang }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
-                                </form>                                
-                                @livewire('jabatan-table', ['search' => request('search')])
+                                </form>
+                                @livewire('jabatan-table', ['search' => request('search'), 'jenjang' => request('id_jenjang')])
                             </div>
                         </div>
                     </div>

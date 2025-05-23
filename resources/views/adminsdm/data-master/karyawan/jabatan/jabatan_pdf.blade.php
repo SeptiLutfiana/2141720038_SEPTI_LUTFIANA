@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Data Jabatan Perum Perhutani</title>
@@ -36,7 +37,8 @@
             margin-top: 10px;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid black;
             padding: 6px;
             text-align: center;
@@ -55,6 +57,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="header-container">
         <img src="{{ public_path('./img/logo-perhutani.png') }}" class="logo" alt="Logo Perhutani">
@@ -66,6 +69,7 @@
             <tr>
                 <th>No</th>
                 <th>Nama Jabatan</th>
+                <th>Jenjang</th>
                 <th>Keterangan</th>
             </tr>
         </thead>
@@ -74,10 +78,13 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td class="text-left">{{ $item->nama_jabatan }}</td>
+                    <td class="text-left">{{ $item->jenjang->nama_jenjang }}</td>
                     <td class="text-left">{{ $item->keterangan }}</td>
+                    <!-- Tampilkan nama jenjang -->
                 </tr>
             @endforeach
         </tbody>
     </table>
 </body>
+
 </html>

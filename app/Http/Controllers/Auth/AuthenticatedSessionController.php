@@ -93,7 +93,7 @@ class AuthenticatedSessionController extends Controller
     // Cek jika role yang dipilih ada di dalam role pengguna
     if (!in_array($newRole, $userRoles)) {
         // Jika role tidak ada dalam role pengguna, tampilkan pesan error dan tetap di halaman yang sama
-        return redirect()->back()->with('error', 'Anda tidak memiliki hak untuk beralih ke role ini.');
+        return redirect()->back()->with('error', 'Kamu tidak memiliki izin untuk mengakses peran ini. Butuh bantuan? Hubungi administrator ya!');
     }
 
     // Pastikan 'id_role' adalah kolom yang valid di tabel 'users'

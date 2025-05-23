@@ -13,14 +13,16 @@ class JabatanExport implements FromArray, WithHeadings, WithEvents, ShouldAutoSi
 {
     public function array(): array
     {
-        $jabatan = Jabatan::select('nama_jabatan', 'keterangan')->get();
+        $jabatan = Jabatan::with('jenjang')->get();
 
         $data = [];
         foreach ($jabatan as $i => $item) {
             $data[] = [
                 'No' => $i + 1,
                 'Nama Jabatan' => $item->nama_jabatan,
+                'Jenjang' => $item->jenjang ? $item->jenjang->nama_jenjang : '-',  // Tambah kolom jenjang
                 'Keterangan' => $item->keterangan,
+
             ];
         }
 
@@ -29,7 +31,7 @@ class JabatanExport implements FromArray, WithHeadings, WithEvents, ShouldAutoSi
 
     public function headings(): array
     {
-        return ['No', 'Nama Jabatan', 'Keterangan'];
+        return ['No', 'Nama Jabatan','Jenjang', 'Keterangan'];
     }
     public function registerEvents(): array
     {

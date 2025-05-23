@@ -1,7 +1,7 @@
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand">
-            <a href="index.html">        
+            <a href="index.html">
                 <img src="{{ asset('img/Logo-MenaraPEFI.png') }}" alt="MENARA PEFI" style="height:40px;">
             </a>
         </div>
@@ -12,249 +12,219 @@
             <li class="menu-header">MENU UTAMA</li>
             <li class="nav-item dropdown {{ $type_menu === 'index' ? 'active' : '' }}">
                 {{-- <a href="{{ url('adminsdm-dashboard') }}" --}}
-                <a href="{{ 
-                Auth::user()->id_role == 1 ? route('adminsdm.dashboard') :
-                (Auth::user()->id_role == 2 ? route('supervisor.spv-dashboard') :
-                (Auth::user()->id_role == 3 ? route('mentor.dashboard-mentor') :
-                (Auth::user()->id_role == 4 ? route('karyawan.dashboard-karyawan') : '#')))
-                }}"
-                    class="nav-link"><i class="fas fa-fire {{ 
-                    (Auth::user()->id_role == 1 && request()->routeIs('adminsdm.dashboard')) || 
-                    (Auth::user()->id_role == 2 && request()->routeIs('supervisor.spv-dashboard'))||
-                    (Auth::user()->id_role == 3 && request()->routeIs('mentor.dashboard-mentor')) || 
-                    (Auth::user()->id_role == 4 && request()->routeIs('karyawan.dashboard-karyawan')) ? 'active' : ''}}"></i><span>Dashboard</span></a>
+                <a href="{{ Auth::user()->id_role == 1
+                    ? route('adminsdm.dashboard')
+                    : (Auth::user()->id_role == 2
+                        ? route('supervisor.spv-dashboard')
+                        : (Auth::user()->id_role == 3
+                            ? route('mentor.dashboard-mentor')
+                            : (Auth::user()->id_role == 4
+                                ? route('karyawan.dashboard-karyawan')
+                                : '#'))) }}"
+                    class="nav-link"><i
+                        class="fas fa-fire {{ (Auth::user()->id_role == 1 && request()->routeIs('adminsdm.dashboard')) ||
+                        (Auth::user()->id_role == 2 && request()->routeIs('supervisor.spv-dashboard')) ||
+                        (Auth::user()->id_role == 3 && request()->routeIs('mentor.dashboard-mentor')) ||
+                        (Auth::user()->id_role == 4 && request()->routeIs('karyawan.dashboard-karyawan'))
+                            ? 'active'
+                            : '' }}"></i><span>Dashboard</span></a>
             </li>
 
             {{-- AdminSDM --}}
             @if (Auth::user()->id_role == 1)
-            <li class="nav-item dropdown {{ $type_menu === 'idps' ? 'active' : '' }}">
-                <a href="#"
-                    class="nav-link has-dropdown"
-                    data-toggle="dropdown"><i class="fas fa-columns"></i> <span>Behavior IDP</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ Request::is('list-idp') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('list-idp') }}">Bank IDP</a>
-                    </li>
-                    <li class="{{ Request::is('admin/datamaster/behavior/idp/create') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/behavior/idp/create') }}">Tambah IDP</a>
-                    </li>
-                    <li class="{{ Request::is('admin/datamaster/behavior/idp') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/behavior/idp') }}">List Perencanaan IDP</a>
-                    </li>
-                    <li class="{{ Request::is('idps') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="#">Riwayat Perencanaan IDP</a>
-                    </li>
-                     <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('panduan-idp') }}">Panduan</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="menu-header">DATA MASTER</li>
-            <li class="nav-item dropdown {{ $type_menu === 'divisi' ? 'active' : '' }}">
-                <a href="#"
-                    class="nav-link has-dropdown"><i class="fas fa-users"></i>
-                    <span>Data Karyawan</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ Request::is('karyawan') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/karyawan') }}">Data Karyawan</a>
-                    </li>
-                    <li class="{{ Request::is('index') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('/admin/datamaster/divisi') }}">Data Divisi</a>
-                    </li>
-                    <li class="{{ Request::is('index') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('/admin/datamaster/jabatan') }}">Data Jabatan</a>
-                    </li>
-                    <li class="{{ Request::is('index') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/angkatanpsp') }}">Angkatan PSP</a>
-                    </li>
-                    <li class="{{ Request::is('admin/datamaster/penempatan') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/penempatan') }}">Penempatan</a>
-                    </li>
-                    <li class="{{ Request::is('admin/datamaster/jenjang') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/jenjang') }}">Jenjang</a>
-                    </li>
-                    <li class="{{ Request::is('admin/datamaster/learning/group') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/learning/group') }}">Learning Group</a>
-                    </li>
-                     <li class="{{ Request::is('admin/datamaster/semester') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/semester') }}">Semester</a>
-                    </li>
-                    <li class="{{ Request::is('admin/datamaster/role') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/role') }}">Role User</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown {{ $type_menu === 'admin/datamaster' ? 'active' : '' }}">
-                <a href="#"
-                    class="nav-link has-dropdown"><i class="far fa-file-alt"></i> <span>Data Kompetensi</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ Request::is('admin/datamaster/kompetensi') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/kompetensi') }}">Data Kompetensi</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown {{ $type_menu === 'metodeBelajar' ? 'active' : '' }}">
-                <a href="#"
-                    class="nav-link has-dropdown"><i class="fas fa-tasks"></i> <span>Data IDP</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ Request::is('admin/datamaster/metode/belajar') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/metode/belajar') }}">Metode Belajar</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown {{ $type_menu === 'supervisor' ? 'active' : '' }}">
-                <a href="#"
-                    class="nav-link has-dropdown"><i class="fas fa-user-tie"></i> <span>Data Supervisor</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ Request::is('admin/datamaster/supervisor') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/supervisor') }}">Supervisor</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown {{ $type_menu === 'mentor' ? 'active' : '' }}">
-                <a href="#"
-                    class="nav-link has-dropdown"><i class="fas fa-chalkboard-teacher"></i> <span>Data Mentor</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ Request::is('admin/datamaster/mentor') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('admin/datamaster/mentor') }}">Mentor</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown {{ $type_menu === 'modules' ? 'active' : '' }}">
-                <a href="#"
-                    class="nav-link has-dropdown"><i class="fas fa-clipboard-check"></i> <span>Data Evaluasi</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ Request::is('modules-calendar') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('modules-calendar') }}">Bank Evaluasi</a>
-                    </li>
-                </ul>
-            </li>
+                <li class="nav-item dropdown {{ $type_menu === 'idps' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
+                            class="fas fa-columns"></i> <span>Behavior IDP</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('list-idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('list-idp') }}">Bank IDP</a>
+                        </li>
+                        <li class="{{ Request::is('admin/datamaster/behavior/idp/create') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/create') }}">Tambah IDP</a>
+                        </li>
+                        <li class="{{ Request::is('admin/datamaster/behavior/idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp') }}">List Perencanaan
+                                IDP</a>
+                        </li>
+                        <li class="{{ Request::is('idps') ? 'active' : '' }}">
+                            <a class="nav-link" href="#">Riwayat Perencanaan IDP</a>
+                        </li>
+                        <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('panduan-idp') }}">Panduan</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-header">DATA MASTER</li>
+                <li class="nav-item dropdown {{ $type_menu === 'divisi' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown"><i class="fas fa-users"></i>
+                        <span>Data Karyawan</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('karyawan') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/karyawan') }}">Data Karyawan</a>
+                        </li>
+                        <li class="{{ Request::is('index') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('/admin/datamaster/divisi') }}">Data Divisi</a>
+                        </li>
+                        <li class="{{ Request::is('index') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('/admin/datamaster/jabatan') }}">Data Jabatan</a>
+                        </li>
+                        <li class="{{ Request::is('index') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/angkatanpsp') }}">Angkatan PSP</a>
+                        </li>
+                        <li class="{{ Request::is('admin/datamaster/penempatan') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/penempatan') }}">Penempatan</a>
+                        </li>
+                        <li class="{{ Request::is('admin/datamaster/jenjang') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/jenjang') }}">Jenjang</a>
+                        </li>
+                        <li class="{{ Request::is('admin/datamaster/learning/group') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/learning/group') }}">Learning Group</a>
+                        </li>
+                        <li class="{{ Request::is('admin/datamaster/semester') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/semester') }}">Semester</a>
+                        </li>
+                        <li class="{{ Request::is('admin/datamaster/role') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/role') }}">Role User</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown {{ $type_menu === 'admin/datamaster' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown"><i class="far fa-file-alt"></i> <span>Data
+                            Kompetensi</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('admin/datamaster/kompetensi') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/kompetensi') }}">Data Kompetensi</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown {{ $type_menu === 'metodeBelajar' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown"><i class="fas fa-tasks"></i> <span>Data
+                            IDP</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('admin/datamaster/metode/belajar') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/metode/belajar') }}">Metode Belajar</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown {{ $type_menu === 'supervisor' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown"><i class="fas fa-user-tie"></i> <span>Data
+                            Supervisor</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('admin/datamaster/supervisor') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/supervisor') }}">Supervisor</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown {{ $type_menu === 'mentor' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown"><i class="fas fa-chalkboard-teacher"></i> <span>Data
+                            Mentor</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('admin/datamaster/mentor') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/mentor') }}">Mentor</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown {{ $type_menu === 'modules' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown"><i class="fas fa-clipboard-check"></i> <span>Data
+                            Evaluasi</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('modules-calendar') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('modules-calendar') }}">Bank Evaluasi</a>
+                        </li>
+                    </ul>
+                </li>
         </ul>
         @endif
-        @if (Auth::user()->id_role == 2)        <!-- Supervisor -->
-        <ul class="sidebar-menu">
-            <li class="nav-item dropdown {{ $type_menu === 'listidp' ? 'active' : '' }}">
-                <a href="#"
-                    class="nav-link has-dropdown"
-                    data-toggle="dropdown"><i class="fas fa-columns"></i> <span>Behavior IDP</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ Request::is('list-idp') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('list-idp') }}">List IDP</a>
-                    </li>
-                    <li class="{{ Request::is('tambah-idp') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('tambah-idp') }}">Tambah IDP</a>
-                    </li>
-                    <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('panduan-idp') }}">Panduan</a>
-                    </li>
-                    <li class="{{ Request::is('layout-top-navigation') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('layout-top-navigation') }}">Riwayat Perencanaan IDP</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        @if (Auth::user()->id_role == 2)
+            <!-- Supervisor -->
+            <ul class="sidebar-menu">
+                <li class="nav-item dropdown {{ $type_menu === 'listidp' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
+                            class="fas fa-columns"></i> <span>Behavior IDP</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('supervisor/behavior/idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('supervisor/behavior/idp') }}">List Perencanaan IDP</a>
+                        </li>
+                        <li class="{{ Request::is('layout-top-navigation') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('layout-top-navigation') }}">Riwayat Perencanaan IDP</a>
+                        </li>
+                        <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('panduan-idp') }}">Panduan</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         @endif
         @if (Auth::user()->id_role == 3)
-        <!-- Mentor -->
-        <ul class="sidebar-menu">
-            <li class="nav-item dropdown {{ $type_menu === 'listidp' ? 'active' : '' }}">
-                <a href="#"
-                    class="nav-link has-dropdown"
-                    data-toggle="dropdown"><i class="fas fa-columns"></i> <span>Behavior IDP</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ Request::is('list-idp') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('list-idp') }}">List IDP</a>
-                    </li>
-                    <li class="{{ Request::is('tambah-idp') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('tambah-idp') }}">Tambah IDP</a>
-                    </li>
-                    <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('panduan-idp') }}">Panduan</a>
-                    </li>
-                    <li class="{{ Request::is('layout-top-navigation') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('layout-top-navigation') }}">Riwayat Perencanaan IDP</a>
-                    </li>
-                </ul>
-            </li>
-            <!-- Menu Evaluasi (Dipisah) -->
-            <li class="nav-item dropdown {{ $type_menu === 'evaluasi' ? 'active' : '' }}">
-                <a href="#" class="nav-link has-dropdown"><i class="fas fa-poll"></i> <span>Evaluasi</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ Request::is('evaluasi-onboarding') ? 'active' : '' }}">
-                        <a href="{{ url('evaluasi-onboarding') }}">Evaluasi On Boarding</a>
-                    </li>
-                    <li class="{{ Request::is('evaluasi-pasca-idp') ? 'active' : '' }}">
-                        <a href="{{ url('evaluasi-pasca-idp') }}">Evaluasi Pasca IDP</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+            <!-- Mentor -->
+            <ul class="sidebar-menu">
+                <li class="nav-item dropdown {{ $type_menu === 'listidp' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
+                            class="fas fa-columns"></i> <span>Behavior IDP</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('mentor/behavior/idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('mentor/behavior/idp') }}">List Perencanaan IDP</a>
+                        </li>
+                        <li class="{{ Request::is('layout-top-navigation') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('layout-top-navigation') }}">Riwayat Perencanaan IDP</a>
+                        </li>
+                        <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('panduan-idp') }}">Panduan</a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- Menu Evaluasi (Dipisah) -->
+                <li class="nav-item dropdown {{ $type_menu === 'evaluasi' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown"><i class="fas fa-poll"></i>
+                        <span>Evaluasi</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('evaluasi-onboarding') ? 'active' : '' }}">
+                            <a href="{{ url('evaluasi-onboarding') }}">Evaluasi On Boarding</a>
+                        </li>
+                        <li class="{{ Request::is('evaluasi-pasca-idp') ? 'active' : '' }}">
+                            <a href="{{ url('evaluasi-pasca-idp') }}">Evaluasi Pasca IDP</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         @endif
         @if (Auth::user()->id_role == 4)
-        <ul class="sidebar-menu">
-            <li class="nav-item dropdown {{ $type_menu === 'listidp' ? 'active' : '' }}">
-                <a href="#"
-                    class="nav-link has-dropdown"
-                    data-toggle="dropdown"><i class="fas fa-columns"></i> <span>Behavior IDP</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ Request::is('list-idp') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('list-idp') }}">Bank IDP</a>
-                    </li>
-                    <li class="{{ Request::is('tambah-idp') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('tambah-idp') }}">Tambah IDP</a>
-                    </li>
-                    <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('panduan-idp') }}">Panduan</a>
-                    </li>
-                    <li class="{{ Request::is('layout-top-navigation') ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ url('layout-top-navigation') }}">Riwayat Perencanaan IDP</a>
-                    </li>
-                </ul>
-            </li>
-            <!-- Menu Evaluasi (Dipisah) -->
-            <li class="nav-item dropdown {{ $type_menu === 'evaluasi' ? 'active' : '' }}">
-                <a href="#" class="nav-link has-dropdown"><i class="fas fa-poll"></i> <span>Evaluasi</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ Request::is('evaluasi-onboarding') ? 'active' : '' }}">
-                        <a href="{{ url('evaluasi-onboarding') }}">Evaluasi On Boarding</a>
-                    </li>
-                    <li class="{{ Request::is('evaluasi-pasca-idp') ? 'active' : '' }}">
-                        <a href="{{ url('evaluasi-pasca-idp') }}">Evaluasi Pasca IDP</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+            <ul class="sidebar-menu">
+                <li class="nav-item dropdown {{ $type_menu === 'listidp' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
+                            class="fas fa-columns"></i> <span>Behavior IDP</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('list-idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('list-idp') }}">Bank IDP</a>
+                        </li>
+                        <li class="{{ Request::is('tambah-idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('tambah-idp') }}">Tambah IDP</a>
+                        </li>
+                        <li class="{{ Request::is('wkaryawan/behavior/idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('karyawan/behavior/idp') }}">List Perencanaan IDP</a>
+                        </li>
+                        <li class="{{ Request::is('layout-top-navigation') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('layout-top-navigation') }}">Riwayat Perencanaan IDP</a>
+                        </li>
+                        <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('panduan-idp') }}">Panduan</a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- Menu Evaluasi (Dipisah) -->
+                <li class="nav-item dropdown {{ $type_menu === 'evaluasi' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown"><i class="fas fa-poll"></i>
+                        <span>Evaluasi</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('evaluasi-onboarding') ? 'active' : '' }}">
+                            <a href="{{ url('evaluasi-onboarding') }}">Evaluasi On Boarding</a>
+                        </li>
+                        <li class="{{ Request::is('evaluasi-pasca-idp') ? 'active' : '' }}">
+                            <a href="{{ url('evaluasi-pasca-idp') }}">Evaluasi Pasca IDP</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         @endif
     </aside>
 </div>

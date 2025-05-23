@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\JabatanExport;
 use App\Imports\JabatanImport;
 use App\Models\Jabatan;
+use App\Models\Jenjang;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -16,12 +17,17 @@ class JabatanController extends Controller
 {
     public function index(Request $request)
     {
+        $id_jenjang = $request->query('id_jenjang');
         $search = $request->query('search');
-
-        $jabatan = Jabatan::when($search, function ($query, $search) {
-            return $query->where('nama_jabatan', 'like', "%$search%")
-                ->orWhere('keterangan', 'like', "%$search%");
-        })
+        $listJenjang = Jenjang::all();
+        $jabatan = Jabatan::with('jenjang') // eager loading relasi jenjang
+            ->when($search, function ($query, $search) {
+                return $query->where('nama_jabatan', 'like', "%$search%")
+                    ->orWhere('keterangan', 'like', "%$search%");
+            })
+            ->when($id_jenjang, function ($query, $id_jenjang) {
+                return $query->where('id_jenjang', $id_jenjang);
+            })
             ->orderBy('nama_jabatan')
             ->paginate(10)
             ->withQueryString(); // agar ?search=... tetap terbawa saat paging
@@ -30,12 +36,16 @@ class JabatanController extends Controller
             'type_menu' => 'jabatan',
             'jabatan' => $jabatan,
             'search' => $search,
+            'listJenjang' => $listJenjang,
+            'id_jenjang' => $id_jenjang,
         ]);
     }
     public function create()
     {
+        $jenjang = Jenjang::all();
         return view('adminsdm.data-master.karyawan.jabatan.create', [
             'type_menu' => 'tambah-jabatan',
+            'jenjang' => $jenjang,
         ]);
     }
     public function store(Request $request)
@@ -46,14 +56,20 @@ class JabatanController extends Controller
             $request->validate([
                 'nama_jabatan' => 'required|string',
                 'keterangan' => 'required|string',
+                'id_jenjang' => 'required|exists:jenjangs,id_jenjang', // validasi jenjang
+
             ], [
                 'nama_jabatan.required' => 'Nama Jabatan harus diisi',
                 'keterangan.required' => 'Keterangan harus diisi',
+                'id_jenjang.required' => 'Jenjang harus dipilih',
+                'id_jenjang.exists' => 'Jenjang tidak valid',
             ]);
 
             Jabatan::create([
                 'nama_jabatan' => $request->nama_jabatan,
                 'keterangan' => $request->keterangan,
+                'id_jenjang' => $request->id_jenjang,
+
             ]);
 
             return redirect()->route('adminsdm.data-master.karyawan.jabatan.index')
@@ -100,9 +116,11 @@ class JabatanController extends Controller
     }
     public function edit($id)
     {
+        $jenjang = Jenjang::all();
         $jabatan = Jabatan::findOrFail($id);
         return view('adminsdm.data-master.karyawan.jabatan.edit', [
             'jabatan'    => $jabatan,
+            'jenjang' => $jenjang,
             'type_menu' => 'jabatan',
         ]);
     }
@@ -112,16 +130,24 @@ class JabatanController extends Controller
         $request->validate([
             'nama_jabatan' => 'required|string',
             'keterangan' => 'required|string',
+            'id_jenjang' => 'required|exists:jenjangs,id_jenjang',
+
         ], [
             'nama_jabatan.required' => 'Nama Jabatan harus diisi',
+            'id_jenjang.required' => 'Jenjang harus dipilih',
+            'id_jenjang.exists' => 'Jenjang tidak valid',
         ]);
 
         // Mengambil data Jabatan berdasarkan ID
         $jabatan = Jabatan::findOrFail($id);
 
         // Melakukan update data jabatan
-        $jabatan->update($request->all());
 
+        $jabatan->update([
+            'nama_jabatan' => $request->nama_jabatan,
+            'keterangan' => $request->keterangan,
+            'id_jenjang' => $request->id_jenjang,
+        ]);
         return redirect()->route('adminsdm.data-master.karyawan.jabatan.index')
             ->with('msg-success', 'Berhasil mengubah data Jabatan ' . $jabatan->nama_jabatan);
     }
@@ -181,12 +207,14 @@ class JabatanController extends Controller
         $table->addRow();
         $table->addCell(1000)->addText("No", ['bold' => true], ['alignment' => 'center']);
         $table->addCell(3000)->addText("Nama Jabatan", ['bold' => true], ['alignment' => 'center']);
+        $table->addCell(5000)->addText("Jenjang", ['bold' => true], ['alignment' => 'center']);
         $table->addCell(5000)->addText("Keterangan", ['bold' => true], ['alignment' => 'center']);
 
         foreach ($jabatan as $i => $item) {
             $table->addRow();
             $table->addCell(1000)->addText($i + 1);
             $table->addCell(3000)->addText($item->nama_jabatan);
+            $table->addCell(5000)->addText($item->jenjang->nama_jenjang);
             $table->addCell(5000)->addText($item->keterangan);
         }
 

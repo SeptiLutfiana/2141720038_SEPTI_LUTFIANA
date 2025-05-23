@@ -9,8 +9,10 @@
                 <h1>Tambah Data Jabatan</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.karyawan.jabatan.index') }}">Data Jabatan</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.karyawan.jabatan.create') }}">Tambah Data Jabatan</a></div>
+                    <div class="breadcrumb-item active"><a
+                            href="{{ route('adminsdm.data-master.karyawan.jabatan.index') }}">Data Jabatan</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.karyawan.jabatan.create') }}">Tambah
+                            Data Jabatan</a></div>
                 </div>
             </div>
 
@@ -33,20 +35,39 @@
                     <div class="card-header">
                         <h4>Tambah Data Jabatan</h4>
                     </div>
-                    <form action="{{ route('adminsdm.data-master.karyawan.jabatan.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('adminsdm.data-master.karyawan.jabatan.store') }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
                             <div class="form-group">
                                 <label>Metode Input</label><br>
-                                <span class="input-option active" id="manual-option" onclick="toggleInputMethod('manual')">Input Manual</span>
-                                <span class="input-option" id="upload-option" onclick="toggleInputMethod('upload')">Upload File</span>
+                                <span class="input-option active" id="manual-option"
+                                    onclick="toggleInputMethod('manual')">Input Manual</span>
+                                <span class="input-option" id="upload-option" onclick="toggleInputMethod('upload')">Upload
+                                    File</span>
                             </div>
-                            <input type="hidden" id="input-method" name="input_manual" value="1"> {{-- Default: manual --}}
+                            <input type="hidden" id="input-method" name="input_manual" value="1">
+                            {{-- Default: manual --}}
                             <!-- Input Manual -->
                             <div id="input-manual">
                                 <div class="form-group">
                                     <label>Nama Jabatan</label>
-                                    <input type="text" name="nama_jabatan" class="form-control @error('nama_jabatan') is-invalid @enderror" value="{{ old('nama_jabatan') }}">
+                                    <input type="text" name="nama_jabatan"
+                                        class="form-control @error('nama_jabatan') is-invalid @enderror"
+                                        value="{{ old('nama_jabatan') }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Jenjang</label>
+                                    <select name="id_jenjang"
+                                        class="form-control @error('id_jenjang') is-invalid @enderror">
+                                        <option value="">-- Pilih Jenjang --</option>
+                                        @foreach ($jenjang as $item)
+                                            <option value="{{ $item->id_jenjang }}"
+                                                {{ old('id_role') == $item->id_jenjang ? 'selected' : '' }}>
+                                                {{ $item->nama_jenjang }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Keterangan</label>
@@ -58,11 +79,14 @@
                             <div id="input-upload" style="display: none;">
                                 <div class="form-group">
                                     <label>Upload File (CSV/XLSX)</label>
-                                    <input type="file" name="file_import" class="form-control @error('file_import') is-invalid @enderror" accept=".xlsx,.csv">
+                                    <input type="file" name="file_import"
+                                        class="form-control @error('file_import') is-invalid @enderror" accept=".xlsx,.csv">
                                     <small class="form-text text-muted">
-                                        Jenis file yang diperbolehkan: <strong>.xlsx</strong>, <strong>.csv</strong>. Ukuran maksimal: <strong>10MB</strong>.
+                                        Jenis file yang diperbolehkan: <strong>.xlsx</strong>, <strong>.csv</strong>. Ukuran
+                                        maksimal: <strong>10MB</strong>.
                                         <br>
-                                        Format Tabel: <strong>no</strong>, <strong>nama_jabatan</strong>, <strong>keterangan</strong>.
+                                        Format Tabel: <strong>no</strong>, <strong>nama_jabatan</strong>,
+                                        <strong>keterangan</strong>.
                                     </small>
                                 </div>
                             </div>
@@ -92,8 +116,8 @@
                     document.getElementById('input-manual').style.display = 'none';
                     document.getElementById('input-upload').style.display = 'block';
                     document.getElementById('input-method').value = ''; // kosongkan supaya tidak masuk logic manual
-                    }
                 }
+            }
         </script>
     @endpush
 @endsection
