@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Halaman Data Kompetensi')
+@section('title', 'Halaman Data Hard Kompetensi')
 @push('style')
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/select.bootstrap4.min.css') }}">
@@ -11,12 +11,12 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Kompetensi</h1>
+                <h1>Data Hard Kompetensi</h1>
 
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
                     <div class="breadcrumb-item"><a
-                            href="{{ route('adminsdm.data-master.kompetensi.index') }}">Kompetensi</a></div>
+                            href="{{ route('adminsdm.data-master.kompetensi.indexHard') }}">Hard Kompetensi</a></div>
                 </div>
             </div>
             <div class="section-body">
@@ -36,7 +36,7 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Data Kompetensi</h4>
+                                <h4>Data Hard Kompetensi</h4>
                                 <div class="card-header-action">
                                     <div class="dropdown mr-2">
                                         <button type="button" class="btn btn-danger rounded-pill dropdown-toggle"
@@ -45,20 +45,20 @@
                                         </button>
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item"
-                                                href="{{ route('adminsdm.data-master.kompetensi.printPdf') }}"
+                                                href="{{ route('adminsdm.data-master.kompetensi.printPdfHard') }}"
                                                 target="_blank">
                                                 <i class="fas fa-file-pdf text-danger"></i> PDF
                                             </a>
                                             <a class="dropdown-item"
-                                                href="{{ route('adminsdm.data-master.kompetensi.exportExcel') }}">
+                                                href="{{ route('adminsdm.data-master.kompetensi.exportExcelHard') }}">
                                                 <i class="fas fa-file-excel text-success"></i> Excel
                                             </a>
                                             <a class="dropdown-item"
-                                                href="{{ route('adminsdm.data-master.kompetensi.exportCSV') }}">
+                                                href="{{ route('adminsdm.data-master.kompetensi.exportCSVHard') }}">
                                                 <i class="fas fa-file-csv text-warning"></i> CSV
                                             </a>
                                             <a class="dropdown-item"
-                                                href="{{ route('adminsdm.data-master.kompetensi.exportDocx') }}">
+                                                href="{{ route('adminsdm.data-master.kompetensi.exportDocxHard') }}">
                                                 <i class="fas fa-file-word text-primary"></i> Word (DOCX)
                                             </a>
                                         </div>
@@ -69,7 +69,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('adminsdm.data-master.kompetensi.index') }}"
+                                <form method="GET" action="{{ route('adminsdm.data-master.kompetensi.indexHard') }}"
                                     class="mb-3">
                                     <div class="form-row">
                                         <div class="col-md-4">
@@ -105,7 +105,7 @@
                                         </div>
                                     </div>
                                 </form>
-                                @livewire('kompetensi-table', [
+                                @livewire('hard-kompetensi-table', [
                                     'search' => request('search'),
                                     'jenis' => request('jenis_kompetensi'),
                                     'jenjang' =>request('jenjang'),

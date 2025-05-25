@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\HardKompetensiExport;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -190,17 +191,24 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
     });
     // Kompetensi
     Route::prefix('admin/datamaster/kompetensi')->name('adminsdm.data-master.kompetensi.')->group(function () {
-        Route::get('/', [KompetensiController::class, 'index'])->name('index');
+        Route::get('/soft', [KompetensiController::class, 'indexSoft'])->name('indexSoft');
+        Route::get('/hard', [KompetensiController::class, 'indexHard'])->name('indexHard');
         Route::get('/create', [KompetensiController::class, 'create'])->name('create');
         Route::post('/store', [KompetensiController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [KompetensiController::class, 'edit'])->name('edit');
         Route::put('/{id}/update', [KompetensiController::class, 'update'])->name('update');
-        Route::get('/{id}/detail', [KompetensiController::class, 'show'])->name('show');
-        Route::delete('/{metodebelajar}', [KompetensiController::class, 'destroy'])->name('destroy');
-        Route::get('/cetak/pdf', [KompetensiController::class, 'printPdf'])->name('printPdf');
-        Route::get('/export/excel', [KompetensiController::class, 'exportExcel'])->name('exportExcel');
-        Route::get('/export/csv', [KompetensiController::class, 'exportCSV'])->name('exportCSV');
-        Route::get('/export/docx', [KompetensiController::class, 'exportDocx'])->name('exportDocx');
+        Route::get('/{id}/detail/soft', [KompetensiController::class, 'showSoft'])->name('showSoft');
+        Route::get('/{id}/detail/hard', [KompetensiController::class, 'showHard'])->name('showHard');
+        Route::delete('/{kompetensi}', [KompetensiController::class, 'destroy'])->name('destroy');
+        Route::get('/cetak/soft/kompetensi/pdf', [KompetensiController::class, 'printPdfSoft'])->name('printPdfSoft');
+        Route::get('/cetak/hard/kompetensi/pdf', [KompetensiController::class, 'printPdfHard'])->name('printPdfHard');
+        Route::get('/export/soft/kompetensi/excel', [KompetensiController::class, 'exportExcelSoft'])->name('exportExcelSoft');
+        Route::get('/export/soft/kompetensi/csv', [KompetensiController::class, 'exportCSVSoft'])->name('exportCSVSoft');
+        Route::get('/export/hard/kompetensi/excel', [KompetensiController::class, 'exportExcelHard'])->name('exportExcelHard');
+        Route::get('/export/hard/kompetensi/csv', [KompetensiController::class, 'exportCSVHard'])->name('exportCSVHard');
+        Route::get('/export/soft/kompetensi/docx', [KompetensiController::class, 'exportDocxSoft'])->name('exportDocxSoft');
+        Route::get('/export/hard/kompetensi/docx', [KompetensiController::class, 'exportDocxHard'])->name('exportDocxHard');
+        Route::get('/get-jabatan-by-jenjang/{id_jenjang}', [KompetensiController::class, 'getJabatanByJenjang'])->name('getJabatanByJenjang');
     });
     // mentor
     Route::prefix('admin/datamaster/mentor')->name('adminsdm.data-master.mentor.')->group(function () {
@@ -275,7 +283,7 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
 Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
     // SUPERVISOR
     Route::get('/supervisor/dashboard', [SupervisorDashboardController::class, 'index'])->name('supervisor.spv-dashboard');
-     // IDP
+    // IDP
     Route::prefix('supervisor/behavior/idp')->name('supervisor.IDP.')->group(function () {
         Route::get('/', [IdpController::class, 'indexSupervisor'])->name('indexSupervisor');
     });

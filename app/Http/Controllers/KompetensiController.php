@@ -2,50 +2,121 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\HardKompetensiExport;
 use App\Exports\KompetensiExport;
 use App\Imports\KompetensiImport;
+use App\Models\Jabatan;
+use App\Models\Jenjang;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Kompetensi;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
+use Illuminate\Support\Carbon;
+use PhpOffice\PhpWord\SimpleType\Jc;
+
 
 class KompetensiController extends Controller
 {
-    public function index(Request $request)
+    public function indexSoft(Request $request)
     {
         $search = $request->query('search');
-        $jenis = $request->query('jenis_kompetensi');
-        $kompetensi = Kompetensi::when($search, function ($query, $search) {
-            return $query->where('nama_kompetensi', 'like', "%$search%")
-                ->orWhere('keterangan', 'like', "%$search%");
-        })
-            ->when($jenis, function ($query, $jenis) {
-                return $query->where('jenis_kompetensi', $jenis);
+        $id_jenjang = $request->query('id_jenjang');
+        $id_jabatan = $request->query('id_jabatan');
+
+        $listJenjang = Jenjang::all();
+        $listJabatan = Jabatan::all();
+
+        $kompetensi = Kompetensi::where('jenis_kompetensi', 'Soft Kompetensi')
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('nama_kompetensi', 'like', "%$search%")
+                        ->orWhere('keterangan', 'like', "%$search%");
+                });
+            })
+            ->when($id_jenjang, function ($query, $id_jenjang) {
+                return $query->where('id_jenjang', $id_jenjang);
+            })
+            ->when($id_jabatan, function ($query, $id_jabatan) {
+                return $query->where('id_jabatan', $id_jabatan);
             })
             ->orderBy('nama_kompetensi')
             ->paginate(10)
-            ->withQueryString(); // agar ?search=... tetap terbawa saat paging
+            ->withQueryString(); // mempertahankan query di pagination
 
-        return view('adminsdm.data-master.kompetensi.index', [
-            'type_menu' => 'kompetensi',
-            'kompetensi' => $kompetensi,
-            'search' => $search,
-            'jenis_kompetensi' => $jenis,
+        return view('adminsdm.data-master.kompetensi.index-soft', [
+            'type_menu'     => 'kompetensi',
+            'kompetensi'    => $kompetensi,
+            'listJenjang'   => $listJenjang,
+            'id_jenjang'    => $id_jenjang,
+            'listJabatan'   => $listJabatan,
+            'id_jabatan'    => $id_jabatan,
+            'search'        => $search,
         ]);
     }
+    public function indexHard(Request $request)
+    {
+        $search = $request->query('search');
+        $id_jenjang = $request->query('id_jenjang');
+        $id_jabatan = $request->query('id_jabatan');
+
+        $listJenjang = Jenjang::all();
+        $listJabatan = Jabatan::all();
+
+        $kompetensi = Kompetensi::where('jenis_kompetensi', 'Hard Kompetensi')
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('nama_kompetensi', 'like', "%$search%")
+                        ->orWhere('keterangan', 'like', "%$search%");
+                });
+            })
+            ->when($id_jenjang, function ($query, $id_jenjang) {
+                return $query->where('id_jenjang', $id_jenjang);
+            })
+            ->when($id_jabatan, function ($query, $id_jabatan) {
+                return $query->where('id_jabatan', $id_jabatan);
+            })
+            ->orderBy('nama_kompetensi')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('adminsdm.data-master.kompetensi.index-hard', [
+            'type_menu'     => 'kompetensi',
+            'kompetensi'    => $kompetensi,
+            'listJenjang'   => $listJenjang,
+            'id_jenjang'    => $id_jenjang,
+            'listJabatan'   => $listJabatan,
+            'id_jabatan'    => $id_jabatan,
+            'search'        => $search,
+        ]);
+    }
+
     public function create()
     {
+        $jenjang = Jenjang::all();
+        $jabatan = Jabatan::all();
+
         return view('adminsdm.data-master.kompetensi.create', [
             'type_menu' => 'tambah-kompetensi',
+            'jenjang' => $jenjang,
+            'jabatan' => $jabatan,
+
         ]);
     }
+    public function getJabatanByJenjang($id_jenjang)
+    {
+        $jabatan = Jabatan::where('id_jenjang', $id_jenjang)->get(['id_jabatan', 'nama_jabatan']);
+        return response()->json($jabatan);
+    }
+
+
     public function store(Request $request)
     {
         // Cek apakah user menggunakan form input manual
         if ($request->filled('input_manual')) {
-            // Validasi untuk input manual
+
+            // Validasi umum
             $request->validate([
                 'nama_kompetensi' => 'required|string',
                 'jenis_kompetensi' => 'required|in:Hard Kompetensi,Soft Kompetensi',
@@ -57,21 +128,40 @@ class KompetensiController extends Controller
                 'keterangan.required' => 'Keterangan harus diisi',
             ]);
 
-            Kompetensi::create([
+            // Validasi tambahan jika jenis adalah Hard Kompetensi
+            if ($request->jenis_kompetensi === 'Hard Kompetensi') {
+                $request->validate([
+                    'id_jenjang' => 'required|exists:jenjangs,id_jenjang',
+                    'id_jabatan' => 'required|exists:jabatans,id_jabatan',
+                ], [
+                    'id_jenjang.required' => 'Jenjang harus dipilih',
+                    'id_jenjang.exists' => 'Jenjang tidak valid',
+                    'id_jabatan.required' => 'Jabatan harus dipilih',
+                    'id_jabatan.exists' => 'Jabatan tidak valid',
+                ]);
+            }
+
+            $kompetensi = Kompetensi::create([
+                'id_jenjang' => $request->jenis_kompetensi === 'Hard Kompetensi' ? $request->id_jenjang : null,
+                'id_jabatan' => $request->jenis_kompetensi === 'Hard Kompetensi' ? $request->id_jabatan : null,
                 'nama_kompetensi' => $request->nama_kompetensi,
                 'jenis_kompetensi' => $request->jenis_kompetensi,
                 'keterangan' => $request->keterangan,
             ]);
 
-            return redirect()->route('adminsdm.data-master.kompetensi.index')
-                ->with('msg-success', 'Berhasil menambahkan data ' . $request->nama_kompetensi);
+            if ($kompetensi->jenis_kompetensi === 'Soft Kompetensi') {
+                return redirect()->route('adminsdm.data-master.kompetensi.indexSoft')
+                    ->with('msg-success', 'Soft Kompetensi ' . $request->nama_kompetensi . ' Berhasil Ditambahkan');
+            } else {
+                return redirect()->route('adminsdm.data-master.kompetensi.indexHard')
+                    ->with('msg-success', 'Hard Kompetensi ' . $request->nama_kompetensi . ' Berhasil Ditambahkan');
+            }
         }
 
         // Jika user memilih upload file
         if ($request->hasFile('file_import')) {
-            // Validasi file upload (CSV atau XLSX dengan ukuran maksimal 10MB)
             $request->validate([
-                'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maksimal 10MB
+                'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maks 10MB
             ], [
                 'file_import.required' => 'File harus diupload.',
                 'file_import.mimes' => 'File harus berformat .xlsx atau .csv.',
@@ -79,128 +169,171 @@ class KompetensiController extends Controller
             ]);
 
             try {
-                // Proses impor data dari file (gunakan paket Laravel Excel)
                 Excel::import(new KompetensiImport, $request->file('file_import'));
 
                 return redirect()->route('adminsdm.data-master.kompetensi.index')
                     ->with('msg-success', 'Berhasil mengimpor data kompetensi dari file.');
             } catch (\Exception $e) {
-                // Jika ada error saat mengimpor, tangani dan tampilkan pesan error
                 return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
             }
         }
 
-        // Kalau tidak ada data input manual atau upload file
         return redirect()->back()->with('msg-error', 'Tidak ada data yang dikirim.');
     }
-
-
-    public function show($id)
+    public function showSoft($id)
     {
         $kompetensi = Kompetensi::findOrFail($id);
 
-        return view('adminsdm.data-master.kompetensi.detail', [
+        return view('adminsdm.data-master.kompetensi.detail-soft', [
+            'kompetensi'    => $kompetensi,
+            'type_menu' => 'kompetensi',
+        ]);
+    }
+    public function showHard($id)
+    {
+        $kompetensi = Kompetensi::findOrFail($id);
+
+        return view('adminsdm.data-master.kompetensi.detail-hard', [
             'kompetensi'    => $kompetensi,
             'type_menu' => 'kompetensi',
         ]);
     }
     public function edit($id)
     {
+        $jenjang = Jenjang::all();
+        $jabatan = Jabatan::all();
         $kompetensi = Kompetensi::findOrFail($id);
         return view('adminsdm.data-master.kompetensi.edit', [
             'kompetensi'    => $kompetensi,
+            'jenjang' => $jenjang,
+            'jabatan' => $jabatan,
             'type_menu' => 'kompetensi',
         ]);
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'nama_kompetensi' => 'required|string',
-            'jenis_kompetensi' => 'required|in:Hard Kompetensi,Soft Kompetensi',
-            'keterangan' => 'required|string',
-        ], [
-            'nama_kompetensi.required' => 'Nama semester harus diisi',
-        ]);
-
         $kompetensi = Kompetensi::findOrFail($id);
 
-        $kompetensi->update($request->all());
+        $baseRules = [
+            'nama_kompetensi' => 'required|string',
+            'keterangan' => 'required|string',
+        ];
 
-        return redirect()->route('adminsdm.data-master.kompetensi.index')
-            ->with('msg-success', 'Berhasil mengubah data  ' . $kompetensi->nama_kompetensi);
+        if ($kompetensi->jenis_kompetensi === 'Hard Kompetensi') {
+            $baseRules['id_jenjang'] = 'required|exists:jenjangs,id_jenjang';
+            $baseRules['id_jabatan'] = 'required|exists:jabatans,id_jabatan';
+        }
+
+        $validated = $request->validate($baseRules);
+
+        // Update berdasarkan jenis
+        if ($kompetensi->jenis_kompetensi === 'Hard Kompetensi') {
+            $kompetensi->update($validated);
+        } else {
+            $kompetensi->update([
+                'nama_kompetensi' => $validated['nama_kompetensi'],
+                'keterangan' => $validated['keterangan'],
+            ]);
+        }
+
+        // Redirect ke index yang sesuai
+        $route = $kompetensi->jenis_kompetensi === 'Soft Kompetensi'
+            ? 'adminsdm.data-master.kompetensi.indexSoft'
+            : 'adminsdm.data-master.kompetensi.indexHard';
+
+        return redirect()->route($route)
+            ->with('msg-success', $kompetensi->jenis_kompetensi . ' ' . $kompetensi->nama_kompetensi . ' berhasil diperbarui.');
     }
-
 
     public function destroy(Kompetensi $kompetensi)
     {
-        $kompetensi->delete();
-        return redirect()->route('adminsdm.data-master.kompetensi.index')->with('msg-success', 'Berhasil menghapus data  ' . $kompetensi->nama_kompetensi);
-    }
-    public function printPdf()
-    {
-        $kompetensi = Kompetensi::all(); // Atau filter sesuai kebutuhan
-        $pdf = Pdf::loadView('adminsdm.data-master.kompetensi.kompetensi_pdf', [
-            'kompetensi' => $kompetensi,
-            'type_menu' => 'kompetensi',
-        ]);
-        return $pdf->stream('kompetensi.pdf'); // atau ->download('learning-group.pdf')
-    }
-    public function exportExcel()
-    {
-        return Excel::download(new KompetensiExport, 'data-kompetensi.xlsx');
+        $nama = $kompetensi->nama_kompetensi;
+        $jenis = $kompetensi->jenis_kompetensi;
+
+        $kompetensi->delete(); // Hapus setelah ambil data penting
+
+        if ($jenis === 'Soft Kompetensi') {
+            return redirect()->route('adminsdm.data-master.kompetensi.indexSoft')
+                ->with('msg-success', 'Soft Kompetensi ' . $nama . ' berhasil dihapus.');
+        } else {
+            return redirect()->route('adminsdm.data-master.kompetensi.indexHard')
+                ->with('msg-success', 'Hard Kompetensi ' . $nama . ' berhasil dihapus.');
+        }
     }
 
-    public function exportCSV()
+    public function printPdfSoft()
     {
-        return Excel::download(new KompetensiExport, 'data-kompetensi.csv');
+        $kompetensi = Kompetensi::where('jenis_kompetensi', 'Soft Kompetensi')->get();
+        $waktuCetak = Carbon::now()->translatedFormat('d F Y H:i');
+        $pdf = Pdf::loadView('adminsdm.data-master.kompetensi.soft-kompetensi-pdf', [
+            'kompetensi' => $kompetensi,
+            'waktuCetak' => $waktuCetak,
+            'jenis' => 'Soft Kompetensi',
+            'type_menu' => 'kompetensi',
+        ]);
+        return $pdf->stream('soft-kompetensi.pdf'); // atau ->download('learning-group.pdf')
     }
-    public function exportDocx()
+    public function printPdfHard()
+    {
+        $kompetensi = Kompetensi::where('jenis_kompetensi', 'Hard Kompetensi')->get();
+        $waktuCetakHard = Carbon::now()->translatedFormat('d F Y H:i');
+        $pdf = Pdf::loadView('adminsdm.data-master.kompetensi.hard-kompetensi-pdf', [
+            'kompetensi' => $kompetensi,
+            'jenis' => 'Hard Kompetensi',
+            'waktuCetakHard' => $waktuCetakHard,
+            'type_menu' => 'kompetensi',
+        ]);
+        return $pdf->stream('hard-kompetensi.pdf'); // atau ->download('learning-group.pdf')
+    }
+    public function exportExcelSoft()
+    {
+        return Excel::download(new KompetensiExport, 'data-soft-kompetensi.xlsx');
+    }
+
+    public function exportCSVSoft()
+    {
+        return Excel::download(new KompetensiExport, 'data-soft-kompetensi.csv');
+    }
+    public function exportExcelHard()
+    {
+        return Excel::download(new HardKompetensiExport, 'data-hard-kompetensi.xlsx');
+    }
+
+    public function exportCSVHard()
+    {
+        return Excel::download(new HardKompetensiExport, 'data-hard-kompetensi.csv');
+    }
+    public function exportDocxSoft()
     {
         $kompetensi = Kompetensi::all();
-        $hardKompetensi = $kompetensi->where('jenis_kompetensi', 'Hard Kompetensi');
         $softKompetensi = $kompetensi->where('jenis_kompetensi', 'Soft Kompetensi');
 
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
 
-        // Tambahkan logo
-        $section->addImage(public_path('./img/logo-perhutani.png'), [
-            'width' => 100,
-            'height' => 100,
+        // === Gunakan Tabel untuk logo dan judul ===
+        $headerTable = $section->addTable();
+        $headerTable->addRow();
+
+        // Kolom 1: Logo
+        $cellLogo = $headerTable->addCell(1500); // Lebar disesuaikan
+        $cellLogo->addImage(public_path('./img/logo-perhutani.png'), [
+            'width' => 80,
+            'height' => 80,
             'wrappingStyle' => 'square',
-            'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::LEFT,
+            'alignment' => Jc::LEFT,
         ]);
 
-        $section->addTextBreak(1);
-
-        // Judul
-        $section->addText('Data Kompetensi Individual Development Plan Perum Perhutani', ['bold' => true, 'size' => 16], ['alignment' => 'center']);
-        $section->addTextBreak(1);
-
-        // ==== Hard Competency ====
-        $section->addText('Hard Kompetensi', ['bold' => true, 'size' => 14]);
-        $table = $section->addTable([
-            'borderSize' => 6,
-            'borderColor' => '000000',
-            'cellMargin' => 80,
-        ]);
-        $table->addRow();
-        $table->addCell(1000)->addText("No", ['bold' => true], ['alignment' => 'center']);
-        $table->addCell(3000)->addText("Nama Kompetensi", ['bold' => true], ['alignment' => 'center']);
-        $table->addCell(3000)->addText("Jenis Kompetensi", ['bold' => true], ['alignment' => 'center']);
-        $table->addCell(5000)->addText("Keterangan", ['bold' => true], ['alignment' => 'center']);
-
-        foreach ($hardKompetensi->values() as $i => $item) {
-            $table->addRow();
-            $table->addCell(1000)->addText($i + 1); // Akan selalu mulai dari 1
-            $table->addCell(3000)->addText($item->nama_kompetensi);
-            $table->addCell(3000)->addText($item->jenis_kompetensi);
-            $table->addCell(5000)->addText($item->keterangan);
-        }
+        // Kolom 2: Judul
+        $cellTitle = $headerTable->addCell(8000); // Lebar disesuaikan
+        $cellTitle->addText(
+            'Data Soft Kompetensi Individual Development Plan Perum Perhutani',
+            ['bold' => true, 'size' => 16],
+            ['alignment' => Jc::CENTER]
+        );
 
         $section->addTextBreak(1);
-
         // ==== Soft Competency ====
         $section->addText('Soft Kompetensi', ['bold' => true, 'size' => 14]);
         $table = $section->addTable([
@@ -211,18 +344,79 @@ class KompetensiController extends Controller
         $table->addRow();
         $table->addCell(1000)->addText("No", ['bold' => true]);
         $table->addCell(3000)->addText("Nama Kompetensi", ['bold' => true]);
-        $table->addCell(3000)->addText("Jenis Kompetensi", ['bold' => true]);
         $table->addCell(5000)->addText("Keterangan", ['bold' => true]);
 
         foreach ($softKompetensi->values() as $i => $item) {
             $table->addRow();
             $table->addCell(1000)->addText($i + 1); // Akan mulai dari 1 juga
             $table->addCell(3000)->addText($item->nama_kompetensi);
-            $table->addCell(3000)->addText($item->jenis_kompetensi);
             $table->addCell(5000)->addText($item->keterangan);
         }
 
-        $fileName = 'kompetensi.docx';
+        $fileName = 'soft-kompetensi.docx';
+        $tempFile = tempnam(sys_get_temp_dir(), $fileName);
+        $writer = IOFactory::createWriter($phpWord, 'Word2007');
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
+    }
+    public function exportDocxHard()
+    {
+        $hardKompetensi = Kompetensi::with('jenjang', 'jabatan')
+            ->where('jenis_kompetensi', 'Hard Kompetensi')
+            ->get(); // <= ini penting agar menjadi Collection
+
+
+        $phpWord = new PhpWord();
+        $section = $phpWord->addSection();
+
+        // === Gunakan Tabel untuk logo dan judul ===
+        $headerTable = $section->addTable();
+        $headerTable->addRow();
+
+        // Kolom 1: Logo
+        $cellLogo = $headerTable->addCell(1500); // Lebar disesuaikan
+        $cellLogo->addImage(public_path('./img/logo-perhutani.png'), [
+            'width' => 80,
+            'height' => 80,
+            'wrappingStyle' => 'square',
+            'alignment' => Jc::LEFT,
+        ]);
+
+        // Kolom 2: Judul
+        $cellTitle = $headerTable->addCell(8000); // Lebar disesuaikan
+        $cellTitle->addText(
+            'Data Soft Kompetensi Individual Development Plan Perum Perhutani',
+            ['bold' => true, 'size' => 16],
+            ['alignment' => Jc::CENTER]
+        );
+
+        $section->addTextBreak(1);
+
+        // Judul
+        // ==== Hard Competency ====
+        $section->addText('Hard Kompetensi', ['bold' => true, 'size' => 14]);
+        $table = $section->addTable([
+            'borderSize' => 6,
+            'borderColor' => '000000',
+            'cellMargin' => 80,
+        ]);
+        $table->addRow();
+        $table->addCell(1000)->addText("No", ['bold' => true], ['alignment' => 'center']);
+        $table->addCell(3000)->addText("Nama Kompetensi", ['bold' => true], ['alignment' => 'center']);
+        $table->addCell(3000)->addText("Jenjang", ['bold' => true], ['alignment' => 'center']);
+        $table->addCell(3000)->addText("Jabatan", ['bold' => true], ['alignment' => 'center']);
+        $table->addCell(5000)->addText("Keterangan", ['bold' => true], ['alignment' => 'center']);
+
+        foreach ($hardKompetensi->values() as $i => $item) {
+            $table->addRow();
+            $table->addCell(1000)->addText($i + 1); // Akan selalu mulai dari 1
+            $table->addCell(3000)->addText($item->nama_kompetensi);
+            $table->addCell(3000)->addText($item->jenjang->nama_jenjang);
+            $table->addCell(3000)->addText($item->jabatan->nama_jabatan);
+            $table->addCell(5000)->addText($item->keterangan);
+        }
+        $fileName = 'hard-kompetensi.docx';
         $tempFile = tempnam(sys_get_temp_dir(), $fileName);
         $writer = IOFactory::createWriter($phpWord, 'Word2007');
         $writer->save($tempFile);

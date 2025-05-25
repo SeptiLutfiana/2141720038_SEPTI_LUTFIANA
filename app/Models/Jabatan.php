@@ -30,4 +30,8 @@ class Jabatan extends Model
   {
     return $this->belongsTo(Jenjang::class, 'id_jenjang');
   }
+  public function kompetensis()
+  {
+    return $this->hasMany(Kompetensi::class, 'id_jabatan', 'id_jabatan');
+  }
 }

@@ -28,4 +28,8 @@ class Jenjang extends Model
   {
     return $this->hasMany(Jabatan::class, 'id_jenjang');
   }
+  public function kompetensis()
+{
+    return $this->hasMany(Kompetensi::class, 'id_jenjang', 'id_jenjang');
+}
 }

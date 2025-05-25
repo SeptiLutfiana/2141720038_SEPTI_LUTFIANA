@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Data Kompetensi IDP Perum Perhutani</title>
+    <title>Data Hard Kompetensi IDP Perum Perhutani</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,17 +66,17 @@
 <body>
     <div class="header-container">
         <img src="{{ public_path('./img/logo-perhutani.png') }}" class="logo" alt="Logo Perhutani">
-        <div class="title">Data Kompetensi <br>Individual Development Plan <br> Perum Perhutani</div>
+        <div class="title">Data Hard Kompetensi <br>Individual Development Plan <br> Perum Perhutani</div>
     </div>
 
     {{-- Tabel Hard Competency --}}
-    <h3>Hard Competency</h3>
     <table>
         <thead>
             <tr>
                 <th>No</th>
                 <th>Nama Kompetensi</th>
-                <th>Jenis Kompetensi</th>
+                <th>Jenjang</th>
+                <th>Jabatan</th>
                 <th>Keterangan</th>
             </tr>
         </thead>
@@ -86,36 +86,16 @@
                 <tr>
                     <td>{{ $no++ }}</td>
                     <td class="text-left">{{ $item->nama_kompetensi }}</td>
-                    <td class="text-left">{{ ucfirst($item->jenis_kompetensi) }}</td>
+                    <td class="text-left">{{ $item->jenjang->nama_jenjang }}</td>
+                    <td class="text-left">{{ $item->jabatan->nama_jabatan }}</td>
                     <td class="text-left">{{ $item->keterangan }}</td>
                 </tr>
             @endforeach
         </tbody>
     </table>
-
-    {{-- Tabel Soft Competency --}}
-    <h3>Soft Competency</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama Kompetensi</th>
-                <th>Jenis Kompetensi</th>
-                <th>Keterangan</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php $no = 1; @endphp
-            @foreach ($kompetensi->where('jenis_kompetensi', 'Soft Kompetensi') as $item)
-                <tr>
-                    <td>{{ $no++ }}</td>
-                    <td class="text-left">{{ $item->nama_kompetensi }}</td>
-                    <td class="text-left">{{ ucfirst($item->jenis_kompetensi) }}</td>
-                    <td class="text-left">{{ $item->keterangan }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <p style="text-align: right; font-size: 10px; margin-top: 20px;">
+        Dicetak pada: {{ $waktuCetakHard }}
+    </p>
 </body>
 
 </html>

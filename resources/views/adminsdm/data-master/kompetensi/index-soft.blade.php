@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Halaman Data Kompetensi')
+@section('title', 'Halaman Data Soft Kompetensi')
 @push('style')
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/select.bootstrap4.min.css') }}">
@@ -11,12 +11,12 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Kompetensi</h1>
+                <h1> Data Soft Kompetensi</h1>
 
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
                     <div class="breadcrumb-item"><a
-                            href="{{ route('adminsdm.data-master.kompetensi.index') }}">Kompetensi</a></div>
+                            href="{{ route('adminsdm.data-master.kompetensi.indexSoft') }}">Soft Kompetensi</a></div>
                 </div>
             </div>
             <div class="section-body">
@@ -36,7 +36,7 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Data Kompetensi</h4>
+                                <h4>Data Soft Kompetensi</h4>
                                 <div class="card-header-action">
                                     <div class="dropdown mr-2">
                                         <button type="button" class="btn btn-danger rounded-pill dropdown-toggle"
@@ -45,20 +45,20 @@
                                         </button>
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item"
-                                                href="{{ route('adminsdm.data-master.kompetensi.printPdf') }}"
+                                                href="{{ route('adminsdm.data-master.kompetensi.printPdfSoft') }}"
                                                 target="_blank">
                                                 <i class="fas fa-file-pdf text-danger"></i> PDF
                                             </a>
                                             <a class="dropdown-item"
-                                                href="{{ route('adminsdm.data-master.kompetensi.exportExcel') }}">
+                                                href="{{ route('adminsdm.data-master.kompetensi.exportExcelSoft') }}">
                                                 <i class="fas fa-file-excel text-success"></i> Excel
                                             </a>
                                             <a class="dropdown-item"
-                                                href="{{ route('adminsdm.data-master.kompetensi.exportCSV') }}">
+                                                href="{{ route('adminsdm.data-master.kompetensi.exportCSVSoft') }}">
                                                 <i class="fas fa-file-csv text-warning"></i> CSV
                                             </a>
                                             <a class="dropdown-item"
-                                                href="{{ route('adminsdm.data-master.kompetensi.exportDocx') }}">
+                                                href="{{ route('adminsdm.data-master.kompetensi.exportDocxSoft') }}">
                                                 <i class="fas fa-file-word text-primary"></i> Word (DOCX)
                                             </a>
                                         </div>
@@ -69,7 +69,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('adminsdm.data-master.kompetensi.index') }}"
+                                <form method="GET" action="{{ route('adminsdm.data-master.kompetensi.indexSoft') }}"
                                     class="mb-3">
                                     <div class="form-row">
                                         <div class="col-md-4">
@@ -78,37 +78,10 @@
                                                 placeholder="Cari nama kompetensi..." value="{{ request('search') }}"
                                                 oninput="this.form.submit()">
                                         </div>
-                                        <div class="col-md-3">
-                                            <label>Pilih Jenis Kompetensi</label>
-                                            <select name="jenis_kompetensi" class="form-control"
-                                                onchange="this.form.submit()">
-                                                <option value="">-- All Kompetensi --</option>
-                                                <option value="Hard Kompetensi"
-                                                    {{ request('jenis_kompetensi') == 'Hard Kompetensi' ? 'selected' : '' }}>
-                                                    Hard Kompetensi</option>
-                                                <option value="Soft Kompetensi"
-                                                    {{ request('jenis_kompetensi') == 'Soft Kompetensi' ? 'selected' : '' }}>
-                                                    Soft Kompetensi</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label>Pilih Jenjang</label>
-                                            <select name="id_jenjang" class="form-control" onchange="this.form.submit()">
-                                                <option value="">-- Semua Jenjang --</option>
-                                                @foreach ($listJenjang as $j)
-                                                    <option value="{{ $j->id_jenjang }}"
-                                                        {{ request('id_jenjang') == $j->id_jenjang ? 'selected' : '' }}>
-                                                        {{ $j->nama_jenjang }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
                                     </div>
                                 </form>
                                 @livewire('kompetensi-table', [
                                     'search' => request('search'),
-                                    'jenis' => request('jenis_kompetensi'),
-                                    'jenjang' =>request('jenjang'),
                                 ])
                             </div>
                         </div>

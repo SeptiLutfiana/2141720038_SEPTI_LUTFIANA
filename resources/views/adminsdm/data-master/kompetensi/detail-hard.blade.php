@@ -22,22 +22,27 @@
                     <div class="col-12 col-md-12">
                         <div class="card">
                             <div class="card-body">
-                                <div class="form-group col-12">
-                                    <label>Id Kompetensi</label>
+                                 <div class="form-group col-12">
+                                    <label>Jenjang</label>
                                     <input readonly type="text" class="form-control"
-                                        value="{{ $kompetensi->id_kompetensi }}">
+                                        value="{{ $kompetensi->jenjang->nama_jenjang ?? '-'  }}">
+                                </div>
+                                 <div class="form-group col-12">
+                                    <label>Jabatan</label>
+                                    <input readonly type="text" class="form-control"
+                                        value="{{ $kompetensi->jabatan->nama_jabatan ?? '-' }}">
                                 </div>
                                 <div class="form-group col-12">
                                     <label>Nama Kompetensi</label>
-                                    <input readonly type="text" class="form-control" value="{{ $kompetensi->nama_kompetensi }}">
+                                    <input readonly type="text" class="form-control" value="{{ $kompetensi->nama_kompetensi ?? '-'  }}">
                                 </div>
                                 <div class="form-group col-12">
                                     <label>Jenis Kompetensi</label>
-                                    <input readonly type="text" class="form-control" value="{{ $kompetensi->jenis_kompetensi}}">
+                                    <input readonly type="text" class="form-control" value="{{ $kompetensi->jenis_kompetensi ?? '-' }}">
                                 </div>
                                 <div class="form-group col-12">
                                     <label>Keterangan</label>
-                                    <textarea readonly class="form-control" style="height:8rem;">{{ $kompetensi->keterangan }}</textarea>
+                                    <textarea readonly class="form-control" style="height:8rem;">{{ $kompetensi->keterangan ?? '-'  }}</textarea>
                                 </div>
                             </div>
                             <div class="card-footer text-right">

@@ -6,7 +6,7 @@ use App\Models\Kompetensi;
 use Livewire\WithPagination;
 use Livewire\Component;
 
-class KompetensiTable extends Component
+class HardKompetensiTable extends Component
 {
     use WithPagination;
 
@@ -16,24 +16,16 @@ class KompetensiTable extends Component
     public $jabatan;
     protected string $paginationTheme = 'bootstrap';
     protected $updatesQueryString = ['search'];
-
+    
     public function mount()
     {
-        // Mengambil search query dari URL
-        $this->search = request()->query('search');
+        // Ambil search dari URL
+        $this->search = request()->query('search', '');
     }
-    public function deleteId($id)
-    {
-        if ($kompetensi = Kompetensi::find($id)) {
-            $kompetensi->delete();
-            session()->flash('msg-success', 'Kompetensi berhasil dihapus');
-        } else {
-            session()->flash('msg-error', 'Kompetensi tidak ditemukan');
-        }
-    }
+
     public function render()
     {
-        $kompetensi = Kompetensi::where('jenis_kompetensi', 'Soft Kompetensi') // filter soft saja
+        $kompetensi = Kompetensi::where('jenis_kompetensi', 'Hard Kompetensi')
             ->when($this->search, function ($query) {
                 return $query->where('nama_kompetensi', 'like', "%{$this->search}%")
                     ->orWhere('keterangan', 'like', "%{$this->search}%");
@@ -48,8 +40,14 @@ class KompetensiTable extends Component
             ->paginate(5)
             ->withQueryString();
 
-        return view('livewire.kompetensi-table', [
-            'kompetensi' => $kompetensi,
+        return view('livewire.hard-kompetensi-table', [
+            'kompetensi' => $kompetensi, // <-- WAJIB dikirim ke view!
         ]);
+    }
+
+    public function updatingSearch()
+    {
+        // Reset halaman pagination jika search berubah
+        $this->resetPage();
     }
 }

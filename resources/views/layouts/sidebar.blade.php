@@ -88,12 +88,22 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item dropdown {{ $type_menu === 'admin/datamaster' ? 'active' : '' }}">
+                <li class="nav-item dropdown {{ $type_menu === 'admin/datamaster/kompetensi' ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown"><i class="far fa-file-alt"></i> <span>Data
                             Kompetensi</span></a>
                     <ul class="dropdown-menu">
+                        <li class="{{ Request::is('admin/datamaster/kompetensi/soft') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/kompetensi/soft') }}">Soft Kompetensi</a>
+                        </li>
+                    </ul>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('admin/datamaster/kompetensi/hard') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/kompetensi/hard') }}">Hard Kompetensi</a>
+                        </li>
+                    </ul>
+                    <ul class="dropdown-menu">
                         <li class="{{ Request::is('admin/datamaster/kompetensi') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('admin/datamaster/kompetensi') }}">Data Kompetensi</a>
+                            <a class="nav-link" href="{{ url('admin/datamaster/kompetensi/create') }}">Tambah Kompetensi</a>
                         </li>
                     </ul>
                 </li>
