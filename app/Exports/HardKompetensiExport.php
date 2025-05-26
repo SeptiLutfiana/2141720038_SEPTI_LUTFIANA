@@ -15,8 +15,12 @@ class HardKompetensiExport implements FromArray, WithHeadings, WithEvents, Shoul
     {
         $kompetensi = Kompetensi::with(['jenjang', 'jabatan'])
             ->where('jenis_kompetensi', 'Hard Kompetensi')
-            ->get();
-
+            ->get()
+            ->sortBy([
+            fn($a, $b) => $a->jenjang->nama_jenjang <=> $b->jenjang->nama_jenjang,
+            fn($a, $b) => $a->jabatan->nama_jabatan <=> $b->jabatan->nama_jabatan,
+            fn($a, $b) => $a->nama_kompetensi <=> $b->nama_kompetensi,
+        ]);
         $data = [];
         foreach ($kompetensi as $i => $item) {
             $data[] = [

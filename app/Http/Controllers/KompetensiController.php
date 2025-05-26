@@ -75,9 +75,6 @@ class KompetensiController extends Controller
             ->when($id_jenjang, function ($query, $id_jenjang) {
                 return $query->where('id_jenjang', $id_jenjang);
             })
-            ->when($id_jabatan, function ($query, $id_jabatan) {
-                return $query->where('id_jabatan', $id_jabatan);
-            })
             ->orderBy('nama_kompetensi')
             ->paginate(10)
             ->withQueryString();
@@ -169,17 +166,17 @@ class KompetensiController extends Controller
                 $countHard = 0;
                 $countSoft = 0;
                 foreach ($collection as $row) {
-                $jenisRaw = $row['jenis_kompetensi'] ?? '';
-                $jenis = ucwords(strtolower(trim($jenisRaw)));
+                    $jenisRaw = $row['jenis_kompetensi'] ?? '';
+                    $jenis = ucwords(strtolower(trim($jenisRaw)));
 
-                Log::info("Jenis kompetensi dari collection: $jenisRaw -> $jenis");
+                    Log::info("Jenis kompetensi dari collection: $jenisRaw -> $jenis");
 
-                if ($jenis === 'Hard Kompetensi') {
-                    $countHard++;
-                } elseif ($jenis === 'Soft Kompetensi') {
-                    $countSoft++;
+                    if ($jenis === 'Hard Kompetensi') {
+                        $countHard++;
+                    } elseif ($jenis === 'Soft Kompetensi') {
+                        $countSoft++;
+                    }
                 }
-            }
 
 
                 // Import data ke DB (gunakan method import biasa)
@@ -296,7 +293,13 @@ class KompetensiController extends Controller
     }
     public function printPdfHard()
     {
-        $kompetensi = Kompetensi::where('jenis_kompetensi', 'Hard Kompetensi')->get();
+        $kompetensi = Kompetensi::where('jenis_kompetensi', 'Hard Kompetensi')
+            ->get()
+            ->sortBy([
+                fn($a, $b) => $a->jenjang->nama_jenjang <=> $b->jenjang->nama_jenjang,
+                fn($a, $b) => $a->jabatan->nama_jabatan <=> $b->jabatan->nama_jabatan,
+                fn($a, $b) => $a->nama_kompetensi <=> $b->nama_kompetensi,
+            ]);
         $waktuCetakHard = Carbon::now()->translatedFormat('d F Y H:i');
         $pdf = Pdf::loadView('adminsdm.data-master.kompetensi.hard-kompetensi-pdf', [
             'kompetensi' => $kompetensi,
@@ -384,7 +387,12 @@ class KompetensiController extends Controller
     {
         $hardKompetensi = Kompetensi::with('jenjang', 'jabatan')
             ->where('jenis_kompetensi', 'Hard Kompetensi')
-            ->get(); // <= ini penting agar menjadi Collection
+            ->get() // <= ini penting agar menjadi Collection
+            ->sortBy([
+            fn($a, $b) => $a->jenjang->nama_jenjang <=> $b->jenjang->nama_jenjang,
+            fn($a, $b) => $a->jabatan->nama_jabatan <=> $b->jabatan->nama_jabatan,
+            fn($a, $b) => $a->nama_kompetensi <=> $b->nama_kompetensi,
+        ]);
 
 
         $phpWord = new PhpWord();

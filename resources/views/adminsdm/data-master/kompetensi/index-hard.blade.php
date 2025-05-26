@@ -15,8 +15,8 @@
 
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a
-                            href="{{ route('adminsdm.data-master.kompetensi.indexHard') }}">Hard Kompetensi</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.kompetensi.indexHard') }}">Hard
+                            Kompetensi</a></div>
                 </div>
             </div>
             <div class="section-body">
@@ -79,19 +79,6 @@
                                                 oninput="this.form.submit()">
                                         </div>
                                         <div class="col-md-3">
-                                            <label>Pilih Jenis Kompetensi</label>
-                                            <select name="jenis_kompetensi" class="form-control"
-                                                onchange="this.form.submit()">
-                                                <option value="">-- All Kompetensi --</option>
-                                                <option value="Hard Kompetensi"
-                                                    {{ request('jenis_kompetensi') == 'Hard Kompetensi' ? 'selected' : '' }}>
-                                                    Hard Kompetensi</option>
-                                                <option value="Soft Kompetensi"
-                                                    {{ request('jenis_kompetensi') == 'Soft Kompetensi' ? 'selected' : '' }}>
-                                                    Soft Kompetensi</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
                                             <label>Pilih Jenjang</label>
                                             <select name="id_jenjang" class="form-control" onchange="this.form.submit()">
                                                 <option value="">-- Semua Jenjang --</option>
@@ -103,12 +90,27 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                        <div class="col-md-3">
+                                            <label>Pilih Jabatan</label>
+                                            <select name="id_jabatan" class="form-control" onchange="this.form.submit()">
+                                                <option value="">-- Semua Jabatan --</option>
+                                                @foreach ($listJabatan as $jab)
+                                                    @if (!$listJenjang || request('id_jenjang') == $jab->id_jenjang)
+                                                        <option value="{{ $jab->id_jabatan }}"
+                                                            {{ request('id_jabatan') == $jab->id_jabatan ? 'selected' : '' }}>
+                                                            {{ $jab->nama_jabatan }}
+                                                        </option>
+                                                    @endif
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
                                 </form>
                                 @livewire('hard-kompetensi-table', [
                                     'search' => request('search'),
                                     'jenis' => request('jenis_kompetensi'),
-                                    'jenjang' =>request('jenjang'),
+                                    'jenjang' => request('id_jenjang'),
+                                    'jabatan' => request('id_jabatan')
                                 ])
                             </div>
                         </div>
