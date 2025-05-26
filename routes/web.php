@@ -160,6 +160,8 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::get('/export/excel', [KaryawanController::class, 'exportExcel'])->name('exportExcel');
         Route::get('/export/csv', [KaryawanController::class, 'exportCSV'])->name('exportCSV');
         Route::get('/export/docx', [KaryawanController::class, 'exportDocx'])->name('exportDocx');
+        Route::get('/get-jabatan-by-jenjang/{id}', [KaryawanController::class, 'getJabatanByJenjang']);
+
     });
     // Semester
     Route::prefix('admin/datamaster/semester')->name('adminsdm.data-master.data-idp.semester.')->group(function () {

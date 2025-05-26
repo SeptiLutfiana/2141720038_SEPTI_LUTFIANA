@@ -417,4 +417,10 @@ class KaryawanController extends Controller
 
         return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
     }
+    public function getJabatanByJenjang($id)
+    {
+        $jabatan = Jabatan::where('id_jenjang', $id)->get();
+
+        return response()->json($jabatan);
+    }
 }
