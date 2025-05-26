@@ -15,7 +15,8 @@ use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 use Illuminate\Support\Carbon;
 use PhpOffice\PhpWord\SimpleType\Jc;
-
+use Maatwebsite\Excel\HeadingRowImport;
+use Illuminate\Support\Facades\Log;
 
 class KompetensiController extends Controller
 {
@@ -160,19 +161,38 @@ class KompetensiController extends Controller
 
         // Jika user memilih upload file
         if ($request->hasFile('file_import')) {
-            $request->validate([
-                'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maks 10MB
-            ], [
-                'file_import.required' => 'File harus diupload.',
-                'file_import.mimes' => 'File harus berformat .xlsx atau .csv.',
-                'file_import.max' => 'Ukuran file maksimal 10MB.',
-            ]);
-
             try {
+                // Ambil data dari file excel tanpa langsung import ke DB
+                $headingRow = (new HeadingRowImport)->toArray($request->file('file_import'))[0][0];
+                $collection = Excel::toCollection(new KompetensiImport, $request->file('file_import'))[0];
+                // Hitung jumlah masing-masing jenis kompetensi
+                $countHard = 0;
+                $countSoft = 0;
+                foreach ($collection as $row) {
+                $jenisRaw = $row['jenis_kompetensi'] ?? '';
+                $jenis = ucwords(strtolower(trim($jenisRaw)));
+
+                Log::info("Jenis kompetensi dari collection: $jenisRaw -> $jenis");
+
+                if ($jenis === 'Hard Kompetensi') {
+                    $countHard++;
+                } elseif ($jenis === 'Soft Kompetensi') {
+                    $countSoft++;
+                }
+            }
+
+
+                // Import data ke DB (gunakan method import biasa)
                 Excel::import(new KompetensiImport, $request->file('file_import'));
 
-                return redirect()->route('adminsdm.data-master.kompetensi.index')
-                    ->with('msg-success', 'Berhasil mengimpor data kompetensi dari file.');
+                // Tentukan route berdasarkan jumlah terbanyak
+                if ($countHard >= $countSoft) {
+                    return redirect()->route('adminsdm.data-master.kompetensi.indexHard')
+                        ->with('msg-success', 'Berhasil mengimpor data kompetensi');
+                } else {
+                    return redirect()->route('adminsdm.data-master.kompetensi.indexSoft')
+                        ->with('msg-success', 'Berhasil mengimpor data kompetensi');
+                }
             } catch (\Exception $e) {
                 return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
             }

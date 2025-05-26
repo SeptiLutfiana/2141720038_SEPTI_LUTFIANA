@@ -128,11 +128,12 @@
                                         Jenis file yang diperbolehkan: <strong>.xlsx</strong>, <strong>.csv</strong>. Ukuran
                                         maksimal: <strong>10MB</strong>.
                                         <br>
-                                        Format Tabel: <strong>no</strong>, <strong>nama_kompetensi</strong>,
-                                        <strong>jenis_kompetensi</strong>, <strong>keterangan</strong>,
-                                        <strong>jenjang</strong>, <strong>jabatan</strong>.
+                                        Format Tabel: <strong>no</strong>, <strong>jenis_kompetensi</strong>,
+                                        <strong>jenjang</strong>, <strong>jabatan</strong>, 
+                                        <strong>jenis_kompetensi</strong>, <strong>keterangan</strong>.
                                         <br>
-                                        <strong>Catatan: </strong>Untuk Soft Kompetensi, silakan kosongkan bagian Jenjang dan Jabatan. </small>
+                                        <strong>Catatan: </strong>Untuk Soft Kompetensi, silakan kosongkan bagian Jenjang
+                                        dan Jabatan. </small>
                                 </div>
                             </div>
                         </div>

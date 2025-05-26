@@ -15,7 +15,7 @@ class KompetensiImport implements OnEachRow, WithHeadingRow
     {
         $data = $row->toArray();
 
-        $jenis = $data['jenis_kompetensi'] ?? '';
+        $jenis = ucwords(strtolower(trim($data['jenis_kompetensi'] ?? ''))); // disesuaikan
 
         // Validasi jenis kompetensi
         if (!in_array($jenis, ['Hard Kompetensi', 'Soft Kompetensi'])) {
