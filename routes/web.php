@@ -161,7 +161,6 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::get('/export/csv', [KaryawanController::class, 'exportCSV'])->name('exportCSV');
         Route::get('/export/docx', [KaryawanController::class, 'exportDocx'])->name('exportDocx');
         Route::get('/get-jabatan-by-jenjang/{id}', [KaryawanController::class, 'getJabatanByJenjang']);
-
     });
     // Semester
     Route::prefix('admin/datamaster/semester')->name('adminsdm.data-master.data-idp.semester.')->group(function () {
@@ -239,15 +238,15 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
     });
     // Behavior IDP
     Route::prefix('admin/datamaster/behavior/idp')->name('adminsdm.BehaviorIDP.')->group(function () {
-        Route::get('/', [IdpController::class, 'index'])->name('index');
+        Route::get('/given/idp', [IdpController::class, 'indexGiven'])->name('indexGiven');
+        Route::get('/bank/idp', [IdpController::class, 'indexBankIdp'])->name('indexBankIdp');
         Route::get('/create', [IdpController::class, 'create'])->name('create');
         Route::post('/store', [IdpController::class, 'store'])->name('store');
         Route::get('/{id}/detail', [IdpController::class, 'show'])->name('show');
         Route::delete('/{id}', [IdpController::class, 'destroy'])->name('destroy');
+        Route::get('/get-jabatan-by-jenjang/{id}', [IdpController::class, 'getJabatanByJenjang'])->name('getJabatanByJenjang');
+        Route::get('/get-kompetensi-by-jabatan/{id}', [IdpController::class, 'getKompetensiByJabatan'])->name('getKompetensiByJabatan');
     });
-    Route::get('/adminsdm/get-filtered-karyawan', [IdpController::class, 'getFilteredKaryawan'])->name('adminsdm.getFilteredKaryawan');
-
-
     Route::get('/list-idp', function () {
         return view('adminsdm.BehaviorIDP.ListIDP.list-idp', [
             'type_menu' => 'listidp'

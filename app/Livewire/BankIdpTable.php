@@ -7,7 +7,7 @@ use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class IdpTable extends Component
+class BankIdpTable extends Component
 {
     use WithPagination;
     public $search;
@@ -35,7 +35,7 @@ class IdpTable extends Component
     public function render()
     {
         $idps = IDP::query()
-            ->where('is_template', false) // Filter utama untuk Bank IDP
+            ->where('is_template', true) // Filter utama untuk Bank IDP
             ->when($this->search, function ($query) {
                 return $query->where(function ($q) {
                     $q->where('proyeksi_karir', 'like', "%{$this->search}%")
@@ -57,7 +57,7 @@ class IdpTable extends Component
             ->paginate(5)
             ->withQueryString();
 
-        return view('livewire.idp-table', [
+        return view('livewire.bank-idp-table', [
             'idps' => $idps,
         ]);
     }

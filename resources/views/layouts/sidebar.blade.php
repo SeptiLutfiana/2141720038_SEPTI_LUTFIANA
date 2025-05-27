@@ -36,14 +36,14 @@
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                             class="fas fa-columns"></i> <span>Behavior IDP</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('list-idp') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('list-idp') }}">Bank IDP</a>
+                        <li class="{{ Request::is('admin/datamaster/behavior/idp/bank/idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/bank/idp') }}">Bank IDP</a>
                         </li>
                         <li class="{{ Request::is('admin/datamaster/behavior/idp/create') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/create') }}">Tambah IDP</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/behavior/idp') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp') }}">List Perencanaan
+                        <li class="{{ Request::is('admin/datamaster/behavior/idp/given/idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/given/idp') }}">List Perencanaan
                                 IDP</a>
                         </li>
                         <li class="{{ Request::is('idps') ? 'active' : '' }}">

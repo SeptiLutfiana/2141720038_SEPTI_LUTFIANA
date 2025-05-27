@@ -4,8 +4,6 @@
             <tr>
                 <th class="text-center">No</th>
                 <th class="text-center">Proyeksi Karir</th>
-                <th class="text-center">Nama Karyawan</th>
-                <th class="text-center">Nama Mentor</th>
                 <th class="text-center">Nama Supervisor</th>
                 <th class="text-center">Learning Group</th>
                 <th class="text-center">Aksi</th>
@@ -18,8 +16,6 @@
                         {{ $loop->iteration + ($idps->currentPage() - 1) * $idps->perPage() }}
                     </td>
                     <td>{{ $idp->proyeksi_karir }}</td>
-                    <td>{{ optional($idp->karyawan)->name ?? '-' }}</td>
-                    <td>{{ optional($idp->mentor)->name ?? '-' }}</td>
                     <td>{{ $idp->supervisor->name }}</td>
                     <td>{{ $idp->karyawan->learningGroup->nama_LG ?? '-'}}</td>
                     <td class="text-left" style="width: 120px;">

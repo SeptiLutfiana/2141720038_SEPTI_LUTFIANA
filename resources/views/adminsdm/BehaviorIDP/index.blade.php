@@ -15,7 +15,7 @@
 
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.index') }}">Data IDP</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Data IDP</a></div>
                 </div>
             </div>
             <div class="section-body">
@@ -46,7 +46,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('adminsdm.BehaviorIDP.index') }}" class="mb-3">
+                                <form method="GET" action="{{ route('adminsdm.BehaviorIDP.indexGiven') }}" class="mb-3">
                                     <div class="form-row">
                                         <div class="col-md-3">
                                             <label>Cari Karyawan</label>

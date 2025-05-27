@@ -1,116 +1,123 @@
 @extends('layouts.app')
 
-@section('title', 'BANK IDP')
-
+@section('title', 'Halaman Bank IDP')
 @push('style')
-    <!-- CSS Libraries -->
+    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/select.bootstrap4.min.css') }}">
+    @livewireStyles()
 @endpush
 
 @section('main')
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>LIST IDP</h1>
+                <h1>Bank Individual Development Plan</h1>
+
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="#">Behavior IDP</a></div>
-                    <div class="breadcrumb-item"><a href="#">BANK IDP</a></div>
-                    <div class="breadcrumb-item">Detail IDP</div>
+                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.indexBankIdp') }}">Data Bank IDP</a></div>
                 </div>
             </div>
-
             <div class="section-body">
-                <h2 class="section-title">BANK IDP</h2>
-                <p class="section-lead">Bank IDP berisi kumpulan IDP untuk karyawan.</p>
-
+                @if (session('msg-success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <div class="alert-icon"><i class="far fa-lightbulb"></i></div>
+                        <div class="alert-body">
+                            <div class="alert-title">Sukses</div>
+                            {{ session('msg-success') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                @endif
                 <div class="row">
-                    <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-                        <article class="article">
-                            <div class="article-header">
-                                <div class="article-image"
-                                    data-background="{{ asset('img/news/img08.jpg') }}">
-                                </div>
-                                <div class="article-title">
-                                    <h2><a href="#">Excepteur sint occaecat cupidatat non proident</a></h2>
-                                </div>
-                            </div>
-                            <div class="article-details">
-                                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse
-                                    cillum dolore eu fugiat nulla pariatur. </p>
-                                <div class="article-cta">
-                                    <a href="#"
-                                        class="btn btn-primary">Read More</a>
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Data Individual Development Plan</h4>
+                                <div class="card-header-action">
+                                    <a href="#" class="btn btn-icon btn-danger icon-left" target="_blank"
+                                        rel="noopener noreferrer"><i class="fas fa-print"></i>
+                                        Print PDF</a>
+                                    <a href="{{ route('adminsdm.BehaviorIDP.create') }}"
+                                        class="btn btn-icon btn-primary icon-left"><i class="fas fa-plus"></i>
+                                        Tambah</a>
                                 </div>
                             </div>
-                        </article>
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-                        <article class="article">
-                            <div class="article-header">
-                                <div class="article-image"
-                                    data-background="{{ asset('img/news/img04.jpg') }}">
-                                </div>
-                                <div class="article-title">
-                                    <h2><a href="#">Excepteur sint occaecat cupidatat non proident</a></h2>
-                                </div>
-                            </div>
-                            <div class="article-details">
-                                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse
-                                    cillum dolore eu fugiat nulla pariatur. </p>
-                                <div class="article-cta">
-                                    <a href="#"
-                                        class="btn btn-primary">Read More</a>
-                                </div>
-                            </div>
-                        </article>
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-                        <article class="article">
-                            <div class="article-header">
-                                <div class="article-image"
-                                    data-background="{{ asset('img/news/img09.jpg') }}">
-                                </div>
-                                <div class="article-title">
-                                    <h2><a href="#">Excepteur sint occaecat cupidatat non proident</a></h2>
-                                </div>
-                            </div>
-                            <div class="article-details">
-                                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse
-                                    cillum dolore eu fugiat nulla pariatur. </p>
-                                <div class="article-cta">
-                                    <a href="#"
-                                        class="btn btn-primary">Read More</a>
-                                </div>
-                            </div>
-                        </article>
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-                        <article class="article">
-                            <div class="article-header">
-                                <div class="article-image"
-                                    data-background="{{ asset('img/news/img12.jpg') }}">
-                                </div>
-                                <div class="article-title">
-                                    <h2><a href="#">Excepteur sint occaecat cupidatat non proident</a></h2>
-                                </div>
-                            </div>
-                            <div class="article-details">
-                                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse
-                                    cillum dolore eu fugiat nulla pariatur. </p>
-                                <div class="article-cta">
-                                    <a href="#"
-                                        class="btn btn-primary">Read More</a>
+                            <div class="card-body">
+                                <form method="GET" action="{{ route('adminsdm.BehaviorIDP.indexBankIdp') }}" class="mb-3">
+                                    <div class="form-row">
+                                        <div class="col-md-3">
+                                            <label>Cari Karyawan</label>
+                                            <input type="text" name="search" class="form-control"
+                                                placeholder="Cari nama karyawan..." value="{{ request('search') }}"
+                                                oninput="this.form.submit()">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Pilih Jenjang</label>
+                                            <select name="id_jenjang" class="form-control" onchange="this.form.submit()">
+                                                <option value="">-- Semua Jenjang --</option>
+                                                @foreach ($listJenjang as $j)
+                                                    <option value="{{ $j->id_jenjang }}"
+                                                        {{ request('id_jenjang') == $j->id_jenjang ? 'selected' : '' }}>
+                                                        {{ $j->nama_jenjang }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Pilih Learning Group</label>
+                                            <select name="lg" class="form-control" onchange="this.form.submit()">
+                                                <option value="">-- Pilih Learning Group --</option>
+                                                @foreach ($listLG as $lg)
+                                                    <option value="{{ $lg->id_LG }}"
+                                                        {{ request('lg') == $lg->id_LG ? 'selected' : '' }}>
+                                                        {{ $lg->nama_LG }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        {{-- <div class="col-md-3">
+                                            <label>Pilih Semester</label>
+                                            <select name="role" class="form-control" onchange="this.form.submit()">
+                                                <option value="">-- Pilih Semester --</option>
+                                                @foreach ($listSemester as $semester)
+                                                    <option value="{{ $semester->id_semester }}" {{ request('semester') == $semester->id_semester? 'selected' : '' }}>
+                                                        {{ $semester->nama_semester }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div> --}}
+                                    </div>
+                                </form>
+                                <div class="table-responsive">
+                                    @livewire('bank-idp-table', [
+                                        'search' => request('search'),
+                                        'jenjang' => request('id_jenjang'),
+                                        'lg' => request('lg'),
+                                        // 'semester' => request('semester'),
+                                    ])
                                 </div>
                             </div>
-                        </article>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
     </div>
 @endsection
-
 @push('scripts')
-    <!-- JS Libraies -->
-
-    <!-- Page Specific JS File -->
+    @livewireScripts()
+    <script>
+        Livewire.on('idpDeleted', message => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses',
+                text: message,
+                timer: 3000,
+                showConfirmButton: false
+            });
+        });
+    </script>
 @endpush
