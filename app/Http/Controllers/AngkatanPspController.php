@@ -31,7 +31,7 @@ class AngkatanPspController extends Controller
 
     // Mengirimkan data ke view
     return view('adminsdm.data-master.karyawan.angkatan-psp.index', [
-        'type_menu' => 'angkatanpsp',
+        'type_menu' => 'data-master',
         'angkatanpsp' => $angkatanpsp,
         'search' => $search,
         'years' => $years, // Kirim daftar tahun ke view
@@ -42,7 +42,7 @@ class AngkatanPspController extends Controller
   public function create()
   {
     return view('adminsdm.data-master.karyawan.angkatan-psp.create', [
-        'type_menu' => 'angkatanpsp',
+        'type_menu' => 'data-master',
     ]);
   }
   public function store(Request $request)
@@ -100,7 +100,7 @@ class AngkatanPspController extends Controller
   
       return view('adminsdm.data-master.karyawan.angkatan-psp.detail', [
           'angkatanpsp' => $angkatanpsp,
-          'type_menu' => 'angkatanpsp', 
+          'type_menu' => 'data-master', 
       ]);
   }  
   public function edit($id)
@@ -108,7 +108,7 @@ class AngkatanPspController extends Controller
     $angkatanpsp = AngkatanPSP::findOrFail($id);
     return view('adminsdm.data-master.karyawan.angkatan-psp.edit', [
         'angkatanpsp'    => $angkatanpsp,
-        'type_menu' => 'angkatanpsp', 
+        'type_menu' => 'data-master', 
     ]);
 }
 
@@ -140,7 +140,7 @@ public function update(Request $request, $id)
         $angkatanpsp = AngkatanPSP::all(); // Atau filter sesuai kebutuhan
         $pdf = Pdf::loadView('adminsdm.data-master.karyawan.angkatan-psp.angkatanpsp_pdf', [
             'angkatanpsp' => $angkatanpsp,
-            'type_menu' => 'angkatanpsp',
+            'type_menu' => 'data-master',
         ]);
         return $pdf->stream('angkatanpsp.pdf'); // atau ->download('learning-group.pdf')
     }

@@ -33,7 +33,7 @@ class JabatanController extends Controller
             ->withQueryString(); // agar ?search=... tetap terbawa saat paging
 
         return view('adminsdm.data-master.karyawan.jabatan.index', [
-            'type_menu' => 'jabatan',
+            'type_menu' => 'data-master',
             'jabatan' => $jabatan,
             'search' => $search,
             'listJenjang' => $listJenjang,
@@ -44,7 +44,7 @@ class JabatanController extends Controller
     {
         $jenjang = Jenjang::all();
         return view('adminsdm.data-master.karyawan.jabatan.create', [
-            'type_menu' => 'tambah-jabatan',
+            'type_menu' => 'data-master',
             'jenjang' => $jenjang,
         ]);
     }
@@ -111,7 +111,7 @@ class JabatanController extends Controller
 
         return view('adminsdm.data-master.karyawan.jabatan.detail', [
             'jabatan'    => $jabatan,
-            'type_menu' => 'jabatan',
+            'type_menu' => 'data-master',
         ]);
     }
     public function edit($id)
@@ -121,7 +121,7 @@ class JabatanController extends Controller
         return view('adminsdm.data-master.karyawan.jabatan.edit', [
             'jabatan'    => $jabatan,
             'jenjang' => $jenjang,
-            'type_menu' => 'jabatan',
+            'type_menu' => 'data-master',
         ]);
     }
 
@@ -163,7 +163,7 @@ class JabatanController extends Controller
         $jabatan = Jabatan::all(); // Atau filter sesuai kebutuhan
         $pdf = Pdf::loadView('adminsdm.data-master.karyawan.jabatan.jabatan_pdf', [
             'jabatan' => $jabatan,
-            'type_menu' => 'jabatan',
+            'type_menu' => 'data-master',
         ]);
         return $pdf->stream('jabatan.pdf'); // atau ->download('learning-group.pdf')
     }

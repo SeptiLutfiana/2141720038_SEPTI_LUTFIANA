@@ -23,7 +23,7 @@ class RoleController extends Controller
                     ->withQueryString(); // agar ?search=... tetap terbawa saat paging
     
         return view('adminsdm.data-master.karyawan.role.index', [
-            'type_menu' => 'role',
+            'type_menu' => 'data-master',
             'role' => $role,
             'search' => $search,
         ]);
@@ -31,7 +31,7 @@ class RoleController extends Controller
     public function create()
     {
       return view('adminsdm.data-master.karyawan.role.create', [
-          'type_menu' => 'tambah-role',
+          'type_menu' => 'data-master',
       ]);
     }
     public function store(Request $request)
@@ -90,7 +90,7 @@ class RoleController extends Controller
     
         return view('adminsdm.data-master.karyawan.role.detail', [
             'role'    => $role,
-            'type_menu' => 'role', 
+            'type_menu' => 'data-master', 
         ]);
     }  
     public function edit($id)
@@ -98,7 +98,7 @@ class RoleController extends Controller
       $role = Role::findOrFail($id);
       return view('adminsdm.data-master.karyawan.role.edit', [
           'role'    => $role,
-          'type_menu' => 'role', 
+          'type_menu' => 'data-master', 
       ]);
   }
   

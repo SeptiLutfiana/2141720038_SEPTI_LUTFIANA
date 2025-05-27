@@ -26,7 +26,7 @@ class JenjangController extends Controller
             ->withQueryString(); // agar ?search=... tetap terbawa saat paging
 
         return view('adminsdm.data-master.karyawan.jenjang.index', [
-            'type_menu' => 'jenjang',
+            'type_menu' => 'data-master',
             'jenjang' => $jenjang,
             'search' => $search,
         ]);
@@ -34,7 +34,7 @@ class JenjangController extends Controller
     public function create()
     {
         return view('adminsdm.data-master.karyawan.jenjang.create', [
-            'type_menu' => 'tambah-jenjang',
+            'type_menu' => 'data-master',
         ]);
     }
     public function store(Request $request)
@@ -93,7 +93,7 @@ class JenjangController extends Controller
 
         return view('adminsdm.data-master.karyawan.jenjang.detail', [
             'jenjang'    => $jenjang,
-            'type_menu' => 'jenjang',
+            'type_menu' => 'data-master',
         ]);
     }
     public function edit($id)
@@ -101,7 +101,7 @@ class JenjangController extends Controller
         $jenjang = Jenjang::findOrFail($id);
         return view('adminsdm.data-master.karyawan.jenjang.edit', [
             'jenjang'    => $jenjang,
-            'type_menu' => 'jenjang',
+            'type_menu' => 'data-master',
         ]);
     }
 
@@ -133,7 +133,7 @@ class JenjangController extends Controller
         $jenjang = Jenjang::all(); // Atau filter sesuai kebutuhan
         $pdf = Pdf::loadView('adminsdm.data-master.karyawan.jenjang.jenjang_pdf', [
             'jenjang' => $jenjang,
-            'type_menu' => 'jenjang',
+            'type_menu' => 'data-master',
         ]);
         return $pdf->stream('jenjang.pdf'); // atau ->download('learning-group.pdf')
     }

@@ -26,7 +26,7 @@ class PenempatanController extends Controller
             ->withQueryString(); // agar ?search=... tetap terbawa saat paging
 
         return view('adminsdm.data-master.karyawan.penempatan.index', [
-            'type_menu' => 'penempatan',
+            'type_menu' => 'data-master',
             'penempatan' => $penempatan,
             'search' => $search,
         ]);
@@ -34,7 +34,7 @@ class PenempatanController extends Controller
     public function create()
     {
         return view('adminsdm.data-master.karyawan.penempatan.create', [
-            'type_menu' => 'tambah-penempatan',
+            'type_menu' => 'data-master',
         ]);
     }
     public function store(Request $request)
@@ -94,7 +94,7 @@ class PenempatanController extends Controller
 
         return view('adminsdm.data-master.karyawan.penempatan.detail', [
             'penempatan'    => $penempatan,
-            'type_menu' => 'penempatan',
+            'type_menu' => 'data-master',
         ]);
     }
     public function edit($id)
@@ -102,7 +102,7 @@ class PenempatanController extends Controller
         $penempatan = Penempatan::findOrFail($id);
         return view('adminsdm.data-master.karyawan.penempatan.edit', [
             'penempatan'    => $penempatan,
-            'type_menu' => 'penempatan',
+            'type_menu' => 'data-master',
         ]);
     }
 
@@ -136,7 +136,7 @@ class PenempatanController extends Controller
         $penempatan = Penempatan::all(); // Atau filter sesuai kebutuhan
         $pdf = Pdf::loadView('adminsdm.data-master.karyawan.penempatan.penempatan_pdf', [
             'penempatan' => $penempatan,
-            'type_menu' => 'penempatan',
+            'type_menu' => 'data-master',
         ]);
         return $pdf->stream('penempatan.pdf'); // atau ->download('learning-group.pdf')
     }

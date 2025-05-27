@@ -55,20 +55,20 @@
                     </ul>
                 </li>
                 <li class="menu-header">DATA MASTER</li>
-                <li class="nav-item dropdown {{ $type_menu === 'divisi' ? 'active' : '' }}">
+                <li class="nav-item dropdown {{ $type_menu === 'data-master' ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown"><i class="fas fa-users"></i>
                         <span>Data Karyawan</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('karyawan') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/karyawan') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/karyawan') }}">Data Karyawan</a>
                         </li>
-                        <li class="{{ Request::is('index') ? 'active' : '' }}">
+                        <li class="{{ Request::is('/admin/datamaster/divisi') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('/admin/datamaster/divisi') }}">Data Divisi</a>
                         </li>
-                        <li class="{{ Request::is('index') ? 'active' : '' }}">
+                        <li class="{{ Request::is('/admin/datamaster/jabatan') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('/admin/datamaster/jabatan') }}">Data Jabatan</a>
                         </li>
-                        <li class="{{ Request::is('index') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/angkatanpsp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/angkatanpsp') }}">Angkatan PSP</a>
                         </li>
                         <li class="{{ Request::is('admin/datamaster/penempatan') ? 'active' : '' }}">
@@ -88,7 +88,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item dropdown {{ $type_menu === 'admin/datamaster/kompetensi' ? 'active' : '' }}">
+                <li class="nav-item dropdown {{ $type_menu === 'kompetensi' ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown"><i class="far fa-file-alt"></i> <span>Data
                             Kompetensi</span></a>
                     <ul class="dropdown-menu">
@@ -102,12 +102,12 @@
                         </li>
                     </ul>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('admin/datamaster/kompetensi') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/kompetensi/create') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/kompetensi/create') }}">Tambah Kompetensi</a>
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item dropdown {{ $type_menu === 'metodeBelajar' ? 'active' : '' }}">
+                <li class="nav-item dropdown {{ $type_menu === 'metodebelajar' ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown"><i class="fas fa-tasks"></i> <span>Data
                             IDP</span></a>
                     <ul class="dropdown-menu">

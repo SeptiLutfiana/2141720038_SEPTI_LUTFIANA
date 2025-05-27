@@ -140,7 +140,7 @@ class IdpController extends Controller
             'listPenempatan' => $listPenempatan,
             'kompetensis' => $kompetensis,
             'metodeBelajars' => $metodeBelajars,
-            'type_menu' => 'idp'
+            'type_menu' => 'idps'
         ]);
     }
 

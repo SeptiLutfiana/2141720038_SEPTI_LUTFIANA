@@ -9,7 +9,10 @@
                     <h1>Tambah IDP Karyawan</h1>
                     <div class="section-header-breadcrumb">
                         <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                        <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.index') }}">Data IDP</a></div>
+                        <div class="breadcrumb-item active"><a href="{{ route('adminsdm.BehaviorIDP.indexBankIdp') }}">Bank IDP</a>
+                        </div>
+                        <div class="breadcrumb-item active"><a href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Given IDP</a>
+                        </div>
                         <div class="breadcrumb-item">Tambah IDP</div>
                     </div>
                 </div>
@@ -271,9 +274,6 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-save"></i> Simpan IDP
                                     </button>
-                                    <a href="{{ route('adminsdm.BehaviorIDP.index') }}" class="btn btn-warning">
-                                        <i class="fas fa-arrow-left"></i> Kembali
-                                    </a>
                                 </div>
                             </form>
                         </div>

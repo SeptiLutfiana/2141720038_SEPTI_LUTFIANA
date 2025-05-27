@@ -65,7 +65,7 @@ class KaryawanController extends Controller
             'lg' => $lg,
             'role' => $roleUser,
             'semester' => $semester,
-            'type_menu' => 'user',
+            'type_menu' => 'data-master',
         ]);
     }
 
@@ -80,7 +80,7 @@ class KaryawanController extends Controller
         $penempatan = Penempatan::all();
         $LG = LearingGroup::all();
         $semester = Semester::all();
-        $type_menu = 'karyawan';
+        $type_menu = 'data-master';
 
         return view('adminsdm.data-master.karyawan.data-karyawan.create', compact(
             'roles',
@@ -192,7 +192,7 @@ class KaryawanController extends Controller
 
         return view('adminsdm.data-master.karyawan.data-karyawan.detail', [
             'user'    => $user,
-            'type_menu' => 'user',
+            'type_menu' => 'data-master',
         ]);
     }
     public function edit($id)
@@ -206,7 +206,7 @@ class KaryawanController extends Controller
         $penempatan = Penempatan::all();
         $LG = LearingGroup::all();
         $semester = Semester::all();
-        $type_menu = 'karyawan';
+        $type_menu = 'data-master';
 
         return view('adminsdm.data-master.karyawan.data-karyawan.edit', compact(
             'user',
@@ -309,7 +309,7 @@ class KaryawanController extends Controller
 
         $pdf = Pdf::loadView('adminsdm.data-master.karyawan.data-karyawan.karyawan_pdf', [
             'user' => $user,
-            'type_menu' => 'user',
+            'type_menu' => 'data-master',
             'waktuCetak' => $waktuCetak,
         ])->setPaper('a4', 'landscape');;
         return $pdf->stream('data-karyawan.pdf'); // atau ->download('learning-group.pdf')

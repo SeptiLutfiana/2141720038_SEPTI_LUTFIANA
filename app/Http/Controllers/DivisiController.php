@@ -27,7 +27,7 @@ class DivisiController extends Controller
             ->withQueryString(); // agar ?search=... tetap terbawa saat paging
 
         return view('adminsdm.data-master.karyawan.divisi.index', [
-            'type_menu' => 'divisi',
+            'type_menu' => 'data-master',
             'divisi' => $divisi,
             'search' => $search,
         ]);
@@ -35,7 +35,7 @@ class DivisiController extends Controller
     public function create()
     {
         return view('adminsdm.data-master.karyawan.divisi.create', [
-            'type_menu' => 'tambah-divisi',
+            'type_menu' => 'data-master',
         ]);
     }
     public function store(Request $request)
@@ -98,7 +98,7 @@ class DivisiController extends Controller
 
         return view('adminsdm.data-master.karyawan.divisi.detail', [
             'divisi'    => $divisi,
-            'type_menu' => 'divisi',
+            'type_menu' => 'data-master',
         ]);
     }
     public function edit($id)
@@ -106,7 +106,7 @@ class DivisiController extends Controller
         $divisi = Divisi::findOrFail($id);
         return view('adminsdm.data-master.karyawan.divisi.edit', [
             'divisi'    => $divisi,
-            'type_menu' => 'divisi',
+            'type_menu' => 'data-master',
         ]);
     }
 
@@ -142,7 +142,7 @@ class DivisiController extends Controller
 
         $pdf = Pdf::loadView('adminsdm.data-master.karyawan.divisi.divisi_pdf', [
             'divisi' => $divisi,
-            'type_menu' => 'divisi',
+            'type_menu' => 'data-master',
             'waktuCetak' => $waktuCetak,
 
         ]);

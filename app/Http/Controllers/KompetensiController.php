@@ -96,7 +96,7 @@ class KompetensiController extends Controller
         $jabatan = Jabatan::all();
 
         return view('adminsdm.data-master.kompetensi.create', [
-            'type_menu' => 'tambah-kompetensi',
+            'type_menu' => 'kompetensi',
             'jenjang' => $jenjang,
             'jabatan' => $jabatan,
 

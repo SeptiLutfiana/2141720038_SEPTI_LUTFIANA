@@ -27,7 +27,7 @@ class SemesterController extends Controller
             ->withQueryString(); // agar ?search=... tetap terbawa saat paging
 
         return view('adminsdm.data-master.data-idp.semester.index', [
-            'type_menu' => 'semester',
+            'type_menu' => 'data-master',
             'semester' => $semester,
             'search' => $search,
         ]);
@@ -35,7 +35,7 @@ class SemesterController extends Controller
     public function create()
     {
         return view('adminsdm.data-master.data-idp.semester.create', [
-            'type_menu' => 'tambah-semester',
+            'type_menu' => 'data-master',
         ]);
     }
     public function store(Request $request)
@@ -94,7 +94,7 @@ class SemesterController extends Controller
 
         return view('adminsdm.data-master.data-idp.semester.detail', [
             'semester'    => $semester,
-            'type_menu' => 'semester',
+            'type_menu' => 'data-master',
         ]);
     }
     public function edit($id)
@@ -102,7 +102,7 @@ class SemesterController extends Controller
         $semester = Semester::findOrFail($id);
         return view('adminsdm.data-master.data-idp.semester.edit', [
             'semester'    => $semester,
-            'type_menu' => 'semester',
+            'type_menu' => 'data-master',
         ]);
     }
 
@@ -134,7 +134,7 @@ class SemesterController extends Controller
         $semester = Semester::all(); // Atau filter sesuai kebutuhan
         $pdf = Pdf::loadView('adminsdm.data-master.data-idp.semester.semester_pdf', [
             'semester' => $semester,
-            'type_menu' => 'semester',
+            'type_menu' => 'data-master',
         ]);
         return $pdf->stream('semester.pdf'); // atau ->download('learning-group.pdf')
     }

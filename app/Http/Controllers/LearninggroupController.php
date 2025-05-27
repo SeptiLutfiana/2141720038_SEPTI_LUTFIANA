@@ -26,7 +26,7 @@ class LearninggroupController extends Controller
                     ->withQueryString(); // agar ?search=... tetap terbawa saat paging
     
         return view('adminsdm.data-master.karyawan.learning-group.index', [
-            'type_menu' => 'LG',
+            'type_menu' => 'data-master',
             'LG' => $LG,
             'search' => $search,
         ]);
@@ -34,7 +34,7 @@ class LearninggroupController extends Controller
     public function create()
     {
       return view('adminsdm.data-master.karyawan.learning-group.create', [
-          'type_menu' => 'tambah-LG',
+          'type_menu' => 'data-master',
       ]);
     }
     public function store(Request $request)
@@ -93,7 +93,7 @@ class LearninggroupController extends Controller
     
         return view('adminsdm.data-master.karyawan.learning-group.detail', [
             'LG'    => $LG,
-            'type_menu' => 'LG', 
+            'type_menu' => 'data-master', 
         ]);
     }  
     public function edit($id)
@@ -101,7 +101,7 @@ class LearninggroupController extends Controller
       $LG = LearingGroup::findOrFail($id);
       return view('adminsdm.data-master.karyawan.learning-group.edit', [
           'LG'    => $LG,
-          'type_menu' => 'LG', 
+          'type_menu' => 'data-master', 
       ]);
   }
   
@@ -133,7 +133,7 @@ class LearninggroupController extends Controller
         $LG = LearingGroup::all(); // Atau filter sesuai kebutuhan
         $pdf = Pdf::loadView('adminsdm.data-master.karyawan.learning-group.learninggroup_pdf', [
             'LG' => $LG,
-            'type_menu' => 'LG',
+            'type_menu' => 'data-master',
         ]);
         return $pdf->stream('jenjang.pdf'); // atau ->download('learning-group.pdf')
     }

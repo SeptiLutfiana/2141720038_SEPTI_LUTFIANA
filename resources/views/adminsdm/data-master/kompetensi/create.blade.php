@@ -9,8 +9,10 @@
                 <h1>Tambah Data Kompetensi</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    {{-- <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.kompetensi.index') }}">Data
-                            Kompetensi</a></div> --}}
+                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.kompetensi.indexSoft') }}">Data Soft 
+                            Kompetensi</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.kompetensi.indexHard') }}">Data
+                             Hard Kompetensi</a></div>
                     <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.kompetensi.create') }}">Tambah Data
                             Kompetensi</a></div>
                 </div>
