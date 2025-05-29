@@ -3,32 +3,94 @@
 @section('title', 'Detail IDP Karyawan')
 
 @section('main')
+    <style>
+        .accordion {
+            border-bottom: 1px solid #dee2e6;
+            padding: 10px 0;
+        }
+
+        .accordion-button {
+            background: none;
+            border: none;
+            font-weight: 600;
+            font-size: 12px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            background: transparent;
+            padding: 0;
+        }
+
+        .accordion-button:focus {
+            outline: none;
+        }
+
+        .accordion-content {
+            display: none;
+            padding-top: 10px;
+            padding-left: 20px;
+        }
+
+        .accordion.open .accordion-content {
+            display: block;
+            font-size: 12px;
+
+        }
+
+        .accordion-icon {
+            transition: transform 0.2s ease;
+            font-size: 16px;
+            display: inline-block;
+            width: 14px;
+            text-align: center;
+        }
+
+        .accordion.open .accordion-icon {
+            transform: rotate(90deg);
+            font-size: 12px;
+
+        }
+
+        .kompetensi-nama {
+            flex: 1;
+        }
+
+        .card-header h4,
+        .card-header h5 {
+            margin-bottom: 0.25rem !important;
+        }
+
+        .accordion-content p {
+            margin-bottom: 0.5rem !important;
+        }
+
+        .accordion {
+            padding-bottom: 0.25rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+    </style>
+
     <div class="main-content">
         <section class="section">
             <div class="section-header">
                 <h1>Detail IDP Karyawan</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Data IDP</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.index') }}">Data IDP</a></div>
                     <div class="breadcrumb-item">Detail IDP</div>
                 </div>
             </div>
 
             <div class="section-body">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-header">
                         <h4>Informasi IDP - {{ $idps->karyawan->name }}</h4>
-                        <small class="text-muted d-block mt-1">
-                            Jenjang: {{ $idps->jenjang->nama_jenjang ?? '-' }} |
-                            Jabatan: {{ $idps->jabatan->nama_jabatan ?? '-' }} |
-                            Divisi: {{ $idps->divisi->nama_divisi ?? '-' }} |
-                            Penempatan: {{ $idps->penempatan->nama_penempatan ?? '-' }} | <br>
-                            Learning Group: {{ $idps->learninggroup->nama_LG ?? '-' }} |
-                            Semester: {{ $idps->semester->nama_semester ?? '-' }} |
-                            Angkatan PSP:
-                            {{ $idp->angkatanpsp->bulan ?? '-' }} {{ $idp->angkatanpsp->tahun ?? '-' }}
-                        </small>
-                        <br>
+                    </div>
+                    <div class="card-body">
                         <div class="row">
                             <div class="form-group col-md-12">
                                 <label>Proyeksi Karir</label>
@@ -37,7 +99,7 @@
 
                             <div class="form-group col-md-12">
                                 <label>Deskripsi</label>
-                                <textarea readonly type="text" class="form-control"style="height:6rem;">{{ $idps->deskripsi_idp }}</textarea>
+                                <input readonly type="text" class="form-control" value="{{ $idps->deskripsi_idp }}">
                             </div>
 
                             <div class="form-group col-md-12">
@@ -82,7 +144,7 @@
                             </div>
                             <div class="form-group col-md-12">
                                 <label>Saran Pengajuan IDP</label>
-                                <textarea readonly type="text" class="form-control" style="height:4rem;">{{ $idps->saran_idp }}</textarea>
+                                <input readonly type="text" class="form-control" value="{{ $idps->saran_idp}}">
                             </div>
                             <div class="form-group col-md-12">
                                 <label>Daftar Kompetensi</label> <br>
@@ -136,7 +198,7 @@
                         </div>
                     </div>
                     <div class="card-footer text-right">
-                        <a class="btn btn-primary" href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Kembali</a>
+                        <a class="btn btn-primary" href="{{ route('adminsdm.BehaviorIDP.index') }}">Kembali</a>
                     </div>
                 </div>
             </div>

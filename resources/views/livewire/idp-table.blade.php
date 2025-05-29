@@ -20,10 +20,10 @@
                     <td>{{ $idp->proyeksi_karir }}</td>
                     <td>{{ optional($idp->karyawan)->name ?? '-' }}</td>
                     <td>{{ optional($idp->mentor)->name ?? '-' }}</td>
-                    <td>{{ $idp->supervisor->name }}</td>
+                    <td>{{ $idp->supervisor->name ?? '-' }}</td>
                     <td>{{ $idp->karyawan->learningGroup->nama_LG ?? '-'}}</td>
                     <td class="text-left" style="width: 120px;">
-                        <a href="#" class="btn btn-warning btn-sm mb-1">
+                        <a href="{{ route('adminsdm.BehaviorIDP.edit', $idp->id_idp) }}" class="btn btn-warning btn-sm mb-1">
                             <i class="fas fa-edit"></i> Edit
                         </a>
                         <br>

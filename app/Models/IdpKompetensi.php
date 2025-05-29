@@ -11,6 +11,7 @@ class IdpKompetensi extends Model
 
     // Primary key custom
     protected $primaryKey = 'id_idpKom';
+    public $timestamps = false;
     protected $fillable = [
         'id_idp',
         'id_kompetensi',
@@ -23,7 +24,7 @@ class IdpKompetensi extends Model
     }
     public function kompetensi()
     {
-        return $this->belongsTo(Kompetensi::class, 'id_kompetensi');
+        return $this->belongsTo(Kompetensi::class, 'id_kompetensi', 'id_kompetensi');
     }
     public function pengerjaans()
     {

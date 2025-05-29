@@ -27,6 +27,16 @@ class IDP extends Model
         'status_pengerjaan',
         'is_template',
         'deskripsi_idp',
+        'id_jenjang',
+        'id_jabatan',
+        'id_LG',
+        'id_divisi',
+        'id_penempatan',
+        'id_semester',
+        'id_angkatanpsp',
+        'is_open',
+        'max_applies',
+        'current_applies',
     ];
     public function karyawan()
     {
@@ -47,6 +57,34 @@ class IDP extends Model
         return $this->belongsTo(User::class, 'id_supervisor')->whereHas('roles', function ($query) {
             $query->where('roles.id_role', 2);
         });
+    }
+    public function jenjang()
+    {
+        return $this->belongsTo(Jenjang::class, 'id_jenjang', 'id_jenjang');
+    }
+    public function jabatan()
+    {
+        return $this->belongsTo(Jabatan::class, 'id_jabatan', 'id_jabatan');
+    }
+    public function angkatanpsp()
+    {
+        return $this->belongsTo(AngkatanPSP::class, 'id_angkatanpsp', 'id_angkatanpsp');
+    }
+    public function learningGroup()
+    {
+        return $this->belongsTo(LearingGroup::class, 'id_LG', 'id_LG');
+    }
+    public function divisi()
+    {
+        return $this->belongsTo(Divisi::class, 'id_divisi', 'id_divisi');
+    }
+    public function penempatan()
+    {
+        return $this->belongsTo(Penempatan::class, 'id_penempatan', 'id_penempatan');
+    }
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'id_semester', 'id_semester');
     }
     public function idpKompetensis()
     {

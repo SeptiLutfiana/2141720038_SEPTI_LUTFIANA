@@ -246,6 +246,8 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::delete('/{id}', [IdpController::class, 'destroy'])->name('destroy');
         Route::get('/get-jabatan-by-jenjang/{id}', [IdpController::class, 'getJabatanByJenjang'])->name('getJabatanByJenjang');
         Route::get('/get-kompetensi-by-jabatan/{id}', [IdpController::class, 'getKompetensiByJabatan'])->name('getKompetensiByJabatan');
+        Route::get('/{id}/edit', [IdpController::class, 'edit'])->name('edit');
+        Route::put('/{id}/update', [IdpController::class, 'update'])->name('update');
     });
     Route::get('/list-idp', function () {
         return view('adminsdm.BehaviorIDP.ListIDP.list-idp', [

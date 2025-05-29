@@ -9,10 +9,12 @@
                     <h1>Tambah IDP Karyawan</h1>
                     <div class="section-header-breadcrumb">
                         <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                        <div class="breadcrumb-item active"><a href="{{ route('adminsdm.BehaviorIDP.indexBankIdp') }}">Bank IDP</a>
+                        <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.indexBankIdp') }}">Data Bank
+                                IDP</a>
                         </div>
-                        <div class="breadcrumb-item active"><a href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Given IDP</a>
+                        <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Data DP</a>
                         </div>
+
                         <div class="breadcrumb-item">Tambah IDP</div>
                     </div>
                 </div>
@@ -201,8 +203,7 @@
                                             <option value="">-- Pilih Supervisor --</option>
                                             @foreach ($supervisors as $item)
                                                 <option value="{{ $item->id }}">{{ $item->name }} -
-                                                    {{ $item->npk }}
-                                                </option>
+                                                    {{ $item->npk }}</option>
                                             @endforeach
                                         </select>
                                     </div>
