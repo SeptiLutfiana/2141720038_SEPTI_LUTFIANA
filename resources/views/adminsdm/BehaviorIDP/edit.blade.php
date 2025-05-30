@@ -28,7 +28,7 @@
                                     <li>{{ $item }}</li>
                                 @endforeach
                             </ul>
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -145,10 +145,14 @@
                                             value="{{ $metode->id_metodeBelajar }}">
                                     @endforeach
                                 @endforeach
-
                             </div>
                             <div class="form-group">
-                                <label>Daftar Kompetensi</label> <br>
+                                <label>Kompetensi</label> <br>
+                                <button type="button" id="btn-tambah-kompetensi" class="btn btn-primary mb-3"
+                                    data-toggle="modal" data-target="#modalTambahKompetensi">
+                                    <i class="fas fa-plus-circle"></i> Tambah Kompetensi
+                                </button>
+                                <br>
                                 <label>Soft Kompetensi</label>
                                 <table class="table table-bordered">
                                     <thead>
@@ -197,7 +201,6 @@
                                                     <button type="button" class="btn btn-warning btn-sm"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#modalHardKompetensi{{ $kom->id_idpKom }}">
-                                                        {{-- PERBAIKAN DI SINI --}}
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                 </td>
@@ -232,10 +235,9 @@
                     <div class="modal-header">
                         <h5 class="modal-title"
                             id="{{ $jenis === 'Soft Kompetensi' ? 'modalLabel' . $kom->id_idpKom : 'modalHardLabel' . $kom->id_idpKom }}">
-                            {{-- PERBAIKAN DI SINI --}}
                             Edit {{ $jenis }}: {{ $kom->kompetensi->nama_kompetensi }}
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -266,18 +268,101 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                         <button type="button" class="btn btn-primary btn-simpan-kompetensi"
-                            data-id="{{ $kom->id_idpKom }}">Simpan</button> {{-- PERBAIKAN DI SINI --}}
+                            data-id="{{ $kom->id_idpKom }}">Simpan</button>
                     </div>
                 </div>
             </div>
         </div>
     @endforeach
+    <!-- Modal Tambah Kompetensi -->
+    <div class="modal fade" id="modalTambahKompetensi" tabindex="-1" role="dialog"
+        aria-labelledby="modalTambahKompetensiLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalTambahKompetensiLabel">Tambah Kompetensi</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formKompetensi">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Jenis Kompetensi</label>
+                                <select class="form-control jenis_kompetensi" id="modalJenisKompetensi">
+                                    <option value="Hard Kompetensi">Hard Kompetensi</option>
+                                    <option value="Soft Kompetensi">Soft Kompetensi</option>
+                                </select>
+                            </div>
+                            <!-- Jenjang -->
+                            <div class="form-group col-md-6" id="formJenjangGroup">
+                                <label>Jenjang</label>
+                                <select class="form-control" id="modalJenjangDropdown">
+                                    <option value="">Pilih Jenjang</option>
+                                    @foreach ($listJenjang as $item)
+                                        <option value="{{ $item->id_jenjang }}">{{ $item->nama_jenjang }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
+                            <!-- Jabatan -->
+                            <div class="form-group col-md-6" id="formJabatanGroup">
+                                <label>Jabatan</label>
+                                <select class="form-control" id="modalJabatanDropdown">
+                                    <option value="">Pilih Jabatan</option>
+                                    @foreach ($listJabatan as $item)
+                                        <option value="{{ $item->id_jabatan }}">{{ $item->nama_jabatan }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Kompetensi</label>
+                                <select class="form-control kompetensi-dropdown" id="modalKompetensiDropdown">
+                                    <!-- Opsi akan diisi oleh JS -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalMetodeBelajar">Pilih Metode Belajar</label>
+                            <select id="modalMetodeBelajar" multiple placeholder="Pilih satu atau lebih metode belajar">
+                                @foreach ($metodeBelajars as $item)
+                                    <option value="{{ $item->id_metodeBelajar }}">
+                                        {{ $item->nama_metodeBelajar }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                        </div>
+                        <div class="form-group">
+                            <label>Sasaran</label>
+                            <textarea class="form-control" id="modalSasaran" style="height:6rem;"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Aksi</label>
+                            <textarea class="form-control" id="modalAksi" style="height:6rem;"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnSimpanKompetensi">
+                        <i class="fas fa-save"></i> Simpan Kompetensi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
+    <!-- Template JS File -->
+    <script src="{{ asset('js/scripts.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
+    <!-- Tom Select JS -->
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> {{-- Tambahkan SweetAlert2 untuk umpan balik pengguna yang lebih baik --}}
     <script>
@@ -394,6 +479,476 @@
                 const submitBtn = this.querySelector('button[type="submit"]');
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            });
+        });
+        $(document).ready(function() {
+            // Inisialisasi TomSelect untuk metode belajar
+            let tomSelectMetodeBelajar = new TomSelect("#modalMetodeBelajar", {
+                plugins: ['remove_button'],
+            });
+
+            const kompetensiData = {
+                "Hard Kompetensi": @json($kompetensi->where('jenis_kompetensi', 'Hard Kompetensi')->values()),
+                "Soft Kompetensi": @json($kompetensi->where('jenis_kompetensi', 'Soft Kompetensi')->values())
+            };
+
+            // Counter untuk ID unik kompetensi baru
+            let newKompetensiCounter = 1000; // Mulai dari 1000 untuk membedakan dengan ID database
+
+            // Fungsi untuk mengisi dropdown kompetensi berdasarkan jenis
+            function renderKompetensiOptions(jenis_kompetensi) {
+                const kompetensiDropdown = $('#modalKompetensiDropdown');
+                kompetensiDropdown.empty().append('<option value="">-- Pilih Kompetensi --</option>');
+
+                if (kompetensiData[jenis_kompetensi]) {
+                    kompetensiData[jenis_kompetensi].forEach(item => {
+                        kompetensiDropdown.append(
+                            `<option value="${item.id_kompetensi}">${item.nama_kompetensi}</option>`);
+                    });
+                }
+            }
+
+            // Inisialisasi pertama kali dropdown kompetensi dengan Hard Kompetensi
+            renderKompetensiOptions('Hard Kompetensi');
+
+            // Event listener untuk perubahan jenis kompetensi
+            $('#modalJenisKompetensi').on('change', function() {
+                renderKompetensiOptions($(this).val());
+                toggleHardKompetensiFields();
+            });
+
+            // Fungsi toggle visibility form jenjang dan jabatan
+            function toggleHardKompetensiFields() {
+                let jenis = $('#modalJenisKompetensi').val();
+                if (jenis === 'Hard Kompetensi') {
+                    $('#modalJenjangDropdown').closest('.form-group').show();
+                    $('#modalJabatanDropdown').closest('.form-group').show();
+                } else {
+                    $('#modalJenjangDropdown').closest('.form-group').hide();
+                    $('#modalJabatanDropdown').closest('.form-group').hide();
+                }
+            }
+
+            // Fungsi untuk mendapatkan nama kompetensi berdasarkan ID
+            function getNamaKompetensi(kompetensiId, jenis) {
+                const data = kompetensiData[jenis];
+                const kompetensi = data.find(item => item.id_kompetensi == kompetensiId);
+                return kompetensi ? kompetensi.nama_kompetensi : 'Kompetensi tidak ditemukan';
+            }
+
+            // Fungsi untuk menambahkan baris ke tabel yang sudah ada
+            function addRowToExistingTable(data, jenis) {
+                let tbody, currentRowCount;
+
+                if (jenis === 'Soft Kompetensi') {
+                    tbody = $('.table').first().find('tbody'); // Tabel Soft Kompetensi (yang pertama)
+                    currentRowCount = tbody.find('tr').length;
+                } else {
+                    tbody = $('.table').last().find('tbody'); // Tabel Hard Kompetensi (yang kedua)
+                    currentRowCount = tbody.find('tr').length;
+                }
+
+                const newRowNumber = currentRowCount + 1;
+                const uniqueId = newKompetensiCounter++;
+
+                // Buat baris baru
+                const newRow = `
+            <tr data-new-kompetensi="${uniqueId}">
+                <td style="width: 50px;">${newRowNumber}</td>
+                <td>${data.kompetensiText}</td>
+                <td style="width: 50px;">
+                    <div class="d-flex flex-column gap-1">
+                        <button type="button" class="btn btn-warning btn-sm edit-new-kompetensi"
+                        data-id="${uniqueId}" data-jenis="${jenis}">
+                        <i class="fas fa-edit"></i>
+                        </button>
+
+                        <button type="button" class="btn btn-danger btn-sm delete-new-kompetensi"
+                        data-id="${uniqueId}">
+                        <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+
+            </tr>
+        `;
+
+                tbody.append(newRow);
+                addHiddenInputsForNewKompetensi(data, uniqueId);
+            }
+
+            // Fungsi untuk menambahkan hidden inputs untuk kompetensi baru
+            function addHiddenInputsForNewKompetensi(data, uniqueId) {
+                const hiddenContainer = document.getElementById('hiddenKompetensiInputs');
+                const wrapper = document.createElement('div');
+                wrapper.dataset.kompetensiHidden = uniqueId;
+                // Input untuk ID (gunakan unique ID)
+                const hiddenId = document.createElement('input');
+                hiddenId.type = 'hidden';
+                hiddenId.name = `kompetensi[new_${uniqueId}][id_kompetensi]`;
+                hiddenId.value = data.kompetensiId;
+                hiddenId.className = `new_kompetensi_${uniqueId}`;
+                hiddenContainer.appendChild(hiddenId);
+
+                // Input untuk sasaran
+                const hiddenSasaran = document.createElement('input');
+                hiddenSasaran.type = 'hidden';
+                hiddenSasaran.name = `kompetensi[new_${uniqueId}][sasaran]`;
+                hiddenSasaran.value = data.sasaran;
+                hiddenSasaran.className = `new_kompetensi_${uniqueId}`;
+                hiddenContainer.appendChild(hiddenSasaran);
+
+                // Input untuk aksi
+                const hiddenAksi = document.createElement('input');
+                hiddenAksi.type = 'hidden';
+                hiddenAksi.name = `kompetensi[new_${uniqueId}][aksi]`;
+                hiddenAksi.value = data.aksi;
+                hiddenAksi.className = `new_kompetensi_${uniqueId}`;
+                hiddenContainer.appendChild(hiddenAksi);
+
+                // Input untuk metode belajar
+                data.metodeIds.forEach(metodeId => {
+                    const hiddenMetode = document.createElement('input');
+                    hiddenMetode.type = 'hidden';
+                    hiddenMetode.name = `kompetensi[new_${uniqueId}][id_metode_belajar][]`;
+                    hiddenMetode.value = metodeId;
+                    hiddenMetode.className = `new_kompetensi_${uniqueId}`;
+                    hiddenContainer.appendChild(hiddenMetode);
+                });
+                hiddenContainer.appendChild(wrapper);
+
+                console.log(`Added new kompetensi with ID: new_${uniqueId}`);
+            }
+
+            // Event tombol simpan kompetensi
+            $('#btnSimpanKompetensi').on('click', function() {
+                const jenis = $('#modalJenisKompetensi').val();
+                const kompetensiDropdown = $('#modalKompetensiDropdown');
+                const kompetensiId = kompetensiDropdown.val();
+                const kompetensiText = kompetensiDropdown.find('option:selected').text();
+
+                const metodeSelect = $('#modalMetodeBelajar');
+                const selectedOptions = metodeSelect.find('option:selected');
+                const metodeIds = selectedOptions.map(function() {
+                    return $(this).val();
+                }).get();
+
+                const sasaran = $('#modalSasaran').val();
+                const aksi = $('#modalAksi').val();
+
+                // Validasi
+                if (!kompetensiId) {
+                    alert("Harap pilih kompetensi");
+                    return;
+                }
+                if (metodeIds.length === 0) {
+                    alert("Harap pilih minimal satu metode belajar");
+                    return;
+                }
+                if (!sasaran.trim() || !aksi.trim()) {
+                    alert("Harap isi sasaran dan aksi");
+                    return;
+                }
+
+                const data = {
+                    kompetensiId: kompetensiId,
+                    kompetensiText: kompetensiText,
+                    metodeIds: metodeIds,
+                    sasaran: sasaran,
+                    aksi: aksi
+                };
+
+                // Tambahkan ke tabel yang sudah ada
+                addRowToExistingTable(data, jenis);
+
+                // Reset form dan tutup modal
+                resetFormModal();
+                const modalTambahKompetensiElement = document.getElementById('modalTambahKompetensi');
+                if (modalTambahKompetensiElement) {
+                    const modalInstance = bootstrap.Modal.getInstance(modalTambahKompetensiElement);
+                    if (modalInstance) {
+                        // Sembunyikan modal jika instance-nya sudah ada
+                        modalInstance.hide();
+                    } else {
+                        // Jika instance belum ada, buat yang baru dan sembunyikan
+                        new bootstrap.Modal(modalTambahKompetensiElement).hide();
+                    }
+                }
+                // Tampilkan pesan sukses
+                if (typeof Swal !== 'undefined') {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                    });
+
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Kompetensi baru berhasil ditambahkan!'
+                    });
+                }
+            });
+
+            // Event handler untuk tombol hapus kompetensi baru
+            $(document).on('click', '.delete-new-kompetensi', function() {
+                const uniqueId = $(this).data('id');
+
+                if (confirm('Apakah Anda yakin ingin menghapus kompetensi ini?')) {
+                    // Hapus baris dari tabel
+                    $(`tr[data-new-kompetensi="${uniqueId}"]`).remove();
+
+                    // Hapus hidden inputs
+                    $(`.new_kompetensi_${uniqueId}`).remove();
+
+                    // Update nomor urut pada tabel
+                    updateTableRowNumbers();
+
+                    if (typeof Swal !== 'undefined') {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true,
+                        });
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Kompetensi berhasil dihapus!'
+                        });
+                    }
+                }
+            });
+
+            // Event handler untuk tombol edit kompetensi baru
+            $(document).on('click', '.edit-new-kompetensi', function() {
+                const uniqueId = $(this).data('id');
+                const jenis = $(this).data('jenis');
+
+                // Ambil data dari hidden inputs
+                const sasaran = $(`input[name="kompetensi[new_${uniqueId}][sasaran]"]`).val();
+                const aksi = $(`input[name="kompetensi[new_${uniqueId}][aksi]"]`).val();
+                const kompetensiId = $(`input[name="kompetensi[new_${uniqueId}][id_kompetensi]"]`).val();
+                const metodeIds = $(`input[name="kompetensi[new_${uniqueId}][id_metode_belajar][]"]`).map(
+                    function() {
+                        return $(this).val();
+                    }).get();
+
+                // Buat modal dinamis untuk edit
+                createEditModalForNewKompetensi(uniqueId, jenis, {
+                    sasaran: sasaran,
+                    aksi: aksi,
+                    kompetensiId: kompetensiId,
+                    metodeIds: metodeIds
+                });
+            });
+
+            // Fungsi untuk membuat modal edit kompetensi baru
+            function createEditModalForNewKompetensi(uniqueId, jenis, data) {
+                const kompetensiName = getNamaKompetensi(data.kompetensiId, jenis);
+
+                const modalHtml = `
+            <div class="modal fade" id="modalEditNew${uniqueId}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit ${jenis}: ${kompetensiName}</h5>
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>Keterangan:</strong> {{ $kom->kompetensi->keterangan }}</p>
+                            <div class="form-group">
+                                <label><strong>Sasaran:</strong></label>
+                                <textarea class="form-control" id="editSasaran${uniqueId}" style="height:8rem;">${data.sasaran}</textarea>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label><strong>Aksi:</strong></label>
+                                <textarea class="form-control" id="editAksi${uniqueId}" style="height:8rem;">${data.aksi}</textarea>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label><strong>Metode Belajar:</strong></label><br>
+                                ${generateMetodeBelajarCheckboxes(uniqueId, data.metodeIds)}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="button" class="btn btn-primary" onclick="saveEditNewKompetensi(${uniqueId})">Simpan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+                // Hapus modal jika sudah ada
+                $(`#modalEditNew${uniqueId}`).remove();
+
+                // Tambahkan modal ke body
+                $('body').append(modalHtml);
+
+                // Tampilkan modal
+                $(`#modalEditNew${uniqueId}`).modal('show');
+            }
+
+            // Fungsi untuk generate checkbox metode belajar
+            function generateMetodeBelajarCheckboxes(uniqueId, selectedMetodeIds) {
+                const metodeBelajars = @json($metodeBelajars);
+                let checkboxes = '';
+
+                metodeBelajars.forEach(metode => {
+                    const isChecked = selectedMetodeIds.includes(metode.id_metodeBelajar.toString()) ?
+                        'checked' : '';
+                    checkboxes += `
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" 
+                           id="editMetode${uniqueId}_${metode.id_metodeBelajar}"
+                           value="${metode.id_metodeBelajar}" ${isChecked}>
+                    <label class="form-check-label" for="editMetode${uniqueId}_${metode.id_metodeBelajar}">
+                        ${metode.nama_metodeBelajar}
+                    </label>
+                </div>
+            `;
+                });
+
+                return checkboxes;
+            }
+
+            // Fungsi untuk menyimpan perubahan kompetensi baru
+            window.saveEditNewKompetensi = function(uniqueId) {
+                const sasaran = $(`#editSasaran${uniqueId}`).val();
+                const aksi = $(`#editAksi${uniqueId}`).val();
+                const metodeIds = $(`#modalEditNew${uniqueId} input[type="checkbox"]:checked`).map(function() {
+                    return $(this).val();
+                }).get();
+
+                if (!sasaran.trim() || !aksi.trim()) {
+                    alert("Harap isi sasaran dan aksi");
+                    return;
+                }
+
+                if (metodeIds.length === 0) {
+                    alert("Harap pilih minimal satu metode belajar");
+                    return;
+                }
+
+                // Update hidden inputs
+                $(`input[name="kompetensi[new_${uniqueId}][sasaran]"]`).val(sasaran);
+                $(`input[name="kompetensi[new_${uniqueId}][aksi]"]`).val(aksi);
+
+                // Hapus metode belajar lama dan tambah yang baru
+                $(`.new_kompetensi_${uniqueId}`).filter(
+                    `input[name="kompetensi[new_${uniqueId}][id_metode_belajar][]"]`).remove();
+
+                const hiddenContainer = document.getElementById('hiddenKompetensiInputs');
+                metodeIds.forEach(metodeId => {
+                    const hiddenMetode = document.createElement('input');
+                    hiddenMetode.type = 'hidden';
+                    hiddenMetode.name = `kompetensi[new_${uniqueId}][id_metode_belajar][]`;
+                    hiddenMetode.value = metodeId;
+                    hiddenMetode.className = `new_kompetensi_${uniqueId}`;
+                    hiddenContainer.appendChild(hiddenMetode);
+                });
+
+                // Tutup modal
+                $(`#modalEditNew${uniqueId}`).modal('hide');
+                $(`#modalEditNew${uniqueId}`).remove();
+
+                if (typeof Swal !== 'undefined') {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                    });
+
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Data kompetensi berhasil diperbarui!'
+                    });
+                }
+            };
+
+            // Fungsi untuk update nomor urut tabel
+            function updateTableRowNumbers() {
+                $('.table tbody').each(function() {
+                    $(this).find('tr').each(function(index) {
+                        $(this).find('td:first').text(index + 1);
+                    });
+                });
+            }
+
+            // Reset form modal tambah kompetensi
+            function resetFormModal() {
+                $('#modalJenisKompetensi').val('Hard Kompetensi').trigger('change');
+                $('#modalSasaran').val('');
+                $('#modalAksi').val('');
+                $('#modalJenjangDropdown').val('').trigger('change');
+                $('#modalJabatanDropdown').empty().append('<option value="">Pilih Jabatan</option>');
+                $('#modalKompetensiDropdown').empty().append('<option value="">Pilih Kompetensi</option>');
+
+                if (typeof tomSelectMetodeBelajar !== 'undefined') {
+                    tomSelectMetodeBelajar.clear();
+                }
+            }
+
+            // Event saat modal tambah kompetensi tampil
+            $('#modalTambahKompetensi').on('show.bs.modal', function() {
+                resetFormModal();
+            });
+
+            // Toggle visibility form jenjang dan jabatan saat awal halaman load
+            toggleHardKompetensiFields();
+
+            // Event saat jenjang dipilih -> ajax ambil jabatan
+            $('#modalJenjangDropdown').on('change', function() {
+                let jenjangId = $(this).val();
+                if (jenjangId) {
+                    $.ajax({
+                        url: '/admin/datamaster/behavior/idp/get-jabatan-by-jenjang/' + jenjangId,
+                        type: 'GET',
+                        success: function(data) {
+                            let jabatanDropdown = $('#modalJabatanDropdown');
+                            jabatanDropdown.empty().append(
+                                '<option value="">Pilih Jabatan</option>');
+                            data.forEach(function(jabatan) {
+                                jabatanDropdown.append(
+                                    `<option value="${jabatan.id_jabatan}">${jabatan.nama_jabatan}</option>`
+                                );
+                            });
+                        }
+                    });
+                } else {
+                    $('#modalJabatanDropdown').empty().append('<option value="">Pilih Jabatan</option>');
+                }
+            });
+
+            // Event saat jabatan dipilih -> ajax ambil kompetensi hard
+            $('#modalJabatanDropdown').on('change', function() {
+                let jabatanId = $(this).val();
+                if (jabatanId) {
+                    $.ajax({
+                        url: '/admin/datamaster/behavior/idp/get-kompetensi-by-jabatan/' +
+                            jabatanId,
+                        type: 'GET',
+                        success: function(data) {
+                            let kompetensiDropdown = $('#modalKompetensiDropdown');
+                            kompetensiDropdown.empty().append(
+                                '<option value="">Pilih Kompetensi</option>');
+                            data.forEach(function(komp) {
+                                kompetensiDropdown.append(
+                                    `<option value="${komp.id_kompetensi}">${komp.nama_kompetensi}</option>`
+                                );
+                            });
+                        }
+                    });
+                } else {
+                    $('#modalKompetensiDropdown').empty().append(
+                        '<option value="">Pilih Kompetensi</option>');
+                }
             });
         });
     </script>

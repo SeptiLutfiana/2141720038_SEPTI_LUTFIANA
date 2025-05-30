@@ -243,11 +243,11 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::get('/create', [IdpController::class, 'create'])->name('create');
         Route::post('/store', [IdpController::class, 'store'])->name('store');
         Route::get('/{id}/detail', [IdpController::class, 'show'])->name('show');
-        Route::delete('/{id}', [IdpController::class, 'destroy'])->name('destroy');
         Route::get('/get-jabatan-by-jenjang/{id}', [IdpController::class, 'getJabatanByJenjang'])->name('getJabatanByJenjang');
         Route::get('/get-kompetensi-by-jabatan/{id}', [IdpController::class, 'getKompetensiByJabatan'])->name('getKompetensiByJabatan');
         Route::get('/{id}/edit', [IdpController::class, 'edit'])->name('edit');
         Route::put('/{id}/update', [IdpController::class, 'update'])->name('update');
+        Route::delete('/{idp}', [IdpController::class, 'destroyGiven'])->name('destroyGiven');
     });
     Route::get('/list-idp', function () {
         return view('adminsdm.BehaviorIDP.ListIDP.list-idp', [

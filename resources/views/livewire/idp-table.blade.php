@@ -32,7 +32,7 @@
                             <i class="fas fa-info-circle"></i> Detail
                         </a>
                         <br>
-                        <form action="#" method="POST" style="display: inline;">
+                        <form action="{{ route('adminsdm.BehaviorIDP.destroyGiven', $idp->id_idp) }}" method="POST" style="display: inline;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger btn-sm rounded mb-1">

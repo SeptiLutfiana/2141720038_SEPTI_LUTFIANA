@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use FFI\Exception;
 
 class IdpController extends Controller
 {
@@ -429,10 +430,10 @@ class IdpController extends Controller
             'type_menu' => 'idps'
         ]);
     }
-
     public function update(Request $request, $id)
     {
         $idp = IDP::findOrFail($id);
+        Log::debug('Data request yang diterima:', $request->all());
 
         $validated = $request->validate([
             'proyeksi_karir' => 'required|string|max:255',
@@ -442,16 +443,19 @@ class IdpController extends Controller
             'id_mentor' => 'required|exists:users,id',
             'id_supervisor' => 'required|exists:users,id',
             'kompetensi' => 'nullable|array',
-            'kompetensi.*.id' => 'required|integer|exists:idp_kompetensis,id_idpKom', // Pastikan ini adalah primary key
+            'kompetensi.*.id' => 'nullable|integer',
+            'kompetensi.*.id_kompetensi' => 'nullable|integer|exists:kompetensis,id_kompetensi', // Hanya untuk yang baru
             'kompetensi.*.sasaran' => 'required|string',
             'kompetensi.*.aksi' => 'required|string',
             'kompetensi.*.id_metode_belajar' => 'nullable|array',
-            'kompetensi.*.id_metode_belajar.*' => 'integer|exists:idp_kompetensi_metode_belajars,id_metodeBelajar',
+            'kompetensi.*.id_metode_belajar.*' => 'integer|exists:metode_belajars,id_metodeBelajar',
         ]);
 
         try {
-            DB::transaction(function () use ($idp, $validated) {
-                // Update data IDP utama
+            DB::transaction(function () use ($idp, $validated, $request) {
+                Log::debug('Memulai transaksi database.');
+
+                // 1. Update data IDP utama
                 $idp->update([
                     'proyeksi_karir' => $validated['proyeksi_karir'],
                     'waktu_mulai' => $validated['waktu_mulai'],
@@ -460,51 +464,142 @@ class IdpController extends Controller
                     'id_mentor' => $validated['id_mentor'],
                     'id_supervisor' => $validated['id_supervisor'],
                 ]);
-
                 Log::debug("IDP utama dengan ID {$idp->id_idp} berhasil diperbarui.");
 
-                // Update kompetensi jika ada
-                if (!empty($validated['kompetensi']) && is_array($validated['kompetensi'])) {
-                    foreach ($validated['kompetensi'] as $kompetensiData) {
-                        $actualIdpKompetensiId = $kompetensiData['id'];
+                // Akan menyimpan id_idpKom dari kompetensi yang sudah ada DAN BARU DIBUAT yang berhasil diproses
+                $submittedIdpKompetensiIds = [];
 
-                        // Lebih baik menggunakan find() jika id_idpKom adalah primary key
-                        $idpKompetensi = IdpKompetensi::find($actualIdpKompetensiId);
+                // 2. Proses kompetensi jika ada
+                if (isset($validated['kompetensi']) && is_array($validated['kompetensi'])) {
+                    Log::debug('Mulai memproses item kompetensi dari request.');
+                    foreach ($validated['kompetensi'] as $key => $kompetensiData) {
 
-                        Log::debug("Memproses kompetensi ID: {$actualIdpKompetensiId}");
-                        Log::debug("Ditemukan IdpKompetensi: " . ($idpKompetensi ? $idpKompetensi->id_idpKom : 'Tidak ditemukan'));
-                        Log::debug("IDP ID saat ini: {$idp->id_idp}");
-                        Log::debug("IdpKompetensi's IDP ID: " . ($idpKompetensi ? $idpKompetensi->id_idp : 'N/A'));
+                        // Periksa apakah ini kompetensi BARU (kuncinya dimulai dengan 'new_')
+                        if (str_starts_with($key, 'new_')) {
+                            Log::debug("Memproses kompetensi BARU dengan key: {$key}", $kompetensiData);
+                            try {
+                                $newIdpKompetensi = IDPKompetensi::create([
+                                    'id_idp' => $idp->id_idp,
+                                    'id_kompetensi' => $kompetensiData['id_kompetensi'], // ID master kompetensi
+                                    'sasaran' => $kompetensiData['sasaran'],
+                                    'aksi' => $kompetensiData['aksi'],
+                                ]);
+                                Log::debug("Kompetensi baru berhasil dibuat dengan ID: {$newIdpKompetensi->id_idpKom}");
 
-                        // Memastikan kompetensi yang akan diupdate adalah milik IDP ini
-                        if ($idpKompetensi && $idpKompetensi->id_idp == $idp->id_idp) {
-                            Log::debug("Kondisi terpenuhi untuk ID: {$actualIdpKompetensiId}. Mencoba update.");
-                            $idpKompetensi->update([
-                                'sasaran' => $kompetensiData['sasaran'],
-                                'aksi' => $kompetensiData['aksi'],
-                            ]);
-                            Log::debug("Sasaran diperbarui menjadi: {$kompetensiData['sasaran']}");
-                            Log::debug("Aksi diperbarui menjadi: {$kompetensiData['aksi']}");
+                                // --- BARIS KRITIS YANG PERLU DITAMBAHKAN ---
+                                // Tambahkan ID kompetensi BARU ke array $submittedIdpKompetensiIds
+                                // Ini penting agar tidak dihapus di langkah selanjutnya
+                                $submittedIdpKompetensiIds[] = $newIdpKompetensi->id_idpKom;
+                                // --------------------------------------------
 
-                            $metodeBelajarIds = $kompetensiData['id_metode_belajar'] ?? [];
-                            $idpKompetensi->metodeBelajars()->sync($metodeBelajarIds);
-                            Log::debug("Metode Belajar disinkronkan dengan ID: " . implode(', ', $metodeBelajarIds));
+                                // Sinkronkan metode belajar untuk kompetensi baru
+                                $metodeBelajarIds = $kompetensiData['id_metode_belajar'] ?? [];
+                                if (!empty($metodeBelajarIds)) {
+                                    $newIdpKompetensi->metodeBelajars()->sync($metodeBelajarIds);
+                                    Log::debug("Metode Belajar untuk kompetensi baru ID: {$newIdpKompetensi->id_idpKom} disinkronkan dengan ID: " . implode(', ', $metodeBelajarIds));
+                                } else {
+                                    Log::debug("Tidak ada metode belajar yang disubmit untuk kompetensi baru ID: {$newIdpKompetensi->id_idpKom}");
+                                }
+                            } catch (Exception $e) {
+                                Log::error("Gagal membuat atau menyinkronkan kompetensi BARU dengan key {$key}. Error: " . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile());
+                                throw $e; // Re-throw the exception to trigger rollback
+                            }
+                        }
+                        // Tangani pembaruan kompetensi yang SUDAH ADA (kuncinya adalah angka atau 'id' ada)
+                        else if (isset($kompetensiData['id'])) { // Periksa 'id' (id_idpKom)
+                            $actualIdpKompetensiId = $kompetensiData['id']; // Ini adalah id_idpKom
+
+                            Log::debug("Memproses kompetensi EXISTING dengan ID: {$actualIdpKompetensiId}", $kompetensiData);
+
+                            try {
+                                // Pastikan kompetensi yang akan diupdate adalah milik IDP ini
+                                $idpKompetensi = IDPKompetensi::where('id_idpKom', $actualIdpKompetensiId)
+                                    ->where('id_idp', $idp->id_idp) // Pastikan milik IDP ini
+                                    ->first();
+
+                                if ($idpKompetensi) {
+                                    Log::debug("Kondisi terpenuhi untuk ID: {$actualIdpKompetensiId}. Mencoba update.");
+
+                                    $idpKompetensi->update([
+                                        'sasaran' => $kompetensiData['sasaran'],
+                                        'aksi' => $kompetensiData['aksi'],
+                                    ]);
+                                    Log::debug("Sasaran diperbarui menjadi: {$kompetensiData['sasaran']} untuk ID: {$actualIdpKompetensiId}");
+                                    Log::debug("Aksi diperbarui menjadi: {$kompetensiData['aksi']} untuk ID: {$actualIdpKompetensiId}");
+
+                                    // Sinkronkan metode belajar untuk kompetensi existing
+                                    $metodeBelajarIds = $kompetensiData['id_metode_belajar'] ?? [];
+                                    $idpKompetensi->metodeBelajars()->sync($metodeBelajarIds);
+                                    Log::debug("Metode Belajar disinkronkan untuk ID: {$actualIdpKompetensiId} dengan ID: " . implode(', ', $metodeBelajarIds));
+
+                                    // Tambahkan ID kompetensi yang sudah ada dan berhasil diproses ke array ini
+                                    $submittedIdpKompetensiIds[] = $actualIdpKompetensiId;
+                                } else {
+                                    Log::warning("Upaya untuk memperbarui IdpKompetensi yang tidak ada atau tidak cocok dengan ID: {$actualIdpKompetensiId} untuk IDP: {$idp->id_idp}. Mungkin sudah dihapus atau ID salah.");
+                                }
+                            } catch (Exception $e) {
+                                Log::error("Gagal memperbarui atau menyinkronkan kompetensi EXISTING ID {$actualIdpKompetensiId}. Error: " . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile());
+                                throw $e; // Re-throw the exception to trigger rollback
+                            }
                         } else {
-                            Log::warning("Upaya untuk memperbarui IdpKompetensi yang tidak ada atau tidak cocok dengan ID: {$actualIdpKompetensiId} untuk IDP: {$idp->id_idp}");
+                            Log::warning("Item kompetensi dengan key '{$key}' di request tidak valid (bukan 'new_' dan tidak punya 'id'). Data: ", $kompetensiData);
                         }
                     }
+                    Log::debug('Selesai memproses semua item kompetensi dari request.');
                 } else {
-                    Log::info("Tidak ada data kompetensi yang dikirim untuk diperbarui.");
+                    Log::info("Tidak ada data kompetensi yang dikirim dalam request update untuk IDP: {$idp->id_idp}.");
                 }
-            });
+
+                // 3. Logika Penghapusan Kompetensi Lama yang Tidak Terkirim
+                Log::debug('Memulai logika penghapusan kompetensi lama.');
+                // Ambil semua id_idpKom dari kompetensi yang saat ini terkait dengan IDP ini di database
+                $currentIdpKompetensiIdsInDb = $idp->idpKompetensis()->pluck('id_idpKom')->toArray();
+                Log::debug("Current IDP Kompetensi IDs in DB: " . implode(', ', $currentIdpKompetensiIdsInDb));
+                Log::debug("Submitted IDP Kompetensi IDs (existing & new): " . implode(', ', $submittedIdpKompetensiIds)); // Log diubah
+
+                // Tentukan ID yang harus dihapus (ada di DB tapi TIDAK ada di submittedIdpKompetensiIds)
+                $idpKompetensiIdsToDelete = array_diff($currentIdpKompetensiIdsInDb, $submittedIdpKompetensiIds);
+
+                if (!empty($idpKompetensiIdsToDelete)) {
+                    Log::debug("Kompetensi IDP yang akan dihapus: " . implode(', ', $idpKompetensiIdsToDelete));
+                    try {
+                        foreach ($idpKompetensiIdsToDelete as $idToDelete) {
+                            $idpKompetensiToDelete = IDPKompetensi::find($idToDelete);
+                            if ($idpKompetensiToDelete) {
+                                // Hapus relasi di tabel pivot 'idp_kompetensi_metode_belajars' terlebih dahulu
+                                $idpKompetensiToDelete->metodeBelajars()->detach();
+                                Log::debug("Metode Belajar dihapus untuk IDPKompetensi: {$idToDelete}");
+                                // Kemudian hapus record IDPKompetensi itu sendiri
+                                $idpKompetensiToDelete->delete();
+                                Log::debug("IDPKompetensi dihapus: {$idToDelete}");
+                            } else {
+                                Log::warning("IDPKompetensi {$idToDelete} tidak ditemukan saat mencoba menghapus. Mungkin sudah dihapus sebelumnya.");
+                            }
+                        }
+                        Log::debug("Penghapusan kompetensi lama selesai.");
+                    } catch (Exception $e) {
+                        Log::error("Gagal menghapus kompetensi lama. Error: " . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile());
+                        throw $e; // Re-throw the exception to trigger rollback
+                    }
+                } else {
+                    Log::info("Tidak ada kompetensi lama yang perlu dihapus untuk IDP: {$idp->id_idp}.");
+                }
+                Log::debug('Transaksi database akan di-commit.');
+            }); // Akhir DB::transaction
 
             return redirect()->route('adminsdm.BehaviorIDP.indexGiven')
-                ->with('msg-success', 'Data IDP berhasil diperbarui.');
-        } catch (\Exception $e) {
-            Log::error('Error updating IDP: ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile());
+                ->with('success', 'Data IDP berhasil diperbarui.');
+        } catch (Exception $e) {
+            // DB::rollBack() sudah ditangani secara otomatis oleh DB::transaction jika terjadi Exception
+            Log::error('Error saat memperbarui IDP: ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile());
             return redirect()->back()
                 ->withInput()
-                ->with('msg-error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
         }
+    }
+    public function destroyGivenw(IDP $idp)
+    {
+        $idp->delete();
+        return redirect()->route('adminsdm.BehaviorIDP.indexGiven')->with('msg-success', 'Berhasil menghapus data Idp ' . $idp->proyeksi_karir);
     }
 }
