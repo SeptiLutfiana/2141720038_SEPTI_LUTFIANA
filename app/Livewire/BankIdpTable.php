@@ -13,14 +13,15 @@ class BankIdpTable extends Component
     public $search;
     public $jenjang;
     public $lg;
-    // public $semester;
+    public $tahun;
     protected string $paginationTheme = 'bootstrap';
-    protected $updatesQueryString = ['search'];
+    protected $updatesQueryString = ['search', 'jenjang', 'lg', 'tahun'];
 
     public function mount()
     {
         // Mengambil search query dari URL
         $this->search = request()->query('search');
+        $this->tahun = request()->query('tahun');
     }
     public function deleteId($id)
     {
@@ -48,11 +49,9 @@ class BankIdpTable extends Component
             ->when($this->lg, function ($query) {
                 return $query->where('id_LG', $this->lg);
             })
-            // ->when($this->semester, function ($query) {
-            //     return $query->whereHas('semester', function ($q) {
-            //         $q->where('semester', $this->semester);
-            //     });
-            // })
+            ->when($this->tahun, function ($query) {
+                return $query->whereYear('waktu_mulai', $this->tahun);
+            })
             ->orderBy('proyeksi_karir')
             ->paginate(5)
             ->withQueryString();

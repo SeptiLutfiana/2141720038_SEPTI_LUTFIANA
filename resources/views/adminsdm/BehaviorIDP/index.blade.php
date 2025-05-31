@@ -37,11 +37,11 @@
                             <div class="card-header">
                                 <h4>Data Individual Development Plan</h4>
                                 <div class="card-header-action">
-                                    <a href="#" class="btn btn-icon btn-danger icon-left" target="_blank" rel="noopener noreferrer"><i
-                                        class="fas fa-print"></i>
-                                    Print PDF</a>
-                                    <a href="{{ route('adminsdm.BehaviorIDP.create') }}" class="btn btn-icon btn-primary icon-left"><i
-                                            class="fas fa-plus"></i>
+                                    <a href="#" class="btn btn-icon btn-danger icon-left" target="_blank"
+                                        rel="noopener noreferrer"><i class="fas fa-print"></i>
+                                        Print PDF</a>
+                                    <a href="{{ route('adminsdm.BehaviorIDP.create') }}"
+                                        class="btn btn-icon btn-primary icon-left"><i class="fas fa-plus"></i>
                                         Tambah</a>
                                 </div>
                             </div>
@@ -50,15 +50,17 @@
                                     <div class="form-row">
                                         <div class="col-md-3">
                                             <label>Cari Karyawan</label>
-                                            <input type="text" name="search" class="form-control" placeholder="Cari nama karyawan..." 
-                                                   value="{{ request('search') }}" oninput="this.form.submit()">
+                                            <input type="text" name="search" class="form-control"
+                                                placeholder="Cari nama karyawan..." value="{{ request('search') }}"
+                                                oninput="this.form.submit()">
                                         </div>
                                         <div class="col-md-3">
                                             <label>Pilih Jenjang</label>
                                             <select name="id_jenjang" class="form-control" onchange="this.form.submit()">
                                                 <option value="">-- Semua Jenjang --</option>
                                                 @foreach ($listJenjang as $j)
-                                                    <option value="{{ $j->id_jenjang }}" {{ request('id_jenjang') == $j->id_jenjang ? 'selected' : '' }}>
+                                                    <option value="{{ $j->id_jenjang }}"
+                                                        {{ request('id_jenjang') == $j->id_jenjang ? 'selected' : '' }}>
                                                         {{ $j->nama_jenjang }}
                                                     </option>
                                                 @endforeach
@@ -66,37 +68,39 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label>Pilih Learning Group</label>
-                                            <select name="lg" class="form-control" onchange="this.form.submit()">
+                                            <select name="id_LG" class="form-control" onchange="this.form.submit()">
                                                 <option value="">-- Pilih Learning Group --</option>
                                                 @foreach ($listLG as $lg)
-                                                    <option value="{{ $lg->id_LG }}" {{ request('lg') == $lg->id_LG ? 'selected' : '' }}>
+                                                    <option value="{{ $lg->id_LG }}"
+                                                        {{ request('id_LG') == $lg->id_LG ? 'selected' : '' }}>
                                                         {{ $lg->nama_LG }}
                                                     </option>
                                                 @endforeach
                                             </select>
                                         </div>
-                                        {{-- <div class="col-md-3">
-                                            <label>Pilih Semester</label>
-                                            <select name="role" class="form-control" onchange="this.form.submit()">
-                                                <option value="">-- Pilih Semester --</option>
-                                                @foreach ($listSemester as $semester)
-                                                    <option value="{{ $semester->id_semester }}" {{ request('semester') == $semester->id_semester? 'selected' : '' }}>
-                                                        {{ $semester->nama_semester }}
+                                        <div class="col-md-3">
+                                            <label>Pilih Tahun</label>
+                                            <select name="tahun" class="form-control" onchange="this.form.submit()">
+                                                <option value="">-- Semua Tahun --</option>
+                                                @foreach ($listTahun as $tahun)
+                                                    <option value="{{ $tahun }}"
+                                                        {{ request('tahun') == $tahun ? 'selected' : '' }}>
+                                                        {{ $tahun }}
                                                     </option>
                                                 @endforeach
                                             </select>
-                                        </div> --}}
+                                        </div>
                                     </div>
                                 </form>
-                                <div class="table-responsive">                                                                              
-                                @livewire('idp-table', [
-                                    'search' => request('search'),
-                                    'jenjang' => request('id_jenjang'),
-                                    'lg' => request('lg'),
-                                    // 'semester' => request('semester'),
-                                ])
+                                <div class="table-responsive">
+                                    @livewire('idp-table', [
+                                        'search' => request('search'),
+                                        'jenjang' => request('id_jenjang'),
+                                        'lg' => request('id_LG'),
+                                        'tahun' => request('tahun'),
+                                    ])
                                 </div>
-                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -12,36 +12,46 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($idps as $idp)
+            @if ($idps->count())
+                @foreach ($idps as $idp)
+                    <tr>
+                        <td class="text-center" style="width: 50px;">
+                            {{ $loop->iteration + ($idps->currentPage() - 1) * $idps->perPage() }}
+                        </td>
+                        <td class="text-center">{{ $idp->proyeksi_karir }}</td>
+                        <td class="text-center">{{ optional($idp->karyawan)->name ?? '-' }}</td>
+                        <td class="text-center">{{ optional($idp->mentor)->name ?? '-' }}</td>
+                        <td class="text-center">{{ $idp->supervisor->name ?? '-' }}</td>
+                        <td class="text-center">{{ $idp->karyawan->learningGroup->nama_LG ?? '-' }}</td>
+                        <td class="text-left" style="width: 120px;">
+                            <a href="{{ route('adminsdm.BehaviorIDP.editGiven', $idp->id_idp) }}"
+                                class="btn btn-warning btn-sm mb-1">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <br>
+                            <a href="{{ route('adminsdm.BehaviorIDP.showGiven', $idp->id_idp) }}"
+                                class="btn btn-primary btn-sm mb-1">
+                                <i class="fas fa-info-circle"></i> Detail
+                            </a>
+                            <br>
+                            <form action="{{ route('adminsdm.BehaviorIDP.destroyGiven', $idp->id_idp) }}" method="POST"
+                                style="display: inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm rounded mb-1">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            @else
                 <tr>
-                    <td class="text-center" style="width: 50px;">
-                        {{ $loop->iteration + ($idps->currentPage() - 1) * $idps->perPage() }}
-                    </td>
-                    <td>{{ $idp->proyeksi_karir }}</td>
-                    <td>{{ optional($idp->karyawan)->name ?? '-' }}</td>
-                    <td>{{ optional($idp->mentor)->name ?? '-' }}</td>
-                    <td>{{ $idp->supervisor->name ?? '-' }}</td>
-                    <td>{{ $idp->karyawan->learningGroup->nama_LG ?? '-'}}</td>
-                    <td class="text-left" style="width: 120px;">
-                        <a href="{{ route('adminsdm.BehaviorIDP.edit', $idp->id_idp) }}" class="btn btn-warning btn-sm mb-1">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                        <br>
-                        <a href="{{ route('adminsdm.BehaviorIDP.show', $idp->id_idp) }}"
-                            class="btn btn-primary btn-sm mb-1">
-                            <i class="fas fa-info-circle"></i> Detail
-                        </a>
-                        <br>
-                        <form action="{{ route('adminsdm.BehaviorIDP.destroyGiven', $idp->id_idp) }}" method="POST" style="display: inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm rounded mb-1">
-                                <i class="fas fa-trash"></i> Hapus
-                            </button>
-                        </form>
+                    <td colspan="6" class="text-center text-muted py-3">
+                        Data Tidak Ditemukan
                     </td>
                 </tr>
-            @endforeach
+            @endif
         </tbody>
     </table>
 

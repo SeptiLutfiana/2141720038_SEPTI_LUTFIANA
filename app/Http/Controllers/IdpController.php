@@ -26,9 +26,13 @@ class IdpController extends Controller
     {
         $search = $request->query('search');
         $id_jenjang = $request->query('id_jenjang');
-        $lg = $request->query('lg');
-        // $semester = $request->query('semester');
-
+        $id_LG = $request->query('lg');
+        $tahun = $request->query('tahun');
+        $listTahun = IDP::whereNotNull('waktu_mulai')
+            ->selectRaw('YEAR(waktu_mulai) as tahun')
+            ->distinct()
+            ->orderByDesc('tahun')
+            ->pluck('tahun');
         $listJenjang = Jenjang::all();
         $listLG = LearingGroup::all();
         // $listSemester = Semester::all();
@@ -46,14 +50,14 @@ class IdpController extends Controller
                     $q->where('id_jenjang', $id_jenjang);
                 });
             })
-            ->when($lg, function ($query, $lg) {
-                return $query->whereHas('karyawan', function ($q) use ($lg) {
-                    $q->where('lg', $lg);
+            ->when($id_LG, function ($query, $id_LG) {
+                return $query->whereHas('karyawan', function ($q) use ($id_LG) {
+                    $q->where('lg', $id_LG);
                 });
             })
-            // ->when($semester, function ($query, $semester) {
-            //     return $query->where('id_semester', $semester);
-            // })
+            ->when($tahun, function ($query, $tahun) {
+                return $query->whereYear('waktu_mulai', $tahun);
+            })
             ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();
@@ -62,11 +66,11 @@ class IdpController extends Controller
             'idps' => $idps,
             'listJenjang' => $listJenjang,
             'listLG' => $listLG,
-            // 'listSemester' => $listSemester,
+            'listTahun' => $listTahun,
             'search' => $search,
             'id_jenjang' => $id_jenjang,
-            'lg' => $lg,
-            // 'semester' => $semester,
+            'lg' => $id_LG,
+            'tahun' => $tahun,
             'type_menu' => 'idps',
         ]);
     }
@@ -74,7 +78,13 @@ class IdpController extends Controller
     {
         $search = $request->query('search');
         $id_jenjang = $request->query('id_jenjang');
-        $lg = $request->query('lg');
+        $id_LG = $request->query('lg');
+        $tahun = $request->query('tahun');
+        $listTahun = IDP::whereNotNull('waktu_mulai')
+            ->selectRaw('YEAR(waktu_mulai) as tahun')
+            ->distinct()
+            ->orderByDesc('tahun')
+            ->pluck('tahun');
         $listJenjang = Jenjang::all();
         $listLG = LearingGroup::all();
         $idps = IDP::query(); // Mulai dengan query dasar
@@ -91,10 +101,13 @@ class IdpController extends Controller
                     $q->where('id_jenjang', $id_jenjang);
                 });
             })
-            ->when($lg, function ($query, $lg) {
-                return $query->whereHas('karyawan', function ($q) use ($lg) {
-                    $q->where('lg', $lg);
+            ->when($id_LG, function ($query, $id_LG) {
+                return $query->whereHas('karyawan', function ($q) use ($id_LG) {
+                    $q->where('id_LG', $id_LG);
                 });
+            })
+            ->when($tahun, function ($query, $tahun) {
+                return $query->whereYear('waktu_mulai', $tahun);
             })
             ->orderByDesc('created_at')
             ->paginate(10)
@@ -104,9 +117,11 @@ class IdpController extends Controller
             'idps' => $idps,
             'listJenjang' => $listJenjang,
             'listLG' => $listLG,
+            'listTahun' => $listTahun,
             'search' => $search,
             'id_jenjang' => $id_jenjang,
-            'lg' => $lg,
+            'lg' => $id_LG,
+            'tahun' => $tahun,
             'type_menu' => 'idps',
         ]);
     }
@@ -178,6 +193,7 @@ class IdpController extends Controller
                 'id_supervisor_jenjang' => 'required|exists:users,id',
                 'id_jenjang_bank' => 'required|exists:jenjangs,id_jenjang',
                 'id_LG' => 'nullable|exists:users,id_LG',
+                'max_applies' => 'required|integer|min:0',
             ];
             $request->validate(array_merge($commonRules, $templateRules));
 
@@ -204,6 +220,8 @@ class IdpController extends Controller
                     'deskripsi_idp' => $request->deskripsi_idp,
                     'id_jenjang' => $request->id_jenjang_bank, // Simpan jenjang untuk template
                     'id_LG' => $request->id_LG, // Simpan LG untuk template
+                    'max_applies' => $request->max_applies,
+
                 ]);
 
                 foreach ($request->kompetensi as $item) {
@@ -228,7 +246,7 @@ class IdpController extends Controller
             });
             // --- AKHIR PERUBAHAN UTAMA UNTUK BANK IDP ---
 
-            return redirect()->route('adminsdm.BehaviorIDP.indexBankIdp')
+            return redirect()->route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp')
                 ->with('msg-success', 'Berhasil membuat IDP Bank untuk jenjang ' . $namaJenjang . ' dan learning group ' . ($namaLG ? $namaLG : 'Semua Learning Group'));
         } else { // Ini adalah Given IDP
             $customRules = [
@@ -301,7 +319,7 @@ class IdpController extends Controller
         }
     }
 
-    public function show($id)
+    public function showGiven($id)
     {
         // Mengambil data Divisi berdasarkan ID
         $idps = IDP::with([
@@ -312,6 +330,21 @@ class IdpController extends Controller
             'idpKompetensis.metodeBelajars' // relasi kompetensi beserta metode belajar
         ])->findOrFail($id);
         return view('adminsdm.BehaviorIDP.detail', [
+            'idps'    => $idps,
+            'type_menu' => 'idps',
+        ]);
+    }
+    public function showBank($id)
+    {
+        // Mengambil data Divisi berdasarkan ID
+        $idps = IDP::with([
+            'karyawan',      // relasi banyak karyawan jika ada
+            'mentor',
+            'supervisor',
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.metodeBelajars' // relasi kompetensi beserta metode belajar
+        ])->findOrFail($id);
+        return view('adminsdm.BehaviorIDP.ListIDP.detail', [
             'idps'    => $idps,
             'type_menu' => 'idps',
         ]);
@@ -399,7 +432,7 @@ class IdpController extends Controller
         $kompetensi = Kompetensi::where('id_jabatan', $id)->where('jenis_kompetensi', 'Hard Kompetensi')->get();
         return response()->json($kompetensi);
     }
-    public function edit($id)
+    public function editGiven($id)
     {
         $idp = IDP::with(['idpKompetensis.metodeBelajars'])->findOrFail($id);
 
@@ -430,7 +463,7 @@ class IdpController extends Controller
             'type_menu' => 'idps'
         ]);
     }
-    public function update(Request $request, $id)
+    public function updateGivenw(Request $request, $id)
     {
         $idp = IDP::findOrFail($id);
         Log::debug('Data request yang diterima:', $request->all());
@@ -597,9 +630,210 @@ class IdpController extends Controller
                 ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
         }
     }
-    public function destroyGivenw(IDP $idp)
+    public function editBank($id)
+    {
+        $idp = IDP::with(['idpKompetensis.metodeBelajars'])->findOrFail($id);
+
+        // Ambil data yang dibutuhkan untuk form
+        $supervisors = User::whereHas('roles', fn($q) => $q->where('user_roles.id_role', 2))->get();
+        $karyawans = User::whereHas('roles', fn($q) => $q->where('user_roles.id_role', 4))->get();
+        $listJenjang = Jenjang::all();
+        $listJabatan = Jabatan::all();
+        $listLG = LearingGroup::all();
+        $listDivisi = Divisi::all();
+        $listPenempatan = Penempatan::all();
+        $kompetensi = Kompetensi::all();
+        $metodeBelajars = MetodeBelajar::all();
+
+        return view('adminsdm.BehaviorIDP.ListIDP.edit', [
+            'idp' => $idp,
+            'supervisors' => $supervisors,
+            'karyawans' => $karyawans,
+            'listJabatan' => $listJabatan,
+            'listJenjang' => $listJenjang,
+            'listLG' => $listLG,
+            'listDivisi' => $listDivisi,
+            'listPenempatan' => $listPenempatan,
+            'kompetensi' => $kompetensi,
+            'metodeBelajars' => $metodeBelajars,
+            'type_menu' => 'idps'
+        ]);
+    }
+    public function updateBank(Request $request, $id)
+    {
+        $idp = IDP::findOrFail($id);
+        Log::debug('Data request yang diterima:', $request->all());
+
+        $validated = $request->validate([
+            'proyeksi_karir' => 'required|string|max:255',
+            'waktu_mulai' => 'required|date',
+            'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
+            'deskripsi_idp' => 'nullable|string',
+            'id_supervisor' => 'required|exists:users,id',
+            'max_applies' => 'required|integer',
+            'kompetensi' => 'nullable|array',
+            'kompetensi.*.id' => 'nullable|integer',
+            'kompetensi.*.id_kompetensi' => 'nullable|integer|exists:kompetensis,id_kompetensi', // Hanya untuk yang baru
+            'kompetensi.*.sasaran' => 'required|string',
+            'kompetensi.*.aksi' => 'required|string',
+            'kompetensi.*.id_metode_belajar' => 'nullable|array',
+            'kompetensi.*.id_metode_belajar.*' => 'integer|exists:metode_belajars,id_metodeBelajar',
+        ]);
+
+        try {
+            DB::transaction(function () use ($idp, $validated, $request) {
+                Log::debug('Memulai transaksi database.');
+
+                // 1. Update data IDP utama
+                $idp->update([
+                    'proyeksi_karir' => $validated['proyeksi_karir'],
+                    'waktu_mulai' => $validated['waktu_mulai'],
+                    'waktu_selesai' => $validated['waktu_selesai'],
+                    'deskripsi_idp' => $validated['deskripsi_idp'] ?? null,
+                    'max_applies' => $validated['max_applies'],
+                    'id_supervisor' => $validated['id_supervisor'],
+                ]);
+                Log::debug("IDP utama dengan ID {$idp->id_idp} berhasil diperbarui.");
+
+                // Akan menyimpan id_idpKom dari kompetensi yang sudah ada DAN BARU DIBUAT yang berhasil diproses
+                $submittedIdpKompetensiIds = [];
+
+                // 2. Proses kompetensi jika ada
+                if (isset($validated['kompetensi']) && is_array($validated['kompetensi'])) {
+                    Log::debug('Mulai memproses item kompetensi dari request.');
+                    foreach ($validated['kompetensi'] as $key => $kompetensiData) {
+
+                        // Periksa apakah ini kompetensi BARU (kuncinya dimulai dengan 'new_')
+                        if (str_starts_with($key, 'new_')) {
+                            Log::debug("Memproses kompetensi BARU dengan key: {$key}", $kompetensiData);
+                            try {
+                                $newIdpKompetensi = IDPKompetensi::create([
+                                    'id_idp' => $idp->id_idp,
+                                    'id_kompetensi' => $kompetensiData['id_kompetensi'], // ID master kompetensi
+                                    'sasaran' => $kompetensiData['sasaran'],
+                                    'aksi' => $kompetensiData['aksi'],
+                                ]);
+                                Log::debug("Kompetensi baru berhasil dibuat dengan ID: {$newIdpKompetensi->id_idpKom}");
+
+                                // --- BARIS KRITIS YANG PERLU DITAMBAHKAN ---
+                                // Tambahkan ID kompetensi BARU ke array $submittedIdpKompetensiIds
+                                // Ini penting agar tidak dihapus di langkah selanjutnya
+                                $submittedIdpKompetensiIds[] = $newIdpKompetensi->id_idpKom;
+                                // --------------------------------------------
+
+                                // Sinkronkan metode belajar untuk kompetensi baru
+                                $metodeBelajarIds = $kompetensiData['id_metode_belajar'] ?? [];
+                                if (!empty($metodeBelajarIds)) {
+                                    $newIdpKompetensi->metodeBelajars()->sync($metodeBelajarIds);
+                                    Log::debug("Metode Belajar untuk kompetensi baru ID: {$newIdpKompetensi->id_idpKom} disinkronkan dengan ID: " . implode(', ', $metodeBelajarIds));
+                                } else {
+                                    Log::debug("Tidak ada metode belajar yang disubmit untuk kompetensi baru ID: {$newIdpKompetensi->id_idpKom}");
+                                }
+                            } catch (Exception $e) {
+                                Log::error("Gagal membuat atau menyinkronkan kompetensi BARU dengan key {$key}. Error: " . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile());
+                                throw $e; // Re-throw the exception to trigger rollback
+                            }
+                        }
+                        // Tangani pembaruan kompetensi yang SUDAH ADA (kuncinya adalah angka atau 'id' ada)
+                        else if (isset($kompetensiData['id'])) { // Periksa 'id' (id_idpKom)
+                            $actualIdpKompetensiId = $kompetensiData['id']; // Ini adalah id_idpKom
+
+                            Log::debug("Memproses kompetensi EXISTING dengan ID: {$actualIdpKompetensiId}", $kompetensiData);
+
+                            try {
+                                // Pastikan kompetensi yang akan diupdate adalah milik IDP ini
+                                $idpKompetensi = IDPKompetensi::where('id_idpKom', $actualIdpKompetensiId)
+                                    ->where('id_idp', $idp->id_idp) // Pastikan milik IDP ini
+                                    ->first();
+
+                                if ($idpKompetensi) {
+                                    Log::debug("Kondisi terpenuhi untuk ID: {$actualIdpKompetensiId}. Mencoba update.");
+
+                                    $idpKompetensi->update([
+                                        'sasaran' => $kompetensiData['sasaran'],
+                                        'aksi' => $kompetensiData['aksi'],
+                                    ]);
+                                    Log::debug("Sasaran diperbarui menjadi: {$kompetensiData['sasaran']} untuk ID: {$actualIdpKompetensiId}");
+                                    Log::debug("Aksi diperbarui menjadi: {$kompetensiData['aksi']} untuk ID: {$actualIdpKompetensiId}");
+
+                                    // Sinkronkan metode belajar untuk kompetensi existing
+                                    $metodeBelajarIds = $kompetensiData['id_metode_belajar'] ?? [];
+                                    $idpKompetensi->metodeBelajars()->sync($metodeBelajarIds);
+                                    Log::debug("Metode Belajar disinkronkan untuk ID: {$actualIdpKompetensiId} dengan ID: " . implode(', ', $metodeBelajarIds));
+
+                                    // Tambahkan ID kompetensi yang sudah ada dan berhasil diproses ke array ini
+                                    $submittedIdpKompetensiIds[] = $actualIdpKompetensiId;
+                                } else {
+                                    Log::warning("Upaya untuk memperbarui IdpKompetensi yang tidak ada atau tidak cocok dengan ID: {$actualIdpKompetensiId} untuk IDP: {$idp->id_idp}. Mungkin sudah dihapus atau ID salah.");
+                                }
+                            } catch (Exception $e) {
+                                Log::error("Gagal memperbarui atau menyinkronkan kompetensi EXISTING ID {$actualIdpKompetensiId}. Error: " . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile());
+                                throw $e; // Re-throw the exception to trigger rollback
+                            }
+                        } else {
+                            Log::warning("Item kompetensi dengan key '{$key}' di request tidak valid (bukan 'new_' dan tidak punya 'id'). Data: ", $kompetensiData);
+                        }
+                    }
+                    Log::debug('Selesai memproses semua item kompetensi dari request.');
+                } else {
+                    Log::info("Tidak ada data kompetensi yang dikirim dalam request update untuk IDP: {$idp->id_idp}.");
+                }
+
+                // 3. Logika Penghapusan Kompetensi Lama yang Tidak Terkirim
+                Log::debug('Memulai logika penghapusan kompetensi lama.');
+                // Ambil semua id_idpKom dari kompetensi yang saat ini terkait dengan IDP ini di database
+                $currentIdpKompetensiIdsInDb = $idp->idpKompetensis()->pluck('id_idpKom')->toArray();
+                Log::debug("Current IDP Kompetensi IDs in DB: " . implode(', ', $currentIdpKompetensiIdsInDb));
+                Log::debug("Submitted IDP Kompetensi IDs (existing & new): " . implode(', ', $submittedIdpKompetensiIds)); // Log diubah
+
+                // Tentukan ID yang harus dihapus (ada di DB tapi TIDAK ada di submittedIdpKompetensiIds)
+                $idpKompetensiIdsToDelete = array_diff($currentIdpKompetensiIdsInDb, $submittedIdpKompetensiIds);
+
+                if (!empty($idpKompetensiIdsToDelete)) {
+                    Log::debug("Kompetensi IDP yang akan dihapus: " . implode(', ', $idpKompetensiIdsToDelete));
+                    try {
+                        foreach ($idpKompetensiIdsToDelete as $idToDelete) {
+                            $idpKompetensiToDelete = IDPKompetensi::find($idToDelete);
+                            if ($idpKompetensiToDelete) {
+                                // Hapus relasi di tabel pivot 'idp_kompetensi_metode_belajars' terlebih dahulu
+                                $idpKompetensiToDelete->metodeBelajars()->detach();
+                                Log::debug("Metode Belajar dihapus untuk IDPKompetensi: {$idToDelete}");
+                                // Kemudian hapus record IDPKompetensi itu sendiri
+                                $idpKompetensiToDelete->delete();
+                                Log::debug("IDPKompetensi dihapus: {$idToDelete}");
+                            } else {
+                                Log::warning("IDPKompetensi {$idToDelete} tidak ditemukan saat mencoba menghapus. Mungkin sudah dihapus sebelumnya.");
+                            }
+                        }
+                        Log::debug("Penghapusan kompetensi lama selesai.");
+                    } catch (Exception $e) {
+                        Log::error("Gagal menghapus kompetensi lama. Error: " . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile());
+                        throw $e; // Re-throw the exception to trigger rollback
+                    }
+                } else {
+                    Log::info("Tidak ada kompetensi lama yang perlu dihapus untuk IDP: {$idp->id_idp}.");
+                }
+                Log::debug('Transaksi database akan di-commit.');
+            }); // Akhir DB::transaction
+
+            return redirect()->route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp')
+                ->with('success', 'Data IDP berhasil diperbarui.');
+        } catch (Exception $e) {
+            // DB::rollBack() sudah ditangani secara otomatis oleh DB::transaction jika terjadi Exception
+            Log::error('Error saat memperbarui IDP: ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+        }
+    }
+    public function destroyGiven(IDP $idp)
     {
         $idp->delete();
         return redirect()->route('adminsdm.BehaviorIDP.indexGiven')->with('msg-success', 'Berhasil menghapus data Idp ' . $idp->proyeksi_karir);
+    }
+    public function destroyBank(IDP $idp)
+    {
+        $idp->delete();
+        return redirect()->route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp')->with('msg-success', 'Berhasil menghapus data Idp ' . $idp->proyeksi_karir);
     }
 }

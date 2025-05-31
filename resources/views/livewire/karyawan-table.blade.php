@@ -1,19 +1,20 @@
 <div>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th class="text-center">No</th>
-                    <th class="text-center">NPK</th>
-                    <th class="text-center">Nama Lengkap</th>
-                    <th class="text-center">Jenjang</th>
-                    <th class="text-center">Jabatan</th>
-                    <th class="text-center">User Role</th>
-                    <th class="text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th class="text-center">No</th>
+                <th class="text-center">NPK</th>
+                <th class="text-center">Nama Lengkap</th>
+                <th class="text-center">Jenjang</th>
+                <th class="text-center">Jabatan</th>
+                <th class="text-center">User Role</th>
+                <th class="text-center">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if ($user->count())
                 @foreach ($user as $item)
-                    <tr>
+                    <tr class="text-center">
                         <td class="text-center" style="width: 50px;">
                             {{ $loop->iteration + ($user->currentPage() - 1) * $user->perPage() }}</td>
                         <td>{{ $item->npk }}</td>
@@ -40,9 +41,15 @@
 
                     </tr>
                 @endforeach
-            </tbody>
-        </table>
-        {{-- Pagination --}}
-        {{ $user->links() }}
+            @else
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-3">
+                        Data Tidak Ditemukan
+                    </td>
+                </tr>
+            @endif
+        </tbody>
+    </table>
+    {{-- Pagination --}}
+    {{ $user->links() }}
 </div>
-

@@ -13,8 +13,8 @@
                 <h1>Edit Data IDP</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Data
-                            Jabatan</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}">Data Bank
+                            IDP</a></div>
                     <div class="breadcrumb-item">Edit Data IDP</div>
                 </div>
             </div>
@@ -35,21 +35,11 @@
                     </div>
                 @endif
                 <div class="card">
-                    <form action="{{ route('adminsdm.BehaviorIDP.updateGiven', $idp->id_idp) }}" method="POST" id="mainForm">
+                    <form action="{{ route('adminsdm.BehaviorIDP.ListIDP.updateBank', $idp->id_idp) }}" method="POST" id="mainForm">
                         @csrf
                         @method('PUT')
                         <div class="card-body">
-                            <h4>{{ $idp->karyawan->name }} - {{ $idp->karyawan->npk }}</h4>
-                            <small class="text-muted d-block mt-1">
-                                Jenjang: {{ $idp->jenjang->nama_jenjang ?? '-' }} |
-                                Jabatan: {{ $idp->jabatan->nama_jabatan ?? '-' }} |
-                                Divisi: {{ $idp->divisi->nama_divisi ?? '-' }} |
-                                Penempatan: {{ $idp->penempatan->nama_penempatan ?? '-' }} | <br>
-                                Learning Group: {{ $idp->learninggroup->nama_LG ?? '-' }} |
-                                Semester: {{ $idp->semester->nama_semester ?? '-' }} |
-                                Angkatan PSP:
-                                {{ $idp->angkatanpsp->bulan ?? '-' }} {{ $idp->angkatanpsp->tahun ?? '-' }}
-                            </small>
+                            <h4>Edit Data IDP {{ $idp->proyeksi_karir }}</h4>
                             <br>
 
                             <div class="form-group">
@@ -65,30 +55,6 @@
                                     class="form-control @if (old('deskripsi_idp')) is-valid @endif
                                 @error('deskripsi_idp') is-invalid @enderror"
                                     style="height:8rem;">{{ old('deskripsi_idp', $idp->deskripsi_idp) }}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Mentor <span class="text-danger">*</span></label>
-                                <select name="id_mentor" class="form-control @error('id_mentor') is-invalid @enderror"
-                                    required>
-                                    @if (empty($idp->id_mentor))
-                                        <option value="">-- Pilih Mentor --</option>
-                                    @endif
-                                    @foreach ($mentors as $item)
-                                        <option value="{{ $item->id }}"
-                                            {{ old('id_mentor', $idp->id_mentor) == $item->id ? 'selected' : '' }}>
-                                            {{ $item->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('id_mentor')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                @if (!empty($idp->id_mentor))
-                                    <small class="text-muted">Mentor saat ini:
-                                        {{ $idp->mentor->name ?? 'Data tidak ditemukan' }}</small>
-                                @else
-                                    <small class="text-warning">Belum ada mentor yang dipilih</small>
-                                @endif
                             </div>
                             <div class="form-group">
                                 <label>Supervisor <span class="text-danger">*</span></label>
@@ -129,6 +95,13 @@
                                 @error('waktu_selesai') is-invalid @enderror"
                                         value="{{ old('waktu_selesai', $idp->waktu_selesai) }}">
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Maksimal Kuota</label>
+                                <input type="number" name="max_applies"
+                                    class="form-control @if (old('max_applies')) is-valid @endif 
+                                    @error('max_applies') is-valid @enderror"
+                                    value="{{ old('max_applies', $idp->max_applies) }}">
                             </div>
 
                             <div id="hiddenKompetensiInputs">

@@ -36,15 +36,15 @@
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                             class="fas fa-columns"></i> <span>Behavior IDP</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('admin/datamaster/behavior/idp/bank/idp') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/bank/idp') }}">Bank IDP</a>
-                        </li>
                         <li class="{{ Request::is('admin/datamaster/behavior/idp/create') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/create') }}">Tambah IDP</a>
                         </li>
+                        <li class="{{ Request::is('admin/datamaster/behavior/idp/bank/idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/bank/idp') }}">Bank IDP</a>
+                        </li>
                         <li class="{{ Request::is('admin/datamaster/behavior/idp/given/idp') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/given/idp') }}">List Perencanaan
-                                IDP</a>
+                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/given/idp') }}">
+                                List Perencanaan IDP</a>
                         </li>
                         <li class="{{ Request::is('idps') ? 'active' : '' }}">
                             <a class="nav-link" href="#">Riwayat Perencanaan IDP</a>
@@ -93,17 +93,20 @@
                             Kompetensi</span></a>
                     <ul class="dropdown-menu">
                         <li class="{{ Request::is('admin/datamaster/kompetensi/soft') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('admin/datamaster/kompetensi/soft') }}">Soft Kompetensi</a>
+                            <a class="nav-link" href="{{ url('admin/datamaster/kompetensi/soft') }}">Soft
+                                Kompetensi</a>
                         </li>
                     </ul>
                     <ul class="dropdown-menu">
                         <li class="{{ Request::is('admin/datamaster/kompetensi/hard') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('admin/datamaster/kompetensi/hard') }}">Hard Kompetensi</a>
+                            <a class="nav-link" href="{{ url('admin/datamaster/kompetensi/hard') }}">Hard
+                                Kompetensi</a>
                         </li>
                     </ul>
                     <ul class="dropdown-menu">
                         <li class="{{ Request::is('admin/datamaster/kompetensi/create') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('admin/datamaster/kompetensi/create') }}">Tambah Kompetensi</a>
+                            <a class="nav-link" href="{{ url('admin/datamaster/kompetensi/create') }}">Tambah
+                                Kompetensi</a>
                         </li>
                     </ul>
                 </li>
@@ -126,7 +129,8 @@
                     </ul>
                 </li>
                 <li class="nav-item dropdown {{ $type_menu === 'mentor' ? 'active' : '' }}">
-                    <a href="#" class="nav-link has-dropdown"><i class="fas fa-chalkboard-teacher"></i> <span>Data
+                    <a href="#" class="nav-link has-dropdown"><i class="fas fa-chalkboard-teacher"></i>
+                        <span>Data
                             Mentor</span></a>
                     <ul class="dropdown-menu">
                         <li class="{{ Request::is('admin/datamaster/mentor') ? 'active' : '' }}">

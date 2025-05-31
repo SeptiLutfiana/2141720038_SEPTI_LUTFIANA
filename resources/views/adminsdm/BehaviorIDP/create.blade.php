@@ -9,7 +9,7 @@
                     <h1>Tambah IDP Karyawan</h1>
                     <div class="section-header-breadcrumb">
                         <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                        <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.indexBankIdp') }}">Data Bank
+                        <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}">Data Bank
                                 IDP</a>
                         </div>
                         <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Data DP</a>
@@ -207,6 +207,13 @@
                                             @endforeach
                                         </select>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="current_applies">Kuota IDP</label>
+                                        <input type="number" name="max_applies" id="max_applies" step="1"
+                                            class="form-control @error('max_applies') is-invalid @enderror"
+                                            value="{{ old('max_applies') }}">
+                                    </div>
+
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">

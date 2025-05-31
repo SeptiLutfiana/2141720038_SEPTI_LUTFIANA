@@ -15,7 +15,8 @@
 
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.indexBankIdp') }}">Data Bank IDP</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}">Data
+                            Bank IDP</a></div>
                 </div>
             </div>
             <div class="section-body">
@@ -46,7 +47,8 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('adminsdm.BehaviorIDP.indexBankIdp') }}" class="mb-3">
+                                <form method="GET" action="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}"
+                                    class="mb-3">
                                     <div class="form-row">
                                         <div class="col-md-3">
                                             <label>Cari Karyawan</label>
@@ -68,35 +70,36 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label>Pilih Learning Group</label>
-                                            <select name="lg" class="form-control" onchange="this.form.submit()">
+                                            <select name="id_LG" class="form-control" onchange="this.form.submit()">
                                                 <option value="">-- Pilih Learning Group --</option>
                                                 @foreach ($listLG as $lg)
                                                     <option value="{{ $lg->id_LG }}"
-                                                        {{ request('lg') == $lg->id_LG ? 'selected' : '' }}>
+                                                        {{ request('id_LG') == $lg->id_LG ? 'selected' : '' }}>
                                                         {{ $lg->nama_LG }}
                                                     </option>
                                                 @endforeach
                                             </select>
                                         </div>
-                                        {{-- <div class="col-md-3">
-                                            <label>Pilih Semester</label>
-                                            <select name="role" class="form-control" onchange="this.form.submit()">
-                                                <option value="">-- Pilih Semester --</option>
-                                                @foreach ($listSemester as $semester)
-                                                    <option value="{{ $semester->id_semester }}" {{ request('semester') == $semester->id_semester? 'selected' : '' }}>
-                                                        {{ $semester->nama_semester }}
+                                        <div class="col-md-3">
+                                            <label>Pilih Tahun</label>
+                                            <select name="tahun" class="form-control" onchange="this.form.submit()">
+                                                <option value="">-- Semua Tahun --</option>
+                                                @foreach ($listTahun as $tahun)
+                                                    <option value="{{ $tahun }}"
+                                                        {{ request('tahun') == $tahun ? 'selected' : '' }}>
+                                                        {{ $tahun }}
                                                     </option>
                                                 @endforeach
                                             </select>
-                                        </div> --}}
+                                        </div>
                                     </div>
                                 </form>
                                 <div class="table-responsive">
                                     @livewire('bank-idp-table', [
                                         'search' => request('search'),
                                         'jenjang' => request('id_jenjang'),
-                                        'lg' => request('lg'),
-                                        // 'semester' => request('semester'),
+                                        'lg' => request('id_LG'),
+                                        'tahun' => request('tahun'),
                                     ])
                                 </div>
                             </div>

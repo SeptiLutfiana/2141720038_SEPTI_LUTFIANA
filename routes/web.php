@@ -239,15 +239,19 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
     // Behavior IDP
     Route::prefix('admin/datamaster/behavior/idp')->name('adminsdm.BehaviorIDP.')->group(function () {
         Route::get('/given/idp', [IdpController::class, 'indexGiven'])->name('indexGiven');
-        Route::get('/bank/idp', [IdpController::class, 'indexBankIdp'])->name('indexBankIdp');
+        Route::get('/bank/idp', [IdpController::class, 'indexBankIdp'])->name('ListIDP.indexBankIdp');
         Route::get('/create', [IdpController::class, 'create'])->name('create');
         Route::post('/store', [IdpController::class, 'store'])->name('store');
-        Route::get('/{id}/detail', [IdpController::class, 'show'])->name('show');
+        Route::get('/{id}/detail/given', [IdpController::class, 'showGiven'])->name('showGiven');
+        Route::get('/{id}/detail', [IdpController::class, 'showBank'])->name('ListIDP.showBank');
         Route::get('/get-jabatan-by-jenjang/{id}', [IdpController::class, 'getJabatanByJenjang'])->name('getJabatanByJenjang');
         Route::get('/get-kompetensi-by-jabatan/{id}', [IdpController::class, 'getKompetensiByJabatan'])->name('getKompetensiByJabatan');
-        Route::get('/{id}/edit', [IdpController::class, 'edit'])->name('edit');
-        Route::put('/{id}/update', [IdpController::class, 'update'])->name('update');
+        Route::get('/{id}/edit', [IdpController::class, 'editGiven'])->name('editGiven');
+        Route::put('/{id}/update', [IdpController::class, 'updateGiven'])->name('updateGiven');
+        Route::get('/{id}/edit/bank/idp', [IdpController::class, 'editBank'])->name('ListIDP.editBank');
+        Route::put('/{id}/update/bank/idp', [IdpController::class, 'updateBank'])->name('ListIDP.updateBank');
         Route::delete('/{idp}', [IdpController::class, 'destroyGiven'])->name('destroyGiven');
+        Route::delete('/{idp}/bank/idp', [IdpController::class, 'destroyBank'])->name('ListIDP.destroyBank');
     });
     Route::get('/list-idp', function () {
         return view('adminsdm.BehaviorIDP.ListIDP.list-idp', [
