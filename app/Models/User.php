@@ -100,4 +100,10 @@ class User extends Authenticatable implements MustVerifyEmail
   {
     return $this->belongsTo(Semester::class, 'id_semester');
   }
+  public function hasRole($roleName)
+  {
+    return $this->userRoles()->whereHas('role', function ($query) use ($roleName) {
+      $query->where('nama_role', $roleName);
+    })->exists();
+  }
 }

@@ -4298,3 +4298,10 @@ body:not(.sidebar-mini)
     padding-bottom: 0.25rem !important;
     margin-bottom: 0.5rem !important;
 }
+.dashed-border-container {
+    border: 2px dashed #ccc; 
+    border-radius: 8px; 
+    padding: 20px; 
+    margin-top: 20px; 
+    margin-bottom: 20px;
+}

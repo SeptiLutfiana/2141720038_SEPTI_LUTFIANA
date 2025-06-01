@@ -349,40 +349,6 @@ class IdpController extends Controller
             'type_menu' => 'idps',
         ]);
     }
-    public function indexKaryawan()
-    {
-        $user = Auth::user(); // Ambil user yang sedang login
-
-        $idps = IDP::with([
-            'mentor',
-            'supervisor',
-            'idpKompetensis.kompetensi',
-            'idpKompetensis.metodeBelajars'
-        ])
-            ->where('id_user', $user->id) // Ambil IDP hanya milik user login
-            ->orderByDesc('created_at')
-            ->paginate(10);
-
-        return view('karyawan.idp.index', [
-            'idps' => $idps,
-            'type_menu' => 'idps',
-        ]);
-    }
-    public function showKaryawan($id)
-    {
-        // Mengambil data Divisi berdasarkan ID
-        $idps = IDP::with([
-            'karyawan',      // relasi banyak karyawan jika ada
-            'mentor',
-            'supervisor',
-            'idpKompetensis.kompetensi',
-            'idpKompetensis.metodeBelajars' // relasi kompetensi beserta metode belajar
-        ])->findOrFail($id);
-        return view('karyawan.IDP.detail', [
-            'idps'    => $idps,
-            'type_menu' => 'idps',
-        ]);
-    }
     public function indexMentor()
     {
         $mentorId = Auth::id();

@@ -308,8 +308,10 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
     Route::get('/karyawan/dashboard', [KaryawanDashboardController::class, 'index'])->name('karyawan.dashboard-karyawan');
     // IDP
     Route::prefix('karyawan/behavior/idp')->name('karyawan.IDP.')->group(function () {
-        Route::get('/', [IdpController::class, 'indexKaryawan'])->name('indexKaryawan');
-        Route::get('/{id}/detail', [IdpController::class, 'showKaryawan'])->name('showKaryawan');
+        Route::get('/', [KaryawanDashboardController::class, 'indexKaryawan'])->name('indexKaryawan');
+        Route::get('/{id}/detail', [KaryawanDashboardController::class, 'showKaryawan'])->name('showKaryawan');
+        Route::post('/idp/implementasi/soft/{id_idpKom}', [KaryawanDashboardController::class, 'storeImplementasiSoft'])->name('storeImplementasiSoft');
+        Route::post('/idp/implementasi/hard/{id_idpKom}', [KaryawanDashboardController::class, 'storeImplementasiHard'])->name('storeImplementasiHardd');
     });
 });
 // PROFILE

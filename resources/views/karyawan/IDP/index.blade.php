@@ -47,80 +47,61 @@
                                     </a>
                                 </div>
                             </div>
-
-                            <div class="card-body table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Proyeksi Karir</th>
-                                            <th>Persetujuan Mentor</th>
-                                            <th>Status Pengajuan IDP</th>
-                                            <th>Progres IDP</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($idps as $i => $item)
-                                            <tr>
-                                                <td>{{ $i + 1 }}</td>
-                                                <td>{{ $item->proyeksi_karir }}</td>
-                                                <td>{{ $item->status_approval_mentor }}</td>
-                                                <td>{{ $item->status_pengajuan_idp }}</td>
-                                                <td>
-                                                    @php
-                                                        // Dummy data
-                                                        $selesai = 2;
-                                                        $total = 2;
-                                                        $persen = $total > 0 ? round(($selesai / $total) * 100) : 0;
-
-                                                        // Warna progress bar
-                                                        $warna = 'bg-danger';
-                                                        if ($persen >= 80) {
-                                                            $warna = 'bg-success';
-                                                        } elseif ($persen >= 50) {
-                                                            $warna = 'bg-warning';
-                                                        }
-                                                    @endphp
-
-                                                    <div style="font-size: 10px;" class="text-muted mb-1">
-                                                        {{ $selesai }}/{{ $total }} | {{ $persen }}%
-                                                    </div>
-                                                    <div class="progress" style="height: 6px; border-radius: 999px;">
-                                                        <div class="progress-bar {{ $warna }}" role="progressbar"
-                                                            style="width: {{ $persen }}%; border-radius: 999px;"
-                                                            aria-valuenow="{{ $persen }}" aria-valuemin="0"
-                                                            aria-valuemax="100">
-                                                        </div>
-                                                    </div>
-                                                </td>
-
-                                                <td class="text-left" style="width: 120px;">
-                                                    <a href="#" class="btn btn-warning btn-sm mb-1"> <i
-                                                            class="fas fa-edit"></i>
-                                                        Edit</a>
-                                                    <br>
-                                                    <a href="{{ route('karyawan.IDP.showKaryawan', $item->id_idp) }}"
-                                                        class="btn btn-primary btn-sm mb-1"> <i
-                                                            class="fas fa-info-circle"></i> Detail</a>
-                                                    <br>
-                                                    <form action="#" method="POST" style="display: inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm rounded mb-1">
-                                                            <i class="fas fa-trash"></i> Hapus
-                                                        </button>
-                                                    </form>
-                                                    <br>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="4" class="text-center">Belum ada data.</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                            <div class="card-body">
+                                <form method="GET" action="{{ route('karyawan.IDP.indexKaryawan') }}" class="mb-3">
+                                    <div class="form-row">
+                                        <div class="col-md-3">
+                                            <label>Cari Karyawan</label>
+                                            <input type="text" name="search" class="form-control"
+                                                placeholder="Cari nama karyawan..." value="{{ request('search') }}"
+                                                oninput="this.form.submit()">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Pilih Jenjang</label>
+                                            <select name="id_jenjang" class="form-control" onchange="this.form.submit()">
+                                                <option value="">-- Semua Jenjang --</option>
+                                                @foreach ($listJenjang as $j)
+                                                    <option value="{{ $j->id_jenjang }}"
+                                                        {{ request('id_jenjang') == $j->id_jenjang ? 'selected' : '' }}>
+                                                        {{ $j->nama_jenjang }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Pilih Learning Group</label>
+                                            <select name="id_LG" class="form-control" onchange="this.form.submit()">
+                                                <option value="">-- Pilih Learning Group --</option>
+                                                @foreach ($listLG as $lg)
+                                                    <option value="{{ $lg->id_LG }}"
+                                                        {{ request('id_LG') == $lg->id_LG ? 'selected' : '' }}>
+                                                        {{ $lg->nama_LG }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Pilih Tahun</label>
+                                            <select name="tahun" class="form-control" onchange="this.form.submit()">
+                                                <option value="">-- Semua Tahun --</option>
+                                                @foreach ($listTahun as $tahun)
+                                                    <option value="{{ $tahun }}"
+                                                        {{ request('tahun') == $tahun ? 'selected' : '' }}>
+                                                        {{ $tahun }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div class="table-responsive">
+                                    @livewire('karyawan-given-idp', [
+                                        'search' => request('search'),
+                                        'jenjang' => request('id_jenjang'),
+                                        'lg' => request('id_LG'),
+                                        'tahun' => request('tahun'),
+                                    ])
+                                </div>
                             </div>
                         </div>
                     </div>

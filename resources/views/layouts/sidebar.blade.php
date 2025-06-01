@@ -204,17 +204,17 @@
         @endif
         @if (Auth::user()->id_role == 4)
             <ul class="sidebar-menu">
-                <li class="nav-item dropdown {{ $type_menu === 'listidp' ? 'active' : '' }}">
+                <li class="nav-item dropdown {{ $type_menu === 'karyawan' ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                             class="fas fa-columns"></i> <span>Behavior IDP</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('list-idp') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('list-idp') }}">Bank IDP</a>
-                        </li>
                         <li class="{{ Request::is('tambah-idp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('tambah-idp') }}">Tambah IDP</a>
                         </li>
-                        <li class="{{ Request::is('wkaryawan/behavior/idp') ? 'active' : '' }}">
+                        <li class="{{ Request::is('list-idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('list-idp') }}">Bank IDP</a>
+                        </li>
+                        <li class="{{ Request::is('karyawan/behavior/idp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('karyawan/behavior/idp') }}">List Perencanaan IDP</a>
                         </li>
                         <li class="{{ Request::is('layout-top-navigation') ? 'active' : '' }}">
