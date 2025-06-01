@@ -300,7 +300,11 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
     Route::get('/mentor/dashboard', [MentorDashboardController::class, 'index'])->name('mentor.dashboard-mentor');
     // IDP
     Route::prefix('mentor/behavior/idp')->name('mentor.IDP.')->group(function () {
-        Route::get('/', [IdpController::class, 'indexMentor'])->name('indexMentor');
+        Route::get('/', [MentorDashboardController::class, 'indexMentor'])->name('indexMentor');
+        Route::get('/detail/{id}', [MentorDashboardController::class, 'showMentor'])->name('mentor.idp.show');
+        Route::put('/penilaian/idp/{id}', [MentorDashboardController::class, 'updatePenilaian'])->name('updatePenilaian');
+
+
     });
 });
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
@@ -311,7 +315,7 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::get('/', [KaryawanDashboardController::class, 'indexKaryawan'])->name('indexKaryawan');
         Route::get('/{id}/detail', [KaryawanDashboardController::class, 'showKaryawan'])->name('showKaryawan');
         Route::post('/idp/implementasi/soft/{id_idpKom}', [KaryawanDashboardController::class, 'storeImplementasiSoft'])->name('storeImplementasiSoft');
-        Route::post('/idp/implementasi/hard/{id_idpKom}', [KaryawanDashboardController::class, 'storeImplementasiHard'])->name('storeImplementasiHardd');
+        Route::post('/idp/implementasi/hard/{id_idpKom}', [KaryawanDashboardController::class, 'storeImplementasiHard'])->name('storeImplementasiHard');
     });
 });
 // PROFILE

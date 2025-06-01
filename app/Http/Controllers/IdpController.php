@@ -349,25 +349,6 @@ class IdpController extends Controller
             'type_menu' => 'idps',
         ]);
     }
-    public function indexMentor()
-    {
-        $mentorId = Auth::id();
-
-        $idps = IDP::with([
-            'mentor',
-            'supervisor',
-            'idpKompetensis.kompetensi',
-            'idpKompetensis.metodeBelajars'
-        ])
-            ->where('id_mentor', $mentorId)  // pastikan pakai 'id_mentor' sesuai kolom di DB
-            ->orderByDesc('created_at')
-            ->paginate(10);
-
-        return view('mentor.IDP.index', [
-            'idps' => $idps,
-            'type_menu' => 'idps',
-        ]);
-    }
     public function indexSupervisor()
     {
         $supervisorId = Auth::id();

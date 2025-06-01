@@ -1,11 +1,12 @@
 <div>
     <table class="table table-striped">
         <thead>
-            <tr class="">
+            <tr class="text-center">
                 <th>No</th>
+                <th>Nama Karyawan</th>
                 <th>Proyeksi Karir</th>
                 <th>Persetujuan Mentor</th>
-                <th>Status Pengajuan IDP</th>
+                <th>Supervisor</th>
                 <th>Progres IDP</th>
                 <th>Aksi</th>
             </tr>
@@ -14,10 +15,17 @@
             @if ($idps->count())
                 @forelse($idps as $i => $item)
                     <tr>
-                        <td>{{ $i + 1 }}</td>
+                        <td class="text-center">{{ $i + 1 }}</td>
+                        <td>{{ $item->karyawan->name }}</td>
                         <td>{{ $item->proyeksi_karir }}</td>
-                        <td>{{ $item->status_approval_mentor }}</td>
-                        <td>{{ $item->status_pengajuan_idp }}</td>
+                        <td class="text-center">
+                            <span
+                                style="background-color: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 9999px;">
+                                {{ $item->status_approval_mentor }}
+                            </span>
+                        </td>
+
+                        <td>{{ $item->supervisor->name }}</td>
                         <td>
                             @php
                                 $idpKompetensis = $item->idpKompetensis;
@@ -58,9 +66,9 @@
                             </div>
                         </td>
                         <td class="text-left" style="width: 150px;">
-                            <a href="{{ route('karyawan.IDP.showKaryawan', $item->id_idp) }}"
+                            <a href="{{ route('mentor.IDP.mentor.idp.show', $item->id_idp) }}"
                                 class="btn btn-primary btn-sm mb-1"> <i class="fas fa-external-link-alt"></i>
-                                Kerjakan</a>
+                                Detail</a>
                             <br>
                             <br>
                         </td>

@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('idp_rekomendasis', function (Blueprint $table) {
-            $table->timestamps(); // menambahkan created_at dan updated_at
-
+        Schema::create('notifications', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('type');
+            $table->morphs('notifiable');
+            $table->text('data');
+            $table->timestamp('read_at')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -22,8 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('idp_rekomendasis', function (Blueprint $table) {
-            $table->dropTimestamps(); // rollback jika ingin hapus kolom timestamps
-        });
+        Schema::dropIfExists('notifications');
     }
 };
