@@ -26,55 +26,65 @@
 
                 <div class="dropdown-list-content dropdown-list-icons">
                     @php
-                        $roles = auth()->user()->roles()->pluck('nama_role')->toArray();
+                        // Ambil ID role aktif dari session
+                        $activeRole = session('active_role');
 
-                        if (in_array('mentor', $roles)) {
-                            $userRole = 'mentor';
-                        } elseif (in_array('supervisor', $roles)) {
-                            $userRole = 'supervisor';
-                        } else {
-                            $userRole = 'karyawan';
-                        }
+                        // Tentukan nama peran
+                        $userRole = match ($activeRole) {
+                            1 => 'adminsdm',
+                            2 => 'supervisor',
+                            3 => 'mentor',
+                            4 => 'karyawan',
+                            default => 'karyawan',
+                        };
                     @endphp
 
-                    @if (auth()->user()->unreadNotifications->count() > 0)
-                        @foreach (auth()->user()->unreadNotifications as $notification)
-                            @php
-                                $idpId = $notification->data['id_idp'] ?? 0;
-                                $idpKomPengId = $notification->data['id_idpKomPeng'] ?? 0;
-                                $notifId = $notification->id;
+                    <div class="dropdown-list-content dropdown-list-icons">
+                        @if (auth()->user()->unreadNotifications->count() > 0)
+                            @foreach (auth()->user()->unreadNotifications as $notification)
+                                @php
+                                    $idpId = $notification->data['id_idp'] ?? 0;
+                                    $idpKomPengId = $notification->data['id_idpKomPeng'] ?? 0;
+                                    $notifId = $notification->id;
 
-                                if ($userRole === 'mentor') {
-                                    $nama = $notification->data['nama_karyawan'] ?? 'Karyawan';
-                                    $routeName = 'mentor.IDP.mentor.idp.show';
-                                } elseif ($userRole === 'supervisor') {
-                                    $nama = $notification->data['nama_karyawan'] ?? 'Karyawan';
-                                    $routeName = 'karyawan.IDP.showKaryawan';
-                                } else {
-                                    $nama = $notification->data['nama_mentor'] ?? 'Mentor';
-                                    $routeName = 'karyawan.IDP.showKaryawan';
-                                }
-                            @endphp
+                                    // Tentukan nama dan rute berdasarkan peran aktif
+                                    switch ($userRole) {
+                                        case 'mentor':
+                                            $nama = $notification->data['nama_karyawan'] ?? 'Karyawan';
+                                            $routeName = 'mentor.IDP.mentor.idp.show';
+                                            break;
+                                        case 'supervisor':
+                                            $nama = $notification->data['nama_karyawan'] ?? 'Karyawan';
+                                            $routeName = 'karyawan.IDP.showKaryawan';
+                                            break;
+                                        case 'karyawan':
+                                            $nama = $notification->data['nama_mentor'] ?? 'Mentor';
+                                            $routeName = 'karyawan.IDP.showKaryawan';
+                                            break;
+                                        case 'adminsdm':
+                                            $nama = $notification->data['nama_user'] ?? 'Mentor';
+                                            $routeName = 'adminsdm.dashboard';
+                                            break;
+                                    }
+                                @endphp
 
-                            <a href="{{ route($routeName, ['id' => $idpId]) }}?pengerjaan={{ $idpKomPengId }}&notification_id={{ $notifId }}"
-                                class="dropdown-item dropdown-item-unread">
-                                <div class="dropdown-item-icon bg-info text-white">
-                                    <i class="fas fa-file-upload"></i>
-                                </div>
-                                <div class="dropdown-item-desc">
-                                    <b>{{ $nama }}</b>
-                                    {{ $notification->data['message'] ?? 'mengunggah hasil IDP' }}
-                                    <div class="time text-primary">{{ $notification->created_at->diffForHumans() }}
+                                <a href="{{ $routeName !== '#' ? route($routeName, ['id' => $idpId]) . '?pengerjaan=' . $idpKomPengId . '&notification_id=' . $notifId : '#' }}"
+                                    class="dropdown-item dropdown-item-unread">
+                                    <div class="dropdown-item-icon bg-info text-white">
+                                        <i class="fas fa-file-upload"></i>
                                     </div>
-                                </div>
-                            </a>
-                        @endforeach
-                    @else
-                        <div class="text-center p-3 text-muted">Tidak ada notifikasi baru.</div>
-                    @endif
-                </div>
-                <div class="dropdown-footer text-center">
-                    <a href="#">View All <i class="fas fa-chevron-right"></i></a>
+                                    <div class="dropdown-item-desc">
+                                        <b>{{ $nama }}</b>
+                                        {{ $notification->data['message'] ?? 'mengunggah hasil IDP' }}
+                                        <div class="time text-primary">{{ $notification->created_at->diffForHumans() }}
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        @else
+                            <div class="text-center p-3 text-muted">Tidak ada notifikasi baru.</div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </li>

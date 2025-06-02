@@ -26,7 +26,7 @@
                             Learning Group: {{ $idps->learninggroup->nama_LG ?? '-' }} |
                             Semester: {{ $idps->semester->nama_semester ?? '-' }} |
                             Angkatan PSP:
-                            {{ $idp->angkatanpsp->bulan ?? '-' }} {{ $idp->angkatanpsp->tahun ?? '-' }}
+                            {{ $idps->angkatanpsp->bulan ?? '-' }} {{ $idps->angkatanpsp->tahun ?? '-' }}
                         </small>
                         <br>
                         <div class="row">

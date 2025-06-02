@@ -244,104 +244,50 @@
                                                             </td>
                                                             <td>{{ $peng->keterangan_hasil ?? '-' }}</td>
                                                             <td class="text-center">
-                                                                {{ $peng->created_at->format('d-m-Y') }}</td>
+                                                                {{ $peng->updated_at != $peng->created_at
+                                                                    ? $peng->updated_at->format('d-m-Y H:i')
+                                                                    : $peng->created_at->format('d-m-Y H:i') }}
+                                                            </td>
                                                             @php
+                                                                $isRevisi = in_array($peng->status_pengerjaan, [
+                                                                    'Ditolak Mentor',
+                                                                    'Revisi Mentor',
+                                                                ]);
                                                                 $statusColors = [
                                                                     'Menunggu Persetujuan' => [
                                                                         'bg' => '#d1fae5',
                                                                         'text' => '#065f46',
-                                                                    ], // hijau muda & hijau tua
+                                                                    ], // Hijau muda & tua
                                                                     'Disetujui Mentor' => [
                                                                         'bg' => '#bfdbfe',
                                                                         'text' => '#1e3a8a',
-                                                                    ], // biru muda & biru tua
+                                                                    ], // Biru muda & tua
                                                                     'Ditolak Mentor' => [
                                                                         'bg' => '#fecaca',
                                                                         'text' => '#991b1b',
-                                                                    ], // merah muda & merah tua
+                                                                    ], // Merah muda & tua
                                                                     'Revisi Mentor' => [
                                                                         'bg' => '#fef3c7',
                                                                         'text' => '#92400e',
-                                                                    ], // kuning muda & kuning tua
+                                                                    ], // Kuning muda & tua
                                                                 ];
-
                                                                 $bgColor =
                                                                     $statusColors[$peng->status_pengerjaan]['bg'] ??
-                                                                    '#e5e7eb'; // default abu-abu
+                                                                    '#e5e7eb'; // Abu-abu default
                                                                 $textColor =
                                                                     $statusColors[$peng->status_pengerjaan]['text'] ??
-                                                                    '#374151'; // default abu-abu gelap
+                                                                    '#374151'; // Abu-abu tua
                                                             @endphp
 
                                                             <td class="text-center">
-                                                                {{ $peng->created_at->format('d-m-Y') }}</td>
-                                                            @php
-                                                                $statusColors = [
-                                                                    'Menunggu Persetujuan' => [
-                                                                        'bg' => '#d1fae5',
-                                                                        'text' => '#065f46',
-                                                                    ], // hijau muda & hijau tua
-                                                                    'Disetujui Mentor' => [
-                                                                        'bg' => '#bfdbfe',
-                                                                        'text' => '#1e3a8a',
-                                                                    ], // biru muda & biru tua
-                                                                    'Ditolak Mentor' => [
-                                                                        'bg' => '#fecaca',
-                                                                        'text' => '#991b1b',
-                                                                    ], // merah muda & merah tua
-                                                                    'Revisi Mentor' => [
-                                                                        'bg' => '#fef3c7',
-                                                                        'text' => '#92400e',
-                                                                    ], // kuning muda & kuning tua
-                                                                ];
-
-                                                                $bgColor =
-                                                                    $statusColors[$peng->status_pengerjaan]['bg'] ??
-                                                                    '#e5e7eb'; // default abu-abu
-                                                                $textColor =
-                                                                    $statusColors[$peng->status_pengerjaan]['text'] ??
-                                                                    '#374151'; // default abu-abu gelap
-                                                            @endphp
-
-                                                            <td class="text-center">
-                                                                @php
-                                                                    $isRevisi = in_array($peng->status_pengerjaan, [
-                                                                        'Ditolak Mentor',
-                                                                        'Revisi Mentor',
-                                                                    ]);
-                                                                    $statusColors = [
-                                                                        'Menunggu Persetujuan' => [
-                                                                            'bg' => '#d1fae5',
-                                                                            'text' => '#065f46',
-                                                                        ],
-                                                                        'Disetujui Mentor' => [
-                                                                            'bg' => '#bfdbfe',
-                                                                            'text' => '#1e3a8a',
-                                                                        ],
-                                                                        'Ditolak Mentor' => [
-                                                                            'bg' => '#fecaca',
-                                                                            'text' => '#991b1b',
-                                                                        ],
-                                                                        'Revisi Mentor' => [
-                                                                            'bg' => '#fef3c7',
-                                                                            'text' => '#92400e',
-                                                                        ],
-                                                                    ];
-                                                                    $bgColor =
-                                                                        $statusColors[$peng->status_pengerjaan]['bg'] ??
-                                                                        '#e5e7eb';
-                                                                    $textColor =
-                                                                        $statusColors[$peng->status_pengerjaan][
-                                                                            'text'
-                                                                        ] ?? '#374151';
-                                                                @endphp
-
                                                                 @if ($isRevisi)
-                                                                    <button
-                                                                        class="btn btn-sm d-flex align-items-center justify-content-center mx-auto"
-                                                                        style="background-color: {{ $bgColor }}; color: {{ $textColor }}; border: 1px solid {{ $textColor }};"
+                                                                    <button type="button"
+                                                                        class="btn btn-sm open-upload-modal"
                                                                         data-toggle="modal"
-                                                                        data-target="#uploadUlangModal{{ $peng->id }}">
+                                                                        data-target="#uploadUlangModal"
+                                                                        data-id="{{ $peng->id_idpKomPeng }}"
+                                                                        data-keterangan="{{ $peng->keterangan_hasil ?? '-' }}"
+                                                                        data-saran="{{ $peng->saran ?? 'Tidak ada saran' }}">
                                                                         <i class="bi bi-upload mr-1"></i>
                                                                         {{ $peng->status_pengerjaan }}
                                                                     </button>
@@ -351,7 +297,6 @@
                                                                         {{ $peng->status_pengerjaan }}
                                                                     </span>
                                                                 @endif
-
                                                             </td>
                                                             <td>{{ $peng->saran }}</td>
 
@@ -523,74 +468,50 @@
                                                             </td>
                                                             <td>{{ $peng->keterangan_hasil ?? '-' }}</td>
                                                             <td class="text-center">
-                                                                {{ $peng->created_at->format('d-m-Y') }}</td>
+                                                                {{ $peng->updated_at != $peng->created_at
+                                                                    ? $peng->updated_at->format('d-m-Y H:i')
+                                                                    : $peng->created_at->format('d-m-Y H:i') }}
+                                                            </td>
                                                             @php
+                                                                $isRevisi = in_array($peng->status_pengerjaan, [
+                                                                    'Ditolak Mentor',
+                                                                    'Revisi Mentor',
+                                                                ]);
                                                                 $statusColors = [
                                                                     'Menunggu Persetujuan' => [
                                                                         'bg' => '#d1fae5',
                                                                         'text' => '#065f46',
-                                                                    ], // hijau muda & hijau tua
+                                                                    ], // Hijau muda & tua
                                                                     'Disetujui Mentor' => [
                                                                         'bg' => '#bfdbfe',
                                                                         'text' => '#1e3a8a',
-                                                                    ], // biru muda & biru tua
+                                                                    ], // Biru muda & tua
                                                                     'Ditolak Mentor' => [
                                                                         'bg' => '#fecaca',
                                                                         'text' => '#991b1b',
-                                                                    ], // merah muda & merah tua
+                                                                    ], // Merah muda & tua
                                                                     'Revisi Mentor' => [
                                                                         'bg' => '#fef3c7',
                                                                         'text' => '#92400e',
-                                                                    ], // kuning muda & kuning tua
+                                                                    ], // Kuning muda & tua
                                                                 ];
-
                                                                 $bgColor =
                                                                     $statusColors[$peng->status_pengerjaan]['bg'] ??
-                                                                    '#e5e7eb'; // default abu-abu
+                                                                    '#e5e7eb'; // Abu-abu default
                                                                 $textColor =
                                                                     $statusColors[$peng->status_pengerjaan]['text'] ??
-                                                                    '#374151'; // default abu-abu gelap
+                                                                    '#374151'; // Abu-abu tua
                                                             @endphp
 
                                                             <td class="text-center">
-                                                                @php
-                                                                    $isRevisi = in_array($peng->status_pengerjaan, [
-                                                                        'Ditolak Mentor',
-                                                                        'Revisi Mentor',
-                                                                    ]);
-                                                                    $statusColors = [
-                                                                        'Menunggu Persetujuan' => [
-                                                                            'bg' => '#d1fae5',
-                                                                            'text' => '#065f46',
-                                                                        ],
-                                                                        'Disetujui Mentor' => [
-                                                                            'bg' => '#bfdbfe',
-                                                                            'text' => '#1e3a8a',
-                                                                        ],
-                                                                        'Ditolak Mentor' => [
-                                                                            'bg' => '#fecaca',
-                                                                            'text' => '#991b1b',
-                                                                        ],
-                                                                        'Revisi Mentor' => [
-                                                                            'bg' => '#fef3c7',
-                                                                            'text' => '#92400e',
-                                                                        ],
-                                                                    ];
-                                                                    $bgColor =
-                                                                        $statusColors[$peng->status_pengerjaan]['bg'] ??
-                                                                        '#e5e7eb';
-                                                                    $textColor =
-                                                                        $statusColors[$peng->status_pengerjaan][
-                                                                            'text'
-                                                                        ] ?? '#374151';
-                                                                @endphp
-
                                                                 @if ($isRevisi)
-                                                                    <button
-                                                                        class="btn btn-sm d-flex align-items-center justify-content-center mx-auto"
-                                                                        style="background-color: {{ $bgColor }}; color: {{ $textColor }}; border: 1px solid {{ $textColor }};"
+                                                                    <button type="button"
+                                                                        class="btn btn-sm open-upload-modal"
                                                                         data-toggle="modal"
-                                                                        data-target="#uploadUlangModal{{ $peng->id }}">
+                                                                        data-target="#uploadUlangModal"
+                                                                        data-id="{{ $peng->id_idpKomPeng }}"
+                                                                        data-keterangan="{{ $peng->keterangan_hasil ?? '-' }}"
+                                                                        data-saran="{{ $peng->saran ?? 'Tidak ada saran' }}">
                                                                         <i class="bi bi-upload mr-1"></i>
                                                                         {{ $peng->status_pengerjaan }}
                                                                     </button>
@@ -600,7 +521,6 @@
                                                                         {{ $peng->status_pengerjaan }}
                                                                     </span>
                                                                 @endif
-
                                                             </td>
                                                             <td>{{ $peng->saran }}</td>
 
@@ -621,11 +541,14 @@
             </div>
         </section>
     </div>
-    <div class="modal fade" id="uploadUlangModal{{ $peng->id }}" tabindex="-1">
-        <div class="modal-dialog modal-lg"> {{-- modal-lg agar lebar --}}
-            <form method="POST" action="#" enctype="multipart/form-data">
+    <!-- Modal Upload Ulang -->
+    <div class="modal fade" id="uploadUlangModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form method="POST" id="uploadUlangForm" enctype="multipart/form-data" action="">
                 @csrf
                 @method('PUT')
+                <input type="hidden" name="peng_id" id="peng_id">
+
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Upload Ulang Implementasi</h5>
@@ -633,28 +556,25 @@
                     </div>
 
                     <div class="modal-body">
-                        {{-- Keterangan dan Saran dari Mentor --}}
-                        <div class="alert" style="background-color: #d1fae5; color: #065f46;">
+                        <div class="alert" id="alertKeterangan" style="background-color: #d1fae5; color: #065f46;">
                             <strong>Keterangan Sebelumnya:</strong><br>
-                            {{ $peng->keterangan_hasil ?? '-' }}<br><br>
-
+                            <span id="keterangan_sebelumnya">-</span><br><br>
                             <strong>Saran Mentor:</strong><br>
-                            {{ $peng->saran ?? 'Tidak ada saran.' }}
+                            <span id="saran_mentor">Tidak ada saran.</span>
                         </div>
 
-                        {{-- Form Upload Baru --}}
                         <div class="form-group">
                             <label>Upload File Baru <span class="text-danger">*</span></label>
                             <input type="file" name="upload_hasil" class="form-control" required>
                             <small class="form-text text-muted">
-                                Format yang diizinkan: <strong>pdf, doc, docx, xlsx, jpg, jpeg, png, csv</strong> | Ukuran
-                                maksimal: <strong>5MB</strong>
+                                Format: <strong>pdf, doc, docx, xlsx, jpg, jpeg, png, csv</strong> | Maks:
+                                <strong>5MB</strong>
                             </small>
                         </div>
 
                         <div class="form-group">
                             <label>Keterangan Baru <span class="text-danger">*</span></label>
-                            <textarea name="keterangan_hasil" class="form-control" style="height:6rem;" required>{{ old('keterangan_hasil', $peng->keterangan_hasil) }}</textarea>
+                            <textarea name="keterangan_hasil" class="form-control" style="height:6rem;" required></textarea>
                         </div>
                     </div>
 
@@ -666,8 +586,11 @@
             </form>
         </div>
     </div>
+
+
 @endsection
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
@@ -764,14 +687,80 @@
                 showConfirmButton: false
             });
         @endif
-        $(document).on('hidden.bs.modal', function (event) {
-        var modal = $(event.target);
-        
-        // Kosongkan semua input file
-        modal.find('input[type="file"]').val('');
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('uploadUlangForm');
+            if (!form) return;
 
-        // Kosongkan semua textarea yang memiliki required
-        modal.find('textarea[required]').val('');
-    });
+            // Event click tombol untuk buka modal dan isi data
+            document.querySelectorAll('.open-upload-modal').forEach(button => {
+                button.addEventListener('click', function() {
+                    form.reset(); // Reset form agar kosong dan validasi hilang
+
+                    const pengId = this.getAttribute('data-id');
+                    const keterangan = this.getAttribute('data-keterangan') || '-';
+                    const saran = this.getAttribute('data-saran') || 'Tidak ada saran';
+
+                    // Isi nilai hidden dan tampilan modal
+                    document.getElementById('peng_id').value = pengId;
+                    document.getElementById('keterangan_sebelumnya').textContent = keterangan;
+                    document.getElementById('saran_mentor').textContent = saran;
+
+                    // Set URL action form dinamis sesuai id
+                    form.action = `/karyawan/behavior/idp/upload-ulang/${pengId}`;
+
+                    // Tampilkan modal bootstrap
+                    $('#uploadUlangModal').modal('show');
+                });
+            });
+
+            // Submit form dengan fetch API
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const pengId = document.getElementById('peng_id').value;
+                const formData = new FormData(form);
+                formData.append('_method', 'PUT'); // Spoof PUT method untuk Laravel
+
+                fetch(`/karyawan/behavior/idp/upload-ulang/${pengId}`, {
+                        method: 'POST', // Tetap POST agar bisa upload file
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                            'Accept': 'application/json' // ✅ Ini WAJIB agar Laravel balas JSON
+                        },
+                        body: formData
+                    })
+                    .then(async response => {
+                        if (!response.ok) {
+                            // Ambil response error jika ada json error message
+                            const err = await response.json().catch(() => ({}));
+                            throw new Error(err.message || 'Gagal mengupload ulang.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: data.message,
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            $('#uploadUlangModal').modal('hide');
+                            location.reload();
+                        });
+
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: error.message,
+                            icon: 'error',
+                            confirmButtonText: 'Tutup'
+                        });
+                        console.error(error);
+                    });
+            });
+        });
     </script>
 @endpush

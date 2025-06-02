@@ -2,13 +2,12 @@
 
 namespace App\Notifications;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Request;
-use Illuminate\Notifications\DatabaseNotification;
-use Illuminate\Support\Facades\Auth;
-
-class PengerjaanBaruNotification extends Notification
+class PengerjaanDikirimUlangNotification extends Notification
 {
     protected $pengerjaan;
 
@@ -31,8 +30,8 @@ class PengerjaanBaruNotification extends Notification
             'id_idpKom' => $this->pengerjaan['id_idpKom'] ?? null,
             'id_idpKomPeng' => $this->pengerjaan['id_idpKomPeng'] ?? null,
             'nama_karyawan' => $this->pengerjaan['nama_karyawan'],
-            'untuk_role' =>$this->pengerjaan['untuk_role'],
-            'message' => 'Mengirim pengerjaan IDP yang perlu dinilai',
+            'untuk_role'=>$this->pengerjaan['untuk_role'],
+            'message' => 'Mengirim Revisi Baru',
         ];
     }
 }

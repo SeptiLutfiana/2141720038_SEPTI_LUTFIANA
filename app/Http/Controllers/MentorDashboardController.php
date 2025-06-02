@@ -142,6 +142,7 @@ class MentorDashboardController extends Controller
             'status' => $request->status_pengerjaan,
             'saran' => $request->saran,
             'nama_mentor' => $user->name,
+            'untuk_role' => 'karyawan',
             'message' => $pesanStatus,
         ]));
         return redirect()->back()->with('success', 'Penilaian berhasil diperbarui.');

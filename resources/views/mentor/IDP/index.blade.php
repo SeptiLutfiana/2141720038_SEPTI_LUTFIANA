@@ -48,7 +48,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('karyawan.IDP.indexKaryawan') }}" class="mb-3">
+                                <form method="GET" action="{{ route('mentor.IDP.indexMentor') }}" class="mb-3">
                                     <div class="form-row">
                                         <div class="col-md-3">
                                             <label>Cari Karyawan</label>

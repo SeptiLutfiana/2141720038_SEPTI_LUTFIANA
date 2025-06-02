@@ -211,8 +211,8 @@
                         <li class="{{ Request::is('tambah-idp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('tambah-idp') }}">Tambah IDP</a>
                         </li>
-                        <li class="{{ Request::is('list-idp') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('list-idp') }}">Bank IDP</a>
+                        <li class="{{ Request::is('karyawan/behavior/idp/bank-id') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('karyawan/behavior/idp/bank-idp') }}">Bank IDP</a>
                         </li>
                         <li class="{{ Request::is('karyawan/behavior/idp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('karyawan/behavior/idp') }}">List Perencanaan IDP</a>

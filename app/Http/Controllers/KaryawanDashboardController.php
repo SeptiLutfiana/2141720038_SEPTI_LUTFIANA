@@ -11,7 +11,10 @@ use App\Models\IdpKompetensiPengerjaan;
 use Illuminate\Support\Facades\Log;
 use App\Models\IdpKompetensi;
 use App\Notifications\PengerjaanBaruNotification;
+use App\Notifications\PengerjaanDikirimUlangNotification;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 
 class KaryawanDashboardController extends Controller
 {
@@ -158,6 +161,7 @@ class KaryawanDashboardController extends Controller
             'id_idpKom' => $idpKompetensi->id_idpKom,
             'nama_karyawan' => $user->name,
             'id_idpKomPeng' => $idpKomPeng->id_idpKomPeng,
+            'untuk_role' => 'mentor',
         ]));
         return redirect()->back()->with('success', 'File dan data berhasil disimpan.');
     }
@@ -219,9 +223,123 @@ class KaryawanDashboardController extends Controller
             'id_idpKom' => $idpKompetensi->id_idpKom,
             'nama_karyawan' => $user->name,
             'id_idpKomPeng' => $idpKomPeng->id_idpKomPeng,
+            'untuk_role' => 'mentor',
         ]));
 
         return redirect()->back()->with('success', 'File dan data berhasil disimpan.');
     }
-    
+    public function uploadUlang(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'upload_hasil' => 'required|file|mimes:pdf,doc,docx,xlsx,jpg,jpeg,png,csv|max:5120', // max 5MB
+            'keterangan_hasil' => 'required|string|max:1000',
+        ]);
+
+        // Cari data pengerjaan berdasarkan ID, fail jika tidak ditemukan
+        $pengerjaan = IdpKompetensiPengerjaan::findOrFail($id);
+
+        // Simpan file jika ada
+        if ($request->hasFile('upload_hasil')) {
+            // Hapus file lama jika ada agar storage tidak penuh
+            if ($pengerjaan->upload_hasil && Storage::disk('public')->exists($pengerjaan->upload_hasil)) {
+                Storage::disk('public')->delete($pengerjaan->upload_hasil);
+            }
+
+            // Simpan file baru dan update path di DB
+            $path = $request->file('upload_hasil')->store('uploads/hasil', 'public');
+            $pengerjaan->upload_hasil = $path;
+        }
+
+        // Update keterangan hasil dan status pengerjaan
+        $pengerjaan->keterangan_hasil = $request->keterangan_hasil;
+        $pengerjaan->status_pengerjaan = 'Menunggu Persetujuan'; // Reset status pengerjaan
+        $pengerjaan->save();
+        $user = Auth::user();
+
+        // Ambil data IDP dan mentor terkait
+        $idpKompetensi = IdpKompetensi::with('idp')->find($pengerjaan->id_idpKom);
+        if (!$idpKompetensi || !$idpKompetensi->idp || !$idpKompetensi->idp->mentor) {
+            Log::warning("Mentor tidak ditemukan saat upload ulang oleh {$user->name}");
+        } else {
+            $mentor = $idpKompetensi->idp->mentor;
+
+            // Kirim notifikasi ke mentor
+            $mentor->notify(new PengerjaanDikirimUlangNotification([
+                'id_idp' => $idpKompetensi->idp->id_idp,
+                'id_idpKom' => $idpKompetensi->id_idpKom,
+                'nama_karyawan' => $user->name,
+                'id_idpKomPeng' => $pengerjaan->id_idpKomPeng,
+                'untuk_role' => 'mentor',
+            ]));
+        }
+        // Kalau kamu mau respon JSON (misal dipakai AJAX/fetch), pakai ini:
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Implementasi berhasil dikirim ulang.',
+            ]);
+        }
+
+        // Kalau request biasa redirect balik dengan flash message
+        return redirect()->back()->with('success', 'Implementasi berhasil dikirim ulang.');
+    }
+    public function bankIdp(Request $request)
+    {
+        $search = $request->query('search');
+        $id_jenjang = $request->query('id_jenjang');
+        $id_LG = $request->query('lg');
+        $tahun = $request->query('tahun');
+
+        $listTahun = IDP::whereNotNull('waktu_mulai')
+            ->selectRaw('YEAR(waktu_mulai) as tahun')
+            ->distinct()
+            ->orderByDesc('tahun')
+            ->pluck('tahun');
+
+        $listJenjang = Jenjang::all();
+        $listLG = LearingGroup::all();
+        $mentors = User::whereHas('roles', fn($q) => $q->where('user_roles.id_role', 3))->get();
+
+        $idps = IDP::with([
+            'jenjang',
+            'learningGroup',
+            'karyawan',
+            'mentor',
+            'supervisor',
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.metodeBelajars',
+            'idpKompetensis.pengerjaans',
+        ])
+            ->where('is_template', true)
+            ->when($search, function ($query, $search) {
+                // Search di kolom proyeksi_karir langsung di tabel idp
+                return $query->where('proyeksi_karir', 'like', "%$search%");
+            })
+            ->when($id_jenjang, function ($query, $id_jenjang) {
+                return $query->where('id_jenjang', $id_jenjang);
+            })
+            ->when($id_LG, function ($query, $id_LG) {
+                return $query->where('id_LG', $id_LG);
+            })
+            ->when($tahun, function ($query, $tahun) {
+                return $query->whereYear('waktu_mulai', $tahun);
+            })
+            ->orderByDesc('created_at')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('karyawan.IDP.bank-idp', [
+            'idps' => $idps,
+            'listJenjang' => $listJenjang,
+            'listLG' => $listLG,
+            'listTahun' => $listTahun,
+            'search' => $search,
+            'id_jenjang' => $id_jenjang,
+            'lg' => $id_LG,
+            'tahun' => $tahun,
+            'mentors' => $mentors,
+            'type_menu' => 'karyawan',
+        ]);
+    }
 }

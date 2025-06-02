@@ -38,15 +38,20 @@ class AuthenticatedSessionController extends Controller
             $loginType => $request->login,
             'password' => $request->password,
         ];
-
         // Proses autentikasi
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-
+            /** @var \App\Models\User $user */
             $user = Auth::user();
-            
-            // Ambil semua role user (diasumsikan dari relasi)
-            $roles = $user->roles->pluck('id_role')->toArray(); // relasi many-to-many: user->roles
+            $user->load('roles');
+            $roles = $user->roles->pluck('id_role')->toArray();
+
+            if (empty($roles)) {
+                Auth::logout();
+                return back()->withErrors([
+                    'login' => 'Akun Anda belum memiliki peran yang aktif. Silakan hubungi administrator.',
+                ]);
+            }
 
             // Urutan prioritas role
             $prioritas = [1, 2, 3, 4];
@@ -55,6 +60,7 @@ class AuthenticatedSessionController extends Controller
             $role_aktif = collect($prioritas)->first(function ($role) use ($roles) {
                 return in_array($role, $roles);
             });
+
 
             // Jika role tidak valid, logout dan beri pesan error
             if (!$role_aktif) {
@@ -83,44 +89,44 @@ class AuthenticatedSessionController extends Controller
         ])->onlyInput('login');
     }
     public function switch(Request $request)
-{
-    $user = Auth::user();
-    $newRole = $request->input('role');
+    {
+        $user = Auth::user();
+        $newRole = $request->input('role');
 
-    // Ambil semua role yang dimiliki oleh pengguna
-    $userRoles = $user->roles->pluck('id_role')->toArray(); // Mengambil id_role dari relasi many-to-many
+        // Ambil semua role yang dimiliki oleh pengguna
+        $userRoles = $user->roles->pluck('id_role')->toArray(); // Mengambil id_role dari relasi many-to-many
 
-    // Cek jika role yang dipilih ada di dalam role pengguna
-    if (!in_array($newRole, $userRoles)) {
-        // Jika role tidak ada dalam role pengguna, tampilkan pesan error dan tetap di halaman yang sama
-        return redirect()->back()->with('error', 'Kamu tidak memiliki izin untuk mengakses peran ini. Butuh bantuan? Hubungi administrator ya!');
+        // Cek jika role yang dipilih ada di dalam role pengguna
+        if (!in_array($newRole, $userRoles)) {
+            // Jika role tidak ada dalam role pengguna, tampilkan pesan error dan tetap di halaman yang sama
+            return redirect()->back()->with('error', 'Kamu tidak memiliki izin untuk mengakses peran ini. Butuh bantuan? Hubungi administrator ya!');
+        }
+
+        // Pastikan 'id_role' adalah kolom yang valid di tabel 'users'
+        $user->id_role = $newRole;
+
+        // Cek jika user adalah instansi dari Model Eloquent
+        if ($user instanceof \Illuminate\Database\Eloquent\Model) {
+            $user->save();
+        } else {
+            // Tangani jika user bukan model Eloquent
+            return redirect()->route('dashboard')->with('error', 'User tidak ditemukan atau bukan model yang valid');
+        }
+        session(['active_role' => (int)$newRole]);
+        // Redirect sesuai dengan role
+        switch ($newRole) {
+            case 1:
+                return redirect()->route('adminsdm.dashboard');
+            case 2:
+                return redirect()->route('supervisor.spv-dashboard');
+            case 3:
+                return redirect()->route('mentor.dashboard-mentor');
+            case 4:
+                return redirect()->route('karyawan.dashboard-karyawan');
+            default:
+                return redirect()->back();
+        }
     }
-
-    // Pastikan 'id_role' adalah kolom yang valid di tabel 'users'
-    $user->id_role = $newRole;
-
-    // Cek jika user adalah instansi dari Model Eloquent
-    if ($user instanceof \Illuminate\Database\Eloquent\Model) {
-        $user->save();
-    } else {
-        // Tangani jika user bukan model Eloquent
-        return redirect()->route('dashboard')->with('error', 'User tidak ditemukan atau bukan model yang valid');
-    }
-    session(['active_role' => (int)$newRole]);
-    // Redirect sesuai dengan role
-    switch ($newRole) {
-        case 1:
-            return redirect()->route('adminsdm.dashboard');
-        case 2:
-            return redirect()->route('supervisor.spv-dashboard');
-        case 3:
-            return redirect()->route('mentor.dashboard-mentor');
-        case 4:
-            return redirect()->route('karyawan.dashboard-karyawan');
-        default:
-            return redirect()->back();
-    }
-}
 
     /**
      * Destroy an authenticated session.

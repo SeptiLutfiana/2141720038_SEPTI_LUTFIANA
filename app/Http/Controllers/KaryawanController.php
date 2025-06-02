@@ -148,7 +148,7 @@ class KaryawanController extends Controller
                 'no_hp' => $request->no_hp,
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($request->npk),
                 'status' => $request->status,
             ]);
             $user->roles()->attach($request->id_role);
