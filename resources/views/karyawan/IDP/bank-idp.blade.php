@@ -13,31 +13,39 @@
                 </div>
             </div>
             <div class="row">
-                @foreach ($idps as $idp)
-                    <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-                        <article class="article">
-                            <div class="article-header">
-                                <div class="article-image" data-background="{{ asset('./img/bank-idp.png') }}"></div>
-                                <div class="article-title">
-                                    <h2 class="text-truncate" style="max-width: 100%">
-                                        <a href="#">{{ $idp->proyeksi_karir }}</a>
-                                    </h2>
-                                </div>
-                            </div>
-                            <div class="article-details">
-                                <p class="text-center">
-                                    <strong>{{ Str::limit($idp->deskripsi_idp, 100) }}</strong>
-                                </p>
-                                <div class="article-cta text-center">
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#modalIdp{{ $idp->id_idp }}">
-                                        Daftar
-                                    </button>
-                                </div>
-                            </div>
-                        </article>
+                @if ($idps->isEmpty())
+                    <div class="col-12">
+                        <div class="alert alert-primary text-center">
+                            <strong>Belum tersedia IDP</strong> untuk jenjang dan learning group Anda saat ini.
+                        </div>
                     </div>
-                @endforeach
+                @else
+                    @foreach ($idps as $idp)
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                            <article class="article">
+                                <div class="article-header">
+                                    <div class="article-image" data-background="{{ asset('./img/bank-idp.png') }}"></div>
+                                    <div class="article-title">
+                                        <h2 class="text-truncate" style="max-width: 100%">
+                                            <a href="#">{{ $idp->proyeksi_karir }}</a>
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div class="article-details">
+                                    <p class="text-center">
+                                        <strong>{{ Str::limit($idp->deskripsi_idp, 100) }}</strong>
+                                    </p>
+                                    <div class="article-cta text-center">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#modalIdp{{ $idp->id_idp }}">
+                                            Daftar
+                                        </button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    @endforeach
+                @endif
             </div>
         </section>
     </div>
@@ -46,9 +54,9 @@
         <div class="modal fade" id="modalIdp{{ $idp->id_idp }}" tabindex="-1"
             aria-labelledby="modalIdpLabel{{ $idp->id_idp }}" aria-hidden="true">
             <div class="modal-dialog modal-lg">
-                <form action="#" method="POST">
+                <form action="{{ route('karyawan.IDP.applyBankIdp', $idp->id_idp) }}" method="POST">
                     @csrf
-                    <input type="hidden" name="idp_id" value="{{ $idp->id_idp }}">
+                    <input type="hidden" name="id_idp_template" value="{{ $idp->id_idp }}">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modalIdpLabel{{ $idp->id_idp }}">
@@ -81,7 +89,9 @@
                                             </p>
                                         </div>
                                         <div class="col-md-6">
-                                            <p><strong>Kuota Tersedia:</strong><br>{{ $idp->max_applies }}</p>
+                                            <p><strong>Kuota
+                                                    Tersedia:</strong><br>{{ $idp->max_applies - ($idp->current_applies ?? 0) }}
+                                            </p>
                                         </div>
                                     </div>
                                     <p><strong>Daftar Kompetensi</p>
@@ -92,9 +102,9 @@
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
                                             <span class="accordion-icon me-2">›</span>
-                                            <p></p><span class="kompetensi-nama">
+                                            <span class="kompetensi-nama">
                                                 {{ $kom->kompetensi->nama_kompetensi }}
-                                            </span></p>
+                                            </span>
                                         </button>
                                         <div class="accordion-content ps-4 mt-2" style="display: none;">
                                             <p><span>{{ $kom->kompetensi->keterangan }}</span></p>
@@ -137,7 +147,7 @@
                                 <label for="mentorSelect{{ $idp->id }}" class="form-label">
                                     <strong>Pilih Mentor <span class="text-danger">*</span></strong>
                                 </label>
-                                <select class="form-control" name="mentor_id" id="mentorSelect{{ $idp->id }}"
+                                <select class="form-control" name="id_mentor" id="mentorSelect{{ $idp->id }}"
                                     required>
                                     <option value="">-- Pilih Mentor --</option>
                                     @foreach ($mentors as $mentor)
@@ -155,7 +165,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <button type="button" class="btn btn-warning" data-bs-dismiss="modal">
                                 <i class="fas fa-times"></i> Batal
                             </button>
                             <button type="submit" class="btn btn-primary">
@@ -171,6 +181,32 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {{-- Swal success alert --}}
+    @if (session('msg-success'))
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            @if (session('msg-error'))
+                <
+                script >
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: "{{ session('msg-error') }}",
+                    });
+        </script>
+    @endif
+
+    @if (session('msg-success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: "{{ session('msg-success') }}",
+            });
+        </script>
+    @endif
+    </script>
+    @endif
     <script>
         function toggleAccordion(button) {
             const content = button.nextElementSibling;

@@ -10,11 +10,13 @@ use App\Models\LearingGroup;
 use App\Models\IdpKompetensiPengerjaan;
 use Illuminate\Support\Facades\Log;
 use App\Models\IdpKompetensi;
+use App\Models\TemplateApplay;
 use App\Notifications\PengerjaanBaruNotification;
 use App\Notifications\PengerjaanDikirimUlangNotification;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class KaryawanDashboardController extends Controller
 {
@@ -286,11 +288,17 @@ class KaryawanDashboardController extends Controller
     }
     public function bankIdp(Request $request)
     {
+        $user = Auth::user();
+        $jenjang_id = $user->id_jenjang;
+        $lgId = $user->learningGroup->id_LG;
         $search = $request->query('search');
         $id_jenjang = $request->query('id_jenjang');
         $id_LG = $request->query('lg');
         $tahun = $request->query('tahun');
-
+        $appliedIdpIds = DB::table('idp_template_applies')
+            ->where('id_user', $user->id)
+            ->pluck('id_idp_template')
+            ->toArray();
         $listTahun = IDP::whereNotNull('waktu_mulai')
             ->selectRaw('YEAR(waktu_mulai) as tahun')
             ->distinct()
@@ -312,12 +320,12 @@ class KaryawanDashboardController extends Controller
             'idpKompetensis.pengerjaans',
         ])
             ->where('is_template', true)
+            ->where('id_jenjang', $jenjang_id)
+            ->where('id_LG', $lgId)
+            ->whereNotIn('id_idp', $appliedIdpIds) // ⬅ ini baris tambahan untuk menyembunyikan IDP yang sudah didaftar
             ->when($search, function ($query, $search) {
                 // Search di kolom proyeksi_karir langsung di tabel idp
                 return $query->where('proyeksi_karir', 'like', "%$search%");
-            })
-            ->when($id_jenjang, function ($query, $id_jenjang) {
-                return $query->where('id_jenjang', $id_jenjang);
             })
             ->when($id_LG, function ($query, $id_LG) {
                 return $query->where('id_LG', $id_LG);
@@ -338,8 +346,101 @@ class KaryawanDashboardController extends Controller
             'id_jenjang' => $id_jenjang,
             'lg' => $id_LG,
             'tahun' => $tahun,
+            'id_jenjang' => $jenjang_id,
+            'id_LG' => $lgId,
             'mentors' => $mentors,
             'type_menu' => 'karyawan',
         ]);
+    }
+    public function applyBankIdp(Request $request)
+    {
+        $request->validate([
+            'id_idp_template' => 'required|exists:idps,id_idp',
+            'id_mentor' => 'required|exists:users,id',
+        ]);
+
+        $user = Auth::user();
+
+        $templateIDP = IDP::where('id_idp', $request->id_idp_template)
+            ->where('is_template', 1)
+            ->firstOrFail();
+        // Cek apakah user sudah pernah daftar IDP ini sebelumnya
+        $sudahDaftar = IDP::where('id_idp_template_asal', $templateIDP->id_idp)
+            ->where('id_user', $user->id)
+            ->exists();
+
+        if ($sudahDaftar) {
+            return redirect()->back()->with('msg-error', 'Anda sudah mendaftar IDP ini!');
+        }
+        // Cek apakah template masih terbuka
+        if (!$templateIDP->is_open) {
+            return back()->withErrors(['msg-success' => 'Template IDP sudah ditutup untuk pendaftaran.']);
+        }
+
+        // Cek kuota apply
+        if ($templateIDP->max_applies !== null && $templateIDP->current_applies >= $templateIDP->max_applies) {
+            return back()->withErrors(['msg-success' => 'Kuota pendaftaran untuk template IDP ini sudah penuh.']);
+        }
+        // 1. Simpan apply record
+        $apply = TemplateApplay::create([
+            'id_idp_template' => $templateIDP->id_idp,
+            'id_user' => $user->id,
+            'id_mentor' => $request->id_mentor,
+            'id_jenjang' => $templateIDP->id_jenjang,
+            'applied_at' => now(),
+            'id_jabatan' => $user->id_jabatan,
+            'id_angkatanpsp' => $user->id_angkatanpsp,
+            'id_divisi' => $user->id_divisi,
+            'id_penempatan' => $user->id_penempatan,
+            'id_LG' => $user->id_LG,
+            'id_semester' => $user->id_semester,
+
+        ]);
+
+        // 2. Buat IDP baru hasil apply user
+        $idp = IDP::create([
+            'id_user' => $user->id,
+            'id_mentor' => $request->id_mentor,
+            'id_supervisor' => $templateIDP->id_supervisor,
+            'id_semester' => $templateIDP->id_semester,
+            'id_jenjang' => $templateIDP->id_jenjang,
+            'id_jabatan' => $user->id_jabatan,
+            'id_angkatanpsp' => $user->id_angkatanpsp,
+            'id_divisi' => $user->id_divisi,
+            'id_penempatan' => $user->id_penempatan,
+            'id_LG' => $user->id_LG,
+            'proyeksi_karir' => $templateIDP->proyeksi_karir,
+            'waktu_mulai' => $templateIDP->waktu_mulai,
+            'waktu_selesai' => $templateIDP->waktu_selesai,
+            'deskripsi_idp' => $templateIDP->deskripsi_idp,
+            'status_approval_mentor' => $templateIDP->status_approval_mentor,
+            'status_pengajuan_idp' => $templateIDP->status_pengajuan_idp,
+            'status_pengerjaan' => $templateIDP->status_pengerjaan,
+            'is_template' => 0,
+            'id_idp_template_asal' => $templateIDP->id_idp,
+        ]);
+
+        // 3. Copy kompetensi + metode belajar ke IDP baru
+        $templateKompetensis = $templateIDP->idpKompetensis;
+
+        foreach ($templateKompetensis as $tempKom) {
+            $idpKom = IdpKompetensi::create([
+                'id_idp' => $idp->id_idp,
+                'id_kompetensi' => $tempKom->id_kompetensi,
+                'sasaran' => $tempKom->sasaran,
+                'aksi' => $tempKom->aksi,
+            ]);
+
+            $metodeBelajars = $tempKom->metodeBelajars;
+            if ($metodeBelajars->isNotEmpty()) {
+                $idpKom->metodeBelajars()->attach($metodeBelajars->pluck('id_metodeBelajar')->toArray());
+            }
+        }
+        // Update current_applies
+        $currentCount = IDP::where('id_idp_template_asal', $templateIDP->id_idp)->count();
+        $templateIDP->current_applies = $currentCount;
+        $templateIDP->save();
+
+        return redirect()->back()->with('msg-success', 'Selamat Anda Berhasil Mendaftar IDP ini!');
     }
 }

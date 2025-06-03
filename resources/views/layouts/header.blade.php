@@ -111,7 +111,7 @@
                     )
                 </div>
             </a>
-            <div class="dropdown-menu dropdown-menu-right">
+            <div class="dropdown-menu dropdown-menu-right" style="min-width: 250px;">
                 <div class="dropdown-title">
                     Hi, {{ Auth::user()->name }} (
                     @php

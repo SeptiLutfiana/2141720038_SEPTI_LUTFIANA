@@ -316,6 +316,7 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::post('/idp/implementasi/hard/{id_idpKom}', [KaryawanDashboardController::class, 'storeImplementasiHard'])->name('storeImplementasiHard');
         Route::put('/upload-ulang/{id}', [KaryawanDashboardController::class, 'uploadUlang'])->name('uploadUlang');
         Route::get('/bank-idp', [KaryawanDashboardController::class, 'bankIdp'])->name('bankIdp');
+        Route::post('/apply-idp/{id}', [KaryawanDashboardController::class, 'applyBankIdp'])->name('applyBankIdp');
     });
 });
 // PROFILE

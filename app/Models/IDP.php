@@ -26,6 +26,7 @@ class IDP extends Model
         'saran_idp',
         'status_pengerjaan',
         'is_template',
+        'id_idp_template_asal',
         'deskripsi_idp',
         'id_jenjang',
         'id_jabatan',
@@ -93,5 +94,9 @@ class IDP extends Model
     public function rekomendasis()
     {
         return $this->hasMany(IdpRekomendasi::class, 'id_idp');
+    }
+    public function templateAsal()
+    {
+        return $this->belongsTo(IDP::class, 'id_idp_template_asal');
     }
 }

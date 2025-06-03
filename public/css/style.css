@@ -4282,7 +4282,9 @@ body:not(.sidebar-mini)
 }
 
 .kompetensi-nama {
-    flex: 1;
+    flex: 2;
+    font-size: 14px;
+    color: #6b7280;
 }
 
 .card-header h4,
@@ -4299,9 +4301,9 @@ body:not(.sidebar-mini)
     margin-bottom: 0.5rem !important;
 }
 .dashed-border-container {
-    border: 2px dashed #ccc; 
-    border-radius: 8px; 
-    padding: 20px; 
-    margin-top: 20px; 
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
     margin-bottom: 20px;
 }
