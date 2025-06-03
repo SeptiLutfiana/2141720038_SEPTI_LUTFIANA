@@ -295,6 +295,7 @@ Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
         Route::get('/', [IdpController::class, 'indexSupervisor'])->name('indexSupervisor');
     });
 });
+// MENTOR
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
     // MENTOR
     Route::get('/mentor/dashboard', [MentorDashboardController::class, 'index'])->name('mentor.dashboard-mentor');
@@ -303,8 +304,11 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::get('/', [MentorDashboardController::class, 'indexMentor'])->name('indexMentor');
         Route::get('/detail/{id}', [MentorDashboardController::class, 'showMentor'])->name('mentor.idp.show');
         Route::put('/penilaian/idp/{id}', [MentorDashboardController::class, 'updatePenilaian'])->name('updatePenilaian');
+        Route::get('/verifikasi/{id}', [MentorDashboardController::class, 'verifikasi'])->name('verfikasi');
+        Route::put('/update/verifikasi/{id}', [MentorDashboardController::class, 'updateVerifikasi'])->name('updateVerifikasi');
     });
 });
+// KARYAWAN
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
     // KARYAWAN
     Route::get('/karyawan/dashboard', [KaryawanDashboardController::class, 'index'])->name('karyawan.dashboard-karyawan');
@@ -317,6 +321,7 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::put('/upload-ulang/{id}', [KaryawanDashboardController::class, 'uploadUlang'])->name('uploadUlang');
         Route::get('/bank-idp', [KaryawanDashboardController::class, 'bankIdp'])->name('bankIdp');
         Route::post('/apply-idp/{id}', [KaryawanDashboardController::class, 'applyBankIdp'])->name('applyBankIdp');
+        Route::get('/{id}/detail/idp', [KaryawanDashboardController::class, 'detailKaryawan'])->name('detailKaryawan');
     });
 });
 // PROFILE

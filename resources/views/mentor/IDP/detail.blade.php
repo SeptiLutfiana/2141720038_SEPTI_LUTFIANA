@@ -91,14 +91,6 @@
                                     <div class="accordion border-bottom mb-2 pb-2">
                                         @php
                                             $statuses = $kom->pengerjaans->pluck('status_pengerjaan');
-
-                                            if ($statuses->every(fn($s) => $s === 'Disetujui Mentor')) {
-                                                $statusText = 'Disetujui Mentor';
-                                                $statusColor = '#3b82f6'; // biru
-                                            } else {
-                                                $statusText = 'Menunggu Persetujuan';
-                                                $statusColor = '#16a34a'; // hijau
-                                            }
                                         @endphp
 
                                         <button class="accordion-button text-start w-100 d-flex align-items-center"
@@ -106,18 +98,31 @@
                                             style="border: none; background: none; padding: 0;">
 
                                             <span class="accordion-icon me-2">›</span>
+
                                             <span class="kompetensi-nama">
-                                                {{ $kom->kompetensi->nama_kompetensi }}   
-                                                <span
-                                                    style="
-                                                        padding: 3px 8px; 
-                                                        border-radius: 12px; 
-                                                        color: white;
-                                                        font-weight: 600;
-                                                        background-color: 
-                                                        {{ $statusText == 'Disetujui Mentor' ? '#3b82f6' : '#22c55e' }};">
-                                                    {{ $statusText }}
-                                                </span>
+                                                {{ $kom->kompetensi->nama_kompetensi }}
+
+                                                @if ($statuses->isNotEmpty())
+                                                    @php
+                                                        if ($statuses->every(fn($s) => $s === 'Disetujui Mentor')) {
+                                                            $statusText = 'Disetujui Mentor';
+                                                            $statusColor = '#3b82f6'; // biru
+                                                        } else {
+                                                            $statusText = 'Menunggu Persetujuan';
+                                                            $statusColor = '#22c55e'; // hijau
+                                                        }
+                                                    @endphp
+                                                    <span
+                                                        style="
+                                                            padding: 3px 8px; 
+                                                            border-radius: 12px; 
+                                                            color: white;
+                                                            font-weight: 600;
+                                                            background-color: {{ $statusColor }};
+                                                        ">
+                                                        {{ $statusText }}
+                                                    </span>
+                                                @endif
                                             </span>
                                         </button>
                                         <div class="accordion-content ps-4 mt-2" style="display: none;">
@@ -254,14 +259,6 @@
                                     <div class="accordion border-bottom mb-2 pb-2">
                                         @php
                                             $statuses = $kom->pengerjaans->pluck('status_pengerjaan');
-
-                                            if ($statuses->every(fn($s) => $s === 'Disetujui Mentor')) {
-                                                $statusText = 'Disetujui Mentor';
-                                                $statusColor = '#3b82f6'; // biru
-                                            } else {
-                                                $statusText = 'Menunggu Persetujuan';
-                                                $statusColor = '#16a34a'; // hijau
-                                            }
                                         @endphp
 
                                         <button class="accordion-button text-start w-100 d-flex align-items-center"
@@ -271,19 +268,32 @@
                                             <span class="accordion-icon me-2">›</span>
 
                                             <span class="kompetensi-nama">
-                                                {{ $kom->kompetensi->nama_kompetensi }}   
-                                                <span
-                                                    style="
-                                                        padding: 3px 8px; 
-                                                        border-radius: 12px; 
-                                                        color: white;
-                                                        font-weight: 600;
-                                                        background-color: 
-                                                        {{ $statusText == 'Disetujui Mentor' ? '#3b82f6' : '#22c55e' }};">
-                                                    {{ $statusText }}
-                                                </span>
+                                                {{ $kom->kompetensi->nama_kompetensi }}
+
+                                                @if ($statuses->isNotEmpty())
+                                                    @php
+                                                        if ($statuses->every(fn($s) => $s === 'Disetujui Mentor')) {
+                                                            $statusText = 'Disetujui Mentor';
+                                                            $statusColor = '#3b82f6'; // biru
+                                                        } else {
+                                                            $statusText = 'Menunggu Persetujuan';
+                                                            $statusColor = '#22c55e'; // hijau
+                                                        }
+                                                    @endphp
+                                                    <span
+                                                        style="
+                                                            padding: 3px 8px; 
+                                                            border-radius: 12px; 
+                                                            color: white;
+                                                            font-weight: 600;
+                                                            background-color: {{ $statusColor }};
+                                                        ">
+                                                        {{ $statusText }}
+                                                    </span>
+                                                @endif
                                             </span>
                                         </button>
+
                                         <div class="accordion-content ps-4 mt-2" style="display: none;">
                                             <p><span>{{ $kom->kompetensi->keterangan }}</span></p>
                                             <p><strong>Metode Belajar:</strong>
@@ -431,7 +441,8 @@
                 @method('PUT')
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title text-center" id="nilaiModalLabel">Persetujuan Implementasi IDP oleh Mentor</h5>
+                        <h5 class="modal-title text-center" id="nilaiModalLabel">Persetujuan Implementasi IDP oleh Mentor
+                        </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
                             <span aria-hidden="true">&times;</span>
                         </button>

@@ -19,11 +19,29 @@
                         <td>{{ $item->karyawan->name }}</td>
                         <td>{{ $item->proyeksi_karir }}</td>
                         <td class="text-center">
+                            @php
+                                $status = $item->status_approval_mentor;
+                                $bgColor = '';
+                                $textColor = '';
+
+                                if ($status === 'Menunggu Persetujuan') {
+                                    $bgColor = '#fef3c7'; // kuning muda
+                                    $textColor = '#92400e'; // coklat gelap
+                                } elseif ($status === 'Disetujui') {
+                                    $bgColor = '#d1fae5'; // hijau muda
+                                    $textColor = '#065f46'; // hijau tua
+                                } elseif ($status === 'Ditolak') {
+                                    $bgColor = '#fee2e2'; // merah muda
+                                    $textColor = '#991b1b'; // merah tua
+                                }
+                            @endphp
+
                             <span
-                                style="background-color: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 9999px;">
-                                {{ $item->status_approval_mentor }}
+                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 4px 10px; border-radius: 9999px;">
+                                {{ $status }}
                             </span>
                         </td>
+
 
                         <td>{{ $item->supervisor->name }}</td>
                         <td>
@@ -66,12 +84,19 @@
                             </div>
                         </td>
                         <td class="text-left" style="width: 150px;">
-                            <a href="{{ route('mentor.IDP.mentor.idp.show', $item->id_idp) }}"
-                                class="btn btn-primary btn-sm mb-1"> <i class="fas fa-external-link-alt"></i>
-                                Detail</a>
-                            <br>
-                            <br>
+                            @if ($item->status_approval_mentor === 'Menunggu Persetujuan')
+                                <a href="{{ route('mentor.IDP.verfikasi', $item->id_idp) }}"
+                                    class="btn btn-warning btn-sm mb-1">
+                                    <i class="fas fa-edit"></i> Verifikasi
+                                </a>
+                            @else
+                                <a href="{{ route('mentor.IDP.mentor.idp.show', $item->id_idp) }}"
+                                    class="btn btn-primary btn-sm mb-1">
+                                    <i class="fas fa-eye"></i> Detail
+                                </a>
+                            @endif
                         </td>
+
                     </tr>
                 @empty
                     <tr>

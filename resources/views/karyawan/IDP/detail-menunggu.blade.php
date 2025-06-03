@@ -8,8 +8,8 @@
             <div class="section-header">
                 <h1>Detail IDP Karyawan</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}">Data IDP</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('karyawan.dashboard-karyawan') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('karyawan.IDP.indexKaryawan') }}">Data IDP</a></div>
                     <div class="breadcrumb-item">Detail IDP</div>
                 </div>
             </div>
@@ -17,7 +17,7 @@
             <div class="section-body">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Informasi Individual Development Plan - {{ $idps->proyeksi_karir }}</h4>
+                        <h4>Informasi IDP - {{ $idps->karyawan->name }}</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -29,6 +29,12 @@
                             <div class="form-group col-md-12">
                                 <label>Deskripsi</label>
                                 <input readonly type="text" class="form-control" value="{{ $idps->deskripsi_idp }}">
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label>Mentor</label>
+                                <input readonly type="text" class="form-control"
+                                    value="{{ $idps->mentor->name ?? '-' }}">
                             </div>
 
                             <div class="form-group col-md-12">
@@ -49,15 +55,25 @@
                                     value="{{ \Carbon\Carbon::parse($idps->waktu_selesai)->format('d-m-Y') }}">
                             </div>
 
-                            <div class="form-group col-md-6">
-                                <label>Maksimal Kuota</label>
+                            <div class="form-group col-md-12">
+                                <label>Status Approval Mentor</label>
                                 <input readonly type="text" class="form-control"
-                                    value="{{ $idps->max_applies }}">
+                                    value="{{ $idps->status_approval_mentor }}">
                             </div>
-                            <div class="form-group col-md-6">
-                                <label>Total Karyawan Applay</label>
+
+                            <div class="form-group col-md-12">
+                                <label>Status Pengajuan IDP</label>
                                 <input readonly type="text" class="form-control"
-                                    value="{{ $idps->current_applies }}">
+                                    value="{{ $idps->status_pengajuan_idp }}">
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label>Status Pengerjaan IDP</label>
+                                <input readonly type="text" class="form-control" value="{{ $idps->status_pengerjaan }}">
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label>Saran Pengajuan IDP</label>
+                                <input readonly type="text" class="form-control" value="{{ $idps->saran_idp }}">
                             </div>
                             <div class="form-group col-md-12">
                                 <label>Daftar Kompetensi</label> <br>
@@ -111,7 +127,7 @@
                         </div>
                     </div>
                     <div class="card-footer text-right">
-                        <a class="btn btn-primary" href="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}">Kembali</a>
+                        <a class="btn btn-primary" href="{{ route('karyawan.IDP.indexKaryawan') }}">Kembali</a>
                     </div>
                 </div>
             </div>

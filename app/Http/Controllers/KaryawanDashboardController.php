@@ -112,6 +112,22 @@ class KaryawanDashboardController extends Controller
             'type_menu' => 'karyawan',
         ]);
     }
+    public function DetailKaryawan($id, Request $request)
+    {
+        $idps = IDP::with([
+            'karyawan',      // relasi banyak karyawan jika ada
+            'mentor',
+            'supervisor',
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.metodeBelajars', // relasi kompetensi beserta metode belajar
+            'idpKompetensis.pengerjaans'
+        ])->findOrFail($id);
+        // Ambil id_pengerjaan dari query string jika ada
+        return view('karyawan.IDP.detail-menunggu', [
+            'idps' => $idps,
+            'type_menu' => 'karyawan',
+        ]);
+    }
     public function storeImplementasiSoft(Request $request, $id_idpKom)
     {
         $request->validate([
@@ -132,12 +148,10 @@ class KaryawanDashboardController extends Controller
 
         // Ambil relasi ke IDP dan mentor
         $idpKompetensi = IdpKompetensi::with('idp')->find($id_idpKom);
-
         if (!$idpKompetensi) {
             Log::error("IDP Kompetensi tidak ditemukan dengan id $id_idpKom");
             return redirect()->back()->with('error', 'IDP Kompetensi tidak ditemukan.');
         }
-
         $idp = $idpKompetensi->idp;
         if (!$idp) {
             Log::error("IDP tidak ditemukan untuk idp_kompetensi id $id_idpKom");
@@ -148,6 +162,10 @@ class KaryawanDashboardController extends Controller
         if (!$mentor) {
             Log::error("Mentor tidak ditemukan untuk IDP ID {$idp->id}");
             return redirect()->back()->with('error', 'Mentor belum ditentukan.');
+        }
+        if ($idp->status_pengerjaan === 'Menunggu Tindakan') {
+            $idp->status_pengerjaan = 'Sedang Dikerjakan';
+            $idp->save();
         }
 
         // Debug log
@@ -210,6 +228,10 @@ class KaryawanDashboardController extends Controller
         if (!$mentor) {
             Log::error("Mentor tidak ditemukan untuk IDP ID {$idp->id}");
             return redirect()->back()->with('error', 'Mentor belum ditentukan.');
+        }
+        if ($idp->status_pengerjaan === 'Menunggu Tindakan') {
+            $idp->status_pengerjaan = 'Sedang Dikerjakan';
+            $idp->save();
         }
 
         // Debug log

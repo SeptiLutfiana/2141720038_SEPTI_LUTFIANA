@@ -10,7 +10,7 @@ use App\Models\LearingGroup;
 use App\Models\IdpKompetensiPengerjaan;
 use Illuminate\Notifications\DatabaseNotification;
 use App\Notifications\PenilaianDiperbaruiNotification;
-
+use App\Notifications\VerifikasiIDPNotification;
 class MentorDashboardController extends Controller
 {
     public function index()
@@ -146,5 +146,60 @@ class MentorDashboardController extends Controller
             'message' => $pesanStatus,
         ]));
         return redirect()->back()->with('success', 'Penilaian berhasil diperbarui.');
+    }
+    public function verifikasi($id)
+    {
+        $idps = IDP::with(['karyawan'])->findOrFail($id);
+
+        // Pastikan hanya mentor yang berwenang bisa buka
+        if ($idps->id_mentor != Auth::id()) {
+            abort(403, 'Anda tidak berhak memverifikasi IDP ini.');
+        }
+
+        return view('mentor.IDP.verifikasi', [
+            'idps' => $idps,
+            'type_menu' => 'mentor',
+        ]);
+    }
+
+    public function updateVerifikasi(Request $request, $id)
+    {
+        $request->validate([
+            'status_approval_mentor' => 'required|in:Disetujui,Ditolak',
+            'status_pengajuan_idp' => 'required|in:Revisi,Disetujui,Tidak Disetujui',
+            'saran' => 'nullable|string|max:1000',
+        ]);
+
+        $idps = IDP::findOrFail($id);
+
+        if ($idps->id_mentor != Auth::id()) {
+            abort(403, 'Anda tidak berhak memverifikasi IDP ini.');
+        }
+
+        $idps->status_approval_mentor = $request->status_approval_mentor;
+        $idps->status_pengajuan_idp = $request->status_pengajuan_idp;
+        $idps->saran_idp = $request->saran_idp;
+        $idps->save();
+        $karyawan = $idps->karyawan;
+        $mentor = Auth::user();
+
+        // Gabungkan pesan status approval dan pengajuan
+        $pesan = "IDP Anda telah diverifikasi oleh mentor ({$mentor->name}). "
+            . "Status Approval Mentor: {$request->status_approval_mentor}. "
+            . "Status Pengajuan: {$request->status_pengajuan_idp}.";
+
+        // Kirim notifikasi ke karyawan
+        $karyawan->notify(new VerifikasiIDPNotification([
+            'id_idp' => $idps->id_idp,
+            'status_pengajuan_idp' => $request->status_pengajuan_idp,
+            'status_approval_mentor' => $request->status_approval_mentor,
+            'saran_idp' => $request->saran_idp,
+            'nama_mentor' => $mentor->name,
+            'untuk_role' => 'karyawan',
+            'message' => $pesan,
+        ]));
+
+        return redirect()->route('mentor.IDP.indexMentor', $id)
+            ->with('msg-success', 'Verifikasi berhasil disimpan.');
     }
 }
