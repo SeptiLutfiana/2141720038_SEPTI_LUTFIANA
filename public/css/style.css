@@ -4307,3 +4307,11 @@ body:not(.sidebar-mini)
     margin-top: 20px;
     margin-bottom: 20px;
 }
+.swal2-confirm-green {
+    background-color: #28a745 !important; /* Hijau Bootstrap */
+    color: white !important;
+}
+
+.swal2-confirm-green:hover {
+    background-color: #218838 !important;
+}

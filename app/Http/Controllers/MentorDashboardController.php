@@ -145,7 +145,7 @@ class MentorDashboardController extends Controller
             'untuk_role' => 'karyawan',
             'message' => $pesanStatus,
         ]));
-        return redirect()->back()->with('success', 'Penilaian berhasil diperbarui.');
+        return redirect()->back()->with('msg-success', 'Penilaian berhasil diperbarui.');
     }
     public function verifikasi($id)
     {

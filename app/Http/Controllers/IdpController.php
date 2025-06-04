@@ -19,6 +19,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use FFI\Exception;
+use App\Notifications\BankIDPNotification;
+use App\Notifications\GivenIDPNotification;
 
 class IdpController extends Controller
 {
@@ -245,7 +247,6 @@ class IdpController extends Controller
                 }
             });
             // --- AKHIR PERUBAHAN UTAMA UNTUK BANK IDP ---
-
             return redirect()->route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp')
                 ->with('msg-success', 'Berhasil membuat IDP Bank untuk jenjang ' . $namaJenjang . ' dan learning group ' . ($namaLG ? $namaLG : 'Semua Learning Group'));
         } else { // Ini adalah Given IDP
@@ -258,12 +259,19 @@ class IdpController extends Controller
             $users = User::whereIn('id', $userIds)->get();
             $userNames = $users->pluck('name')->implode(', '); // Get names and join them with a comma
 
-            foreach ($request->id_user as $idUser) {
-                DB::transaction(function () use ($idUser, $request) {
-                    $this->createIdpForUser($idUser, $request, false); // untuk Given IDP
-                });
+            $createdIdps = [];
+
+            foreach ($userIds as $idUser) {
+                // Panggil fungsi yang mengelola transaksi dan mengembalikan IDP
+                $idp = $this->createIdpForUser($idUser, $request, false);
+                $createdIdps[$idUser] = $idp;
             }
 
+            foreach ($users as $user) {
+                if (isset($createdIdps[$user->id])) {
+                    $user->notify(new GivenIDPNotification($createdIdps[$user->id]->id_idp));
+                }
+            }
             return redirect()->route('adminsdm.BehaviorIDP.indexGiven')
                 ->with('msg-success', 'Berhasil membuat IDP untuk karyawan terpilih: ' . $userNames);
         }
@@ -317,6 +325,7 @@ class IdpController extends Controller
                 ]);
             }
         }
+        return $idp;
     }
 
     public function showGiven($id)

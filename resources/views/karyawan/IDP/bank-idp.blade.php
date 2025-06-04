@@ -182,31 +182,35 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     {{-- Swal success alert --}}
-    @if (session('msg-success'))
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            @if (session('msg-error'))
-                <
-                script >
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        text: "{{ session('msg-error') }}",
-                    });
-        </script>
-    @endif
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    @if (session('msg-success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: "{{ session('msg-success') }}",
-            });
-        </script>
-    @endif
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (session('msg-success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: @json(session('msg-success')),
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        confirmButton: 'swal2-confirm-green'
+                    }
+                });
+            @endif
+
+            @if (session('msg-error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: @json(session('msg-error')),
+                    confirmButtonText: 'Tutup',
+                    customClass: {
+                        confirmButton: 'swal2-confirm-green'
+                    }
+                });
+            @endif
+        });
     </script>
-    @endif
     <script>
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
