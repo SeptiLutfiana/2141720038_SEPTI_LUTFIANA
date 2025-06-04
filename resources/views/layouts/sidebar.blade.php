@@ -152,7 +152,7 @@
         @if (Auth::user()->id_role == 2)
             <!-- Supervisor -->
             <ul class="sidebar-menu">
-                <li class="nav-item dropdown {{ $type_menu === 'listidp' ? 'active' : '' }}">
+                <li class="nav-item dropdown {{ $type_menu === 'supervisor' ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                             class="fas fa-columns"></i> <span>Behavior IDP</span></a>
                     <ul class="dropdown-menu">

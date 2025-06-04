@@ -23,6 +23,6 @@ class IdpKompetensiPengerjaan extends Model
     }
      public function nilaiPengerjaanIdp()
     {
-        return $this->hasMany(NilaiPengerjaanIdp::class, 'id_idpKomPeng', 'id_idpKomPeng');
+        return $this->hasOne(NilaiPengerjaanIdp::class, 'id_idpKomPeng', 'id_idpKomPeng');
     }
 }
