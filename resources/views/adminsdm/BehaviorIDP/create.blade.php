@@ -9,7 +9,8 @@
                     <h1>Tambah IDP Karyawan</h1>
                     <div class="section-header-breadcrumb">
                         <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                        <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}">Data Bank
+                        <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}">Data
+                                Bank
                                 IDP</a>
                         </div>
                         <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Data DP</a>
@@ -252,7 +253,7 @@
                                                 <th width="25%">Nama Kompetensi</th>
                                                 <th width="20%">Metode Belajar</th>
                                                 <th width="20%">Sasaran</th>
-                                                <th width="20%">Aksi</th>
+                                                <th width="20%">Aksi (Implementasi)</th>
                                                 <th width="15%">Aksi</th>
                                             </tr>
                                         </thead>
@@ -270,7 +271,8 @@
                                                 <th width="25%">Nama Kompetensi</th>
                                                 <th width="20%">Metode Belajar</th>
                                                 <th width="20%">Sasaran</th>
-                                                <th width="20%">Aksi</th>
+                                                <th width="20%">Aksi (implementasi)</th>
+                                                <th width="20%">Peran</th>
                                                 <th width="15%">Aksi</th>
                                             </tr>
                                         </thead>
@@ -337,6 +339,17 @@
                                     <label>Kompetensi</label>
                                     <select class="form-control kompetensi-dropdown" id="modalKompetensiDropdown">
                                         <!-- Opsi akan diisi oleh JS -->
+                                    </select>
+                                </div>
+                                <!-- Peran Kompetensi, hidden default -->
+                                <div class="form-group col-md-12" id="formPeranGroup">
+                                    <label>Peran Kompetensi</label>
+                                    <select class="form-control" id="modalPeranDropdown" name="peran">
+                                        <option value="umum">Kompetensi Umum</option>
+                                        <option value="utama">Kompetensi Utama</option>
+                                        <option value="kunci_core">Kompetensi Kunci Core</option>
+                                        <option value="kunci_bisnis">Kompetensi Kunci Bisnis</option>
+                                        <option value="kunci_enabler">Kompetensi Kunci Enabler</option>
                                     </select>
                                 </div>
                             </div>
@@ -572,7 +585,6 @@
                 "Hard Kompetensi": @json($kompetensis->where('jenis_kompetensi', 'Hard Kompetensi')->values()),
                 "Soft Kompetensi": @json($kompetensis->where('jenis_kompetensi', 'Soft Kompetensi')->values())
             };
-
             let kompetensiIndex = 0;
             let daftarHard = [];
             let daftarSoft = [];
@@ -614,6 +626,7 @@
 
                 const sasaran = document.getElementById('modalSasaran').value;
                 const aksi = document.getElementById('modalAksi').value;
+                const peran = document.getElementById('modalPeranDropdown').value;
 
                 // Validasi
                 if (!kompetensiId) {
@@ -637,7 +650,8 @@
                     metodeIds,
                     metodeText,
                     sasaran,
-                    aksi
+                    aksi,
+                    peran
                 };
 
                 if (jenis === "Hard Kompetensi") {
@@ -691,9 +705,10 @@
             <td>${item.metodeText}</td>
             <td>${item.sasaran}</td>
             <td>${item.aksi}</td>
+            <td>${item.peran}</td>
             <td class="text-center">
                 <button type="button" class="btn btn-danger btn-sm" onclick="hapusKompetensi('soft', ${index})">
-                    <i class="fas fa-trash"></i> Hapus
+                    <i class="fas fa-trash"></i>
                 </button>
             </td>
         </tr>
@@ -715,6 +730,8 @@
         <input type="hidden" name="kompetensi[${index}][id_kompetensi]" value="${item.kompetensiId}">
         <input type="hidden" name="kompetensi[${index}][sasaran]" value="${item.sasaran}">
         <input type="hidden" name="kompetensi[${index}][aksi]" value="${item.aksi}">
+        <input type="hidden" name="kompetensi[${index}][peran]" value="${item.peran}">
+
     `;
 
                 // Tambahkan input hidden untuk metode belajar (array)
@@ -780,9 +797,13 @@
                     if (jenis === 'Hard Kompetensi') {
                         $('#modalJenjangDropdown').closest('.form-group').show();
                         $('#modalJabatanDropdown').closest('.form-group').show();
+                        $('#formPeranGroup').closest('.form-group').hide(); // Hide Peran Kompetensi for Hard Kompetensi
+                        $('#modalPeranDropdown').val('umum');
                     } else {
                         $('#modalJenjangDropdown').closest('.form-group').hide();
                         $('#modalJabatanDropdown').closest('.form-group').hide();
+                        $('#formPeranGroup').show(); // Show Peran Kompetensi for Soft Kompetensi
+                        renderKompetensiOptions('Soft Kompetensi');
                     }
                 }
 

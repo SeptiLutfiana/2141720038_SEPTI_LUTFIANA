@@ -17,6 +17,7 @@ class IdpKompetensi extends Model
         'id_kompetensi',
         'sasaran',
         'aksi',
+        'peran',
     ];
     public function idp()
     {

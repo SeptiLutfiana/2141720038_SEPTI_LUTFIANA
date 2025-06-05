@@ -188,6 +188,7 @@ class IdpController extends Controller
             'kompetensi.*.id_metode_belajar.*' => 'exists:metode_belajars,id_metodeBelajar',
             'kompetensi.*.sasaran' => 'required|string',
             'kompetensi.*.aksi' => 'required|string',
+            'kompetensi.*.peran' => 'required|in:umum,utama,kunci_core,kunci_bisnis,kunci_enabler',
         ];
 
         if ($isTemplate) {
@@ -236,6 +237,7 @@ class IdpController extends Controller
                         'id_kompetensi' => $item['id_kompetensi'],
                         'sasaran' => $item['sasaran'],
                         'aksi' => $item['aksi'],
+                        'peran' => $item['peran'],
                     ]);
 
                     foreach ($item['id_metode_belajar'] as $idMetode) {
@@ -261,11 +263,12 @@ class IdpController extends Controller
 
             $createdIdps = [];
 
-            foreach ($userIds as $idUser) {
-                // Panggil fungsi yang mengelola transaksi dan mengembalikan IDP
-                $idp = $this->createIdpForUser($idUser, $request, false);
-                $createdIdps[$idUser] = $idp;
-            }
+            DB::transaction(function () use ($userIds, $request, &$createdIdps) {
+                foreach ($userIds as $idUser) {
+                    $idp = $this->createIdpForUser($idUser, $request, false);
+                    $createdIdps[$idUser] = $idp;
+                }
+            });
 
             foreach ($users as $user) {
                 if (isset($createdIdps[$user->id])) {
@@ -316,6 +319,7 @@ class IdpController extends Controller
                 'id_kompetensi' => $item['id_kompetensi'],
                 'sasaran' => $item['sasaran'],
                 'aksi' => $item['aksi'],
+                'peran' => $item['peran'],
             ]);
 
             foreach ($item['id_metode_belajar'] as $idMetode) {
