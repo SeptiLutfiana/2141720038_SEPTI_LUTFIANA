@@ -2,12 +2,12 @@
 
 namespace App\Livewire;
 
-use App\Models\IDP;
-use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\User;
+use App\Models\IDP;
 
-class IdpTable extends Component
+class RiwayatIdpTable extends Component
 {
     use WithPagination;
     public $search;
@@ -37,7 +37,10 @@ class IdpTable extends Component
     {
         $idps = IDP::query()
             ->where('is_template', false) // Filter utama untuk Bank IDP
-            ->doesntHave('rekomendasis') // Tidak punya data rekomendasi sama sekali
+            ->whereHas('rekomendasis', function ($q) {
+                $q->whereNotNull('hasil_rekomendasi')
+                    ->where('hasil_rekomendasi', '!=', '');
+            })
             ->when($this->search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
                     $q->where('proyeksi_karir', 'like', "%$search%")
@@ -60,7 +63,7 @@ class IdpTable extends Component
             ->paginate(5)
             ->withQueryString();
 
-        return view('livewire.idp-table', [
+        return view('livewire.riwayat-idp-table', [
             'idps' => $idps,
         ]);
     }

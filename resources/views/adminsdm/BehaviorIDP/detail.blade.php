@@ -26,7 +26,7 @@
                             Learning Group: {{ $idps->learninggroup->nama_LG ?? '-' }} |
                             Semester: {{ $idps->semester->nama_semester ?? '-' }} |
                             Angkatan PSP:
-                            {{ $idp->angkatanpsp->bulan ?? '-' }} {{ $idp->angkatanpsp->tahun ?? '-' }}
+                            {{ $idps->angkatanpsp->bulan ?? '-' }} {{ $idps->angkatanpsp->tahun ?? '-' }}
                         </small>
                         <br>
                         <div class="row">
@@ -40,13 +40,13 @@
                                 <textarea readonly type="text" class="form-control"style="height:6rem;">{{ $idps->deskripsi_idp }}</textarea>
                             </div>
 
-                            <div class="form-group col-md-12">
+                            <div class="form-group col-md-6">
                                 <label>Mentor</label>
                                 <input readonly type="text" class="form-control"
                                     value="{{ $idps->mentor->name ?? '-' }}">
                             </div>
 
-                            <div class="form-group col-md-12">
+                            <div class="form-group col-md-6">
                                 <label>Supervisor</label>
                                 <input readonly type="text" class="form-control"
                                     value="{{ $idps->supervisor->name ?? '-' }}">

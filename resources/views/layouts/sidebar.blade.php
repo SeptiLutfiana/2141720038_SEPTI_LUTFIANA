@@ -46,8 +46,8 @@
                             <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/given/idp') }}">
                                 List Perencanaan IDP</a>
                         </li>
-                        <li class="{{ Request::is('idps') ? 'active' : '' }}">
-                            <a class="nav-link" href="#">Riwayat Perencanaan IDP</a>
+                        <li class="{{ Request::is('admin/datamaster/behavior/idp/riwayat/idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/riwayat/idp') }}">Riwayat Perencanaan IDP</a>
                         </li>
                         <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('panduan-idp') }}">Panduan</a>

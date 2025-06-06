@@ -252,6 +252,8 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::put('/{id}/update/bank/idp', [IdpController::class, 'updateBank'])->name('ListIDP.updateBank');
         Route::delete('/{idp}', [IdpController::class, 'destroyGiven'])->name('destroyGiven');
         Route::delete('/{idp}/bank/idp', [IdpController::class, 'destroyBank'])->name('ListIDP.destroyBank');
+        Route::get('/riwayat/idp', [AdminDashboardController::class, 'indexRiwayatIdp'])->name('RiwayatIDP.indexRiwayatIdp');
+        Route::get('/{id}/riwayat/idp', [AdminDashboardController::class, 'showRiwayatIDP'])->name('RiwayatIDP.showRiwayatIdp');
     });
     Route::get('/list-idp', function () {
         return view('adminsdm.BehaviorIDP.ListIDP.list-idp', [

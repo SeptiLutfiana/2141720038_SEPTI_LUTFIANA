@@ -66,12 +66,7 @@
                         </td>
                         <td>{{ $idp->rekomendasis->first()->hasil_rekomendasi ?? 'Menunggu Penilaian' }}</td>
                         <td class="text-left" style="width: 120px;">
-                            <a href="{{ route('adminsdm.BehaviorIDP.editGiven', $idp->id_idp) }}"
-                                class="btn btn-warning btn-sm mb-1">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <br>
-                            <a href="{{ route('adminsdm.BehaviorIDP.showGiven', $idp->id_idp) }}"
+                            <a href="{{ route('adminsdm.BehaviorIDP.RiwayatIDP.showRiwayatIdp', $idp->id_idp) }}"
                                 class="btn btn-primary btn-sm mb-1">
                                 <i class="fas fa-info-circle"></i> Detail
                             </a>
