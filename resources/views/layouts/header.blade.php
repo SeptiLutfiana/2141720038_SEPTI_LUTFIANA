@@ -55,7 +55,7 @@
                                             break;
                                         case 'supervisor':
                                             $nama = $notification->data['nama_karyawan'] ?? 'Karyawan';
-                                            $routeName = 'karyawan.IDP.showKaryawan';
+                                            $routeName = 'supervisor.IDP.showSupervisor';
                                             break;
                                         case 'karyawan':
                                             $nama = $notification->data['nama_mentor'] ?? 'Mentor';

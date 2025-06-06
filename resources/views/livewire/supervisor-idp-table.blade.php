@@ -23,7 +23,7 @@
                         <td>{{ $item->learningGroup->nama_LG }}</td>
                         <td>{{ $item->proyeksi_karir }}</td>
                         <td>{{ $item->mentor->name ?? '-' }}</td>
-                        <td>{{ $item->idpKompetensi->pengerjaans->nilaiPengerjaanIdp->rating ?? 'menunggu penilaian' }}</td>
+                        <td>{{ $item->rekomendasis->first()->hasil_rekomendasi ?? 'menunggu penilaian' }}</td>
                         <td>
                             @php
                                 $idpKompetensis = $item->idpKompetensis;

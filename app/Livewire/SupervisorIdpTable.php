@@ -67,7 +67,7 @@ class SupervisorIdpTable extends Component
             ->when($this->lg, fn($q) => $q->where('id_LG', $this->lg))
             ->when($this->tahun, fn($q) => $q->whereYear('waktu_mulai', $this->tahun))
             ->orderBy('proyeksi_karir')
-            ->paginate(5)
+            ->paginate(10)
             ->withQueryString();
 
         return view('livewire.supervisor-idp-table', [

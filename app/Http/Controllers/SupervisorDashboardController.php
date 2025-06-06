@@ -10,6 +10,8 @@ use App\Models\LearingGroup;
 use App\Models\IdpKompetensiPengerjaan;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\NilaiPengerjaanIdp;
+use App\Services\IdpRekomendasiService;
+use Illuminate\Support\Facades\Log;
 
 class SupervisorDashboardController extends Controller
 {
@@ -125,21 +127,60 @@ class SupervisorDashboardController extends Controller
             'type_menu' => 'karyawan',
         ]);
     }
+    protected $rekomendasiService;
+
+    public function __construct(IdpRekomendasiService $rekomendasiService)
+    {
+        $this->rekomendasiService = $rekomendasiService;
+    }
+
     public function store(Request $request)
     {
-        $request->validate([
-            'rating' => 'required|in:1,2,3,4,5',
-            'saran' => 'nullable|string',
-            'id_idpKomPeng' => 'required|exists:idp_kompetensi_pengerjaans,id_idpKomPeng',
-        ]);
-
-        NilaiPengerjaanIdp::updateOrCreate(
-            ['id_idpKomPeng' => $request->id_idpKomPeng], // condition (jika sudah ada)
-            [ // update data
-                'rating' => $request->rating,
-                'saran' => $request->saran,
+        $validated = $request->validate(
+            [
+                'rating' => 'required|in:1,2,3,4,5',
+                'saran' => 'required|string',
+                'id_idpKomPeng' => 'required|exists:idp_kompetensi_pengerjaans,id_idpKomPeng',
+            ],
+            [
+                'rating.required' => 'Rating wajib diisi.',
+                'saran.required' => 'Saran wajib diisi.',
             ]
         );
+
+        // Simpan atau update nilai pengerjaan (tanpa limit upload)
+        $nilai = NilaiPengerjaanIdp::create([
+            'id_idpKomPeng' => $validated['id_idpKomPeng'],
+            'rating' => $validated['rating'],
+            'saran' => $validated['saran'],
+        ]);
+
+        // Ambil data IDP terkait melalui relasi
+        $idpKomPeng = $nilai->idpKompetensiPengerjaan;
+        $idp = $idpKomPeng->idpKompetensi->idp;
+
+        // Load relasi untuk hitung pengerjaan
+        $idp->load([
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.pengerjaans.nilaiPengerjaanIdp',
+        ]);
+        // Hitung total pengerjaan dan yang sudah dinilai (minimal satu penilaian)
+        $totalPengerjaan = 0;
+        $jumlahDinilai = 0;
+
+        foreach ($idp->idpKompetensis as $kompetensi) {
+            foreach ($kompetensi->pengerjaans as $pengerjaan) {
+                $totalPengerjaan++;
+                if ($pengerjaan->nilaiPengerjaanIdp()->exists()) {
+                    $jumlahDinilai++;
+                }
+            }
+        }
+
+        // Jika semua pengerjaan sudah ada penilaian minimal satu, hitung reksomendasi
+        if ($totalPengerjaan > 0 && $jumlahDinilai === $totalPengerjaan) {
+            $this->rekomendasiService->hitungRekomendasi($idp);
+        }
 
         return redirect()->back()->with('msg-success', 'Penilaian berhasil disimpan.');
     }

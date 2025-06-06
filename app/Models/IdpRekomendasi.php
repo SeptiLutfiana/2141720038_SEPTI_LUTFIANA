@@ -14,6 +14,8 @@ class IdpRekomendasi extends Model
         'id_idp',
         'hasil_rekomendasi',
         'deskripsi_rekomendasi',
+        'nilai_akhir_soft',
+        'nilai_akhir_hard'
     ];
      public function idp()
      {
