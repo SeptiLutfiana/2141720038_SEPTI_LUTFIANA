@@ -38,9 +38,18 @@ class BankIdpTable extends Component
         $idps = IDP::query()
             ->where('is_template', true) // Filter utama untuk Bank IDP
             ->when($this->search, function ($query) {
-                return $query->where(function ($q) {
-                    $q->where('proyeksi_karir', 'like', "%{$this->search}%")
-                        ->orWhere('npk', 'like', "%{$this->search}%");
+                $search = $this->search; // Pastikan variabel tersedia di dalam closure
+                return $query->where(function ($q) use ($search) {
+                    $q->where('proyeksi_karir', 'like', "%{$search}%")
+                        ->orWhereHas('supervisor', function ($q2) use ($search) {
+                            $q2->where('name', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('mentor', function ($q3) use ($search) {
+                            $q3->where('name', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('karyawan', function ($q4) use ($search) {
+                            $q4->where('name', 'like', "%{$search}%");
+                        });
                 });
             })
             ->when($this->jenjang, function ($query) {

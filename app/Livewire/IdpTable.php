@@ -39,12 +39,14 @@ class IdpTable extends Component
             ->where('is_template', false) // Filter utama untuk Bank IDP
             ->doesntHave('rekomendasis') // Tidak punya data rekomendasi sama sekali
             ->when($this->search, function ($query, $search) {
-                return $query->where(function ($q) use ($search) {
-                    $q->where('proyeksi_karir', 'like', "%$search%")
-                        ->orWhereHas('karyawan', function ($sub) use ($search) {
-                            $sub->where('npk', 'like', "%$search%")
-                                ->orWhere('nama', 'like', "%$search%");
-                        });
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('karyawan', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('mentor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('supervisor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    });
                 });
             })
             ->when($this->jenjang, function ($query) {

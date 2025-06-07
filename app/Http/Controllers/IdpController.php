@@ -19,9 +19,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use FFI\Exception;
-use App\Notifications\BankIDPNotification;
 use App\Notifications\GivenIDPNotification;
-
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Carbon;
 class IdpController extends Controller
 {
     public function indexGiven(Request $request)
@@ -42,9 +42,14 @@ class IdpController extends Controller
         $idps->where('is_template', false)
             ->with(['karyawan', 'karyawan.jenjang', 'karyawan.learningGroup'])
             ->when($search, function ($query, $search) {
-                return $query->whereHas('karyawan', function ($q) use ($search) {
-                    $q->where('proyeksi_karir', 'like', "%$search%")
-                        ->orWhere('id_karyawan', 'like', "%$search%");
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('karyawan', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('mentor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('supervisor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    });
                 });
             })
             ->when($id_jenjang, function ($query, $id_jenjang) {
@@ -93,9 +98,14 @@ class IdpController extends Controller
         $idps->where('is_template', true)
             ->with(['karyawan', 'karyawan.jenjang', 'karyawan.learningGroup'])
             ->when($search, function ($query, $search) {
-                return $query->whereHas('karyawan', function ($q) use ($search) {
-                    $q->where('proyeksi_karir', 'like', "%$search%")
-                        ->orWhere('id_karyawan', 'like', "%$search%");
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('karyawan', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('mentor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('supervisor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    });
                 });
             })
             ->when($id_jenjang, function ($query, $id_jenjang) {
@@ -795,5 +805,35 @@ class IdpController extends Controller
     {
         $idp->delete();
         return redirect()->route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp')->with('msg-success', 'Berhasil menghapus data Idp ' . $idp->proyeksi_karir);
+    }
+    public function cetakPDF()
+    {
+        $idps = IDP::with([
+            'karyawan',
+            'jenjang',
+            'jabatan',
+            'divisi',
+            'penempatan',
+            'learninggroup',
+            'semester',
+            'angkatanpsp',
+            'mentor',
+            'supervisor',
+            'rekomendasis',
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.metodeBelajars',
+            'idpKompetensis.pengerjaans.nilaiPengerjaanIdp'
+        ])
+        ->where('is_template', true)
+        ->get();
+        // Waktu cetak
+        $waktuCetak = Carbon::now()->translatedFormat('d F Y H:i');
+        $pdf = Pdf::loadView('adminsdm.BehaviorIDP.ListIDP.bankidp_pdf', [
+            'idps' => $idps,
+            'waktuCetak' => $waktuCetak,
+            'type_menu'=> 'idps'
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->stream('Bank-IDP.pdf');
     }
 }
