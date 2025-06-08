@@ -22,6 +22,7 @@ use FFI\Exception;
 use App\Notifications\GivenIDPNotification;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
+
 class IdpController extends Controller
 {
     public function indexGiven(Request $request)
@@ -397,9 +398,29 @@ class IdpController extends Controller
         return response()->json($jabatan);
     }
 
-    public function getKompetensiByJabatan($id)
+    public function getKompetensiByJabatan(Request $request, $id) // Ubah parameter menjadi Request $request, $id
     {
-        $kompetensi = Kompetensi::where('id_jabatan', $id)->where('jenis_kompetensi', 'Hard Kompetensi')->get();
+        // Ambil ID kompetensi yang sudah ada dari request AJAX
+        // Ini akan berisi ID dari Hard maupun Soft Kompetensi yang sudah ada di IDP
+        $existingKompetensiIds = $request->input('existing_kompetensi_ids', []);
+        Log::debug('Existing Kompetensi IDs dari request (untuk filter Hard Kompetensi):', $existingKompetensiIds);
+
+        // Query kompetensi:
+        // 1. Berdasarkan id_jabatan
+        // 2. Hanya untuk 'Hard Kompetensi' (sesuai klarifikasi Anda)
+        $query = Kompetensi::where('id_jabatan', $id)
+            ->where('jenis_kompetensi', 'Hard Kompetensi'); // Tetap pertahankan filter ini
+
+        // 3. Tambahkan kondisi untuk mengecualikan kompetensi yang sudah ada
+        if (!empty($existingKompetensiIds)) {
+            $query->whereNotIn('id_kompetensi', $existingKompetensiIds);
+            Log::debug('Mengecualikan Hard Kompetensi dengan ID:', $existingKompetensiIds);
+        }
+
+        $kompetensi = $query->get(['id_kompetensi', 'nama_kompetensi', 'jenis_kompetensi']);
+
+        Log::debug('Hard Kompetensi yang ditemukan:', $kompetensi->toArray());
+
         return response()->json($kompetensi);
     }
     public function editGiven($id)
@@ -433,7 +454,7 @@ class IdpController extends Controller
             'type_menu' => 'idps'
         ]);
     }
-    public function updateGivenw(Request $request, $id)
+    public function updateGiven(Request $request, $id)
     {
         $idp = IDP::findOrFail($id);
         Log::debug('Data request yang diterima:', $request->all());
@@ -450,6 +471,7 @@ class IdpController extends Controller
             'kompetensi.*.id_kompetensi' => 'nullable|integer|exists:kompetensis,id_kompetensi', // Hanya untuk yang baru
             'kompetensi.*.sasaran' => 'required|string',
             'kompetensi.*.aksi' => 'required|string',
+            'kompetensi.*.peran' => 'nullable|string',
             'kompetensi.*.id_metode_belajar' => 'nullable|array',
             'kompetensi.*.id_metode_belajar.*' => 'integer|exists:metode_belajars,id_metodeBelajar',
         ]);
@@ -486,6 +508,8 @@ class IdpController extends Controller
                                     'id_kompetensi' => $kompetensiData['id_kompetensi'], // ID master kompetensi
                                     'sasaran' => $kompetensiData['sasaran'],
                                     'aksi' => $kompetensiData['aksi'],
+                                    'peran' => $kompetensiData['peran'] ?? 'umum',
+
                                 ]);
                                 Log::debug("Kompetensi baru berhasil dibuat dengan ID: {$newIdpKompetensi->id_idpKom}");
 
@@ -526,6 +550,7 @@ class IdpController extends Controller
                                     $idpKompetensi->update([
                                         'sasaran' => $kompetensiData['sasaran'],
                                         'aksi' => $kompetensiData['aksi'],
+                                        'peran' => $kompetensiData['peran'] ?? 'umum',
                                     ]);
                                     Log::debug("Sasaran diperbarui menjadi: {$kompetensiData['sasaran']} untuk ID: {$actualIdpKompetensiId}");
                                     Log::debug("Aksi diperbarui menjadi: {$kompetensiData['aksi']} untuk ID: {$actualIdpKompetensiId}");
@@ -646,6 +671,7 @@ class IdpController extends Controller
             'kompetensi.*.id_kompetensi' => 'nullable|integer|exists:kompetensis,id_kompetensi', // Hanya untuk yang baru
             'kompetensi.*.sasaran' => 'required|string',
             'kompetensi.*.aksi' => 'required|string',
+            'kompetensi.*.peran' => 'nullable|string',
             'kompetensi.*.id_metode_belajar' => 'nullable|array',
             'kompetensi.*.id_metode_belajar.*' => 'integer|exists:metode_belajars,id_metodeBelajar',
         ]);
@@ -682,6 +708,7 @@ class IdpController extends Controller
                                     'id_kompetensi' => $kompetensiData['id_kompetensi'], // ID master kompetensi
                                     'sasaran' => $kompetensiData['sasaran'],
                                     'aksi' => $kompetensiData['aksi'],
+                                    'peran' => $kompetensiData['peran'] ?? 'umum',
                                 ]);
                                 Log::debug("Kompetensi baru berhasil dibuat dengan ID: {$newIdpKompetensi->id_idpKom}");
 
@@ -722,6 +749,7 @@ class IdpController extends Controller
                                     $idpKompetensi->update([
                                         'sasaran' => $kompetensiData['sasaran'],
                                         'aksi' => $kompetensiData['aksi'],
+                                        'peran' => $kompetensiData['peran'] ?? 'umum',
                                     ]);
                                     Log::debug("Sasaran diperbarui menjadi: {$kompetensiData['sasaran']} untuk ID: {$actualIdpKompetensiId}");
                                     Log::debug("Aksi diperbarui menjadi: {$kompetensiData['aksi']} untuk ID: {$actualIdpKompetensiId}");
@@ -824,16 +852,31 @@ class IdpController extends Controller
             'idpKompetensis.metodeBelajars',
             'idpKompetensis.pengerjaans.nilaiPengerjaanIdp'
         ])
-        ->where('is_template', true)
-        ->get();
+            ->where('is_template', true)
+            ->get();
         // Waktu cetak
         $waktuCetak = Carbon::now()->translatedFormat('d F Y H:i');
         $pdf = Pdf::loadView('adminsdm.BehaviorIDP.ListIDP.bankidp_pdf', [
             'idps' => $idps,
             'waktuCetak' => $waktuCetak,
-            'type_menu'=> 'idps'
+            'type_menu' => 'idps'
         ])->setPaper('a4', 'landscape');
 
         return $pdf->stream('Bank-IDP.pdf');
+    }
+    // Di IDPController.php atau controller lain
+    public function getSoftKompetensi(Request $request)
+    {
+        $existingKompetensiIds = $request->input('existing_kompetensi_ids', []);
+
+        $query = Kompetensi::where('jenis_kompetensi', 'Soft Kompetensi');
+
+        if (!empty($existingKompetensiIds)) {
+            $query->whereNotIn('id_kompetensi', $existingKompetensiIds);
+        }
+
+        $kompetensi = $query->get(['id_kompetensi', 'nama_kompetensi']);
+
+        return response()->json($kompetensi);
     }
 }

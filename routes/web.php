@@ -257,6 +257,8 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::get('/idp/cetak/{id}', [AdminDashboardController::class, 'cetakPDF'])->name('adminsdm.idp.cetak');
         Route::get('/idp/cetak-filter', [AdminDashboardController::class, 'cetakFiltered'])->name('cetakFiltered');
         Route::get('/cetak/pdf', [IdpController::class, 'cetakPdf'])->name('ListIDP.cetakPdf');
+        Route::get('/get-soft-kompetensi', [IDPController::class, 'getSoftKompetensi'])->name('getSoftKompetensi');
+
     });
     Route::get('/list-idp', function () {
         return view('adminsdm.BehaviorIDP.ListIDP.list-idp', [

@@ -35,7 +35,8 @@
                     </div>
                 @endif
                 <div class="card">
-                    <form action="{{ route('adminsdm.BehaviorIDP.updateGiven', $idp->id_idp) }}" method="POST" id="mainForm">
+                    <form action="{{ route('adminsdm.BehaviorIDP.updateGiven', $idp->id_idp) }}" method="POST"
+                        id="mainForm">
                         @csrf
                         @method('PUT')
                         <div class="card-body">
@@ -139,7 +140,8 @@
                                         value="{{ $kom->sasaran }}">
                                     <input type="hidden" name="kompetensi[{{ $kom->id_idpKom }}][aksi]"
                                         value="{{ $kom->aksi }}">
-
+                                    <input type="hidden" name="kompetensi[{{ $kom->id_idpKom }}][peran]"
+                                        value="{{ $kom->peran ?? 'umum' }}">
                                     @foreach ($kom->metodeBelajars as $metode)
                                         <input type="hidden" name="kompetensi[{{ $kom->id_idpKom }}][id_metode_belajar][]"
                                             value="{{ $metode->id_metodeBelajar }}">
@@ -219,7 +221,7 @@
         </section>
     </div>
 
-    {{-- MODAL SECTION --}}
+    {{-- PERBAIKAN MODAL SECTION - Tambahkan field peran untuk edit kompetensi existing --}}
     @foreach ($idp->idpKompetensis as $kom)
         @php
             $jenis = $kom->kompetensi->jenis_kompetensi;
@@ -227,9 +229,9 @@
 
         <div class="modal fade"
             id="{{ $jenis === 'Soft Kompetensi' ? 'modalKompetensi' . $kom->id_idpKom : 'modalHardKompetensi' . $kom->id_idpKom }}"
-            {{-- PERBAIKAN DI SINI --}} tabindex="-1"
+            tabindex="-1"
             aria-labelledby="{{ $jenis === 'Soft Kompetensi' ? 'modalLabel' . $kom->id_idpKom : 'modalHardLabel' . $kom->id_idpKom }}"
-            {{-- PERBAIKAN DI SINI --}} aria-hidden="true">
+            aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -246,12 +248,31 @@
 
                         <div class="form-group">
                             <label><strong>Sasaran:</strong></label>
-                            <textarea class="form-control modal-sasaran" data-id="{{ $kom->id_idpKom }}" style="height:8rem;">{{ old('kompetensi.' . $kom->id_idpKom . '.sasaran', $kom->sasaran) }}</textarea> {{-- PERBAIKAN DI SINI --}}
+                            <textarea class="form-control modal-sasaran" data-id="{{ $kom->id_idpKom }}" style="height:8rem;">{{ old('kompetensi.' . $kom->id_idpKom . '.sasaran', $kom->sasaran) }}</textarea>
                         </div>
 
                         <div class="form-group mt-3">
                             <label><strong>Aksi:</strong></label>
-                            <textarea class="form-control modal-aksi" data-id="{{ $kom->id_idpKom }}" style="height:8rem;">{{ old('kompetensi.' . $kom->id_idpKom . '.aksi', $kom->aksi) }}</textarea> {{-- PERBAIKAN DI SINI --}}
+                            <textarea class="form-control modal-aksi" data-id="{{ $kom->id_idpKom }}" style="height:8rem;">{{ old('kompetensi.' . $kom->id_idpKom . '.aksi', $kom->aksi) }}</textarea>
+                        </div>
+
+                        {{-- TAMBAHAN: Field untuk edit peran kompetensi --}}
+                        <div class="form-group mt-3">
+                            <label><strong>Peran Kompetensi:</strong></label>
+                            <select class="form-control modal-peran" data-id="{{ $kom->id_idpKom }}">
+                                <option value="umum" {{ ($kom->peran ?? 'umum') === 'umum' ? 'selected' : '' }}>
+                                    Kompetensi Umum</option>
+                                <option value="utama" {{ ($kom->peran ?? '') === 'utama' ? 'selected' : '' }}>Kompetensi
+                                    Utama</option>
+                                <option value="kunci_core" {{ ($kom->peran ?? '') === 'kunci_core' ? 'selected' : '' }}>
+                                    Kompetensi Kunci Core</option>
+                                <option value="kunci_bisnis"
+                                    {{ ($kom->peran ?? '') === 'kunci_bisnis' ? 'selected' : '' }}>Kompetensi Kunci Bisnis
+                                </option>
+                                <option value="kunci_enabler"
+                                    {{ ($kom->peran ?? '') === 'kunci_enabler' ? 'selected' : '' }}>Kompetensi Kunci
+                                    Enabler</option>
+                            </select>
                         </div>
 
                         <div class="form-group mt-3">
@@ -260,7 +281,6 @@
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input modal-metode" type="checkbox"
                                         data-id="{{ $kom->id_idpKom }}" value="{{ $metode->id_metodeBelajar }}"
-                                        {{-- PERBAIKAN DI SINI --}}
                                         {{ $kom->metodeBelajars->contains('id_metodeBelajar', $metode->id_metodeBelajar) ? 'checked' : '' }}>
                                     <label class="form-check-label">{{ $metode->nama_metodeBelajar }}</label>
                                 </div>
@@ -325,6 +345,17 @@
                                     <!-- Opsi akan diisi oleh JS -->
                                 </select>
                             </div>
+                            <!-- Peran Kompetensi, hidden default -->
+                            <div class="form-group col-md-12" id="formPeranGroup">
+                                <label>Peran Kompetensi</label>
+                                <select class="form-control" id="modalPeranDropdown" name="peran">
+                                    <option value="umum">Kompetensi Umum</option>
+                                    <option value="utama">Kompetensi Utama</option>
+                                    <option value="kunci_core">Kompetensi Kunci Core</option>
+                                    <option value="kunci_bisnis">Kompetensi Kunci Bisnis</option>
+                                    <option value="kunci_enabler">Kompetensi Kunci Enabler</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="modalMetodeBelajar">Pilih Metode Belajar</label>
@@ -378,58 +409,63 @@
             }
 
             // Tangani tombol simpan modal
+            // PERBAIKAN JAVASCRIPT - Tangani tombol simpan modal dengan field peran
             document.querySelectorAll('.btn-simpan-kompetensi').forEach(button => {
                 button.addEventListener('click', function() {
-                    const komId = this.dataset.id; // Ini adalah id_idpKom secara langsung
+                    const komId = this.dataset.id; // ID dari id_idpKom
+                    const jenis = this.dataset
+                        .jenis; // Jenis: 'Soft Kompetensi' atau 'Hard Kompetensi'
 
                     const modal = this.closest('.modal');
 
-                    console.log(`Updating kompetensi ID: ${komId}`);
+                    console.log(`Updating kompetensi ID: ${komId}, Jenis: ${jenis}`);
 
-                    // Dapatkan nilai dari modal
+                    // Ambil nilai sasaran, aksi, dan peran
                     const sasaran = modal.querySelector(`.modal-sasaran[data-id="${komId}"]`).value;
                     const aksi = modal.querySelector(`.modal-aksi[data-id="${komId}"]`).value;
+                    const peran = modal.querySelector(`.modal-peran[data-id="${komId}"]`).value;
                     const checkedMetodes = modal.querySelectorAll(
                         `.modal-metode[data-id="${komId}"]:checked`);
+
+                    // Update input tersembunyi untuk sasaran, aksi, dan peran
                     const hiddenSasaran = document.querySelector(
-                        `input[name="kompetensi[${komId}][sasaran]"]`); // Gunakan komId di sini
+                        `input[name="kompetensi[${komId}][sasaran]"]`);
                     const hiddenAksi = document.querySelector(
-                        `input[name="kompetensi[${komId}][aksi]"]`); // Gunakan komId di sini
+                        `input[name="kompetensi[${komId}][aksi]"]`);
+                    const hiddenPeran = document.querySelector(
+                        `input[name="kompetensi[${komId}][peran]"]`);
 
                     if (hiddenSasaran) {
                         hiddenSasaran.value = sasaran;
                         console.log(`Sasaran diperbarui untuk ID ${komId}: ${sasaran}`);
-                    } else {
-                        console.error(
-                            `Input sasaran tersembunyi tidak ditemukan untuk ID ${komId}`);
                     }
 
                     if (hiddenAksi) {
                         hiddenAksi.value = aksi;
                         console.log(`Aksi diperbarui untuk ID ${komId}: ${aksi}`);
-                    } else {
-
                     }
 
-                    // Hapus input metode belajar yang ada untuk kompetensi ini
-                    document.querySelectorAll(
-                            `input[name^="kompetensi[${komId}][id_metode_belajar]"]`)
-                        .forEach( // Gunakan komId di sini
-                            input => {
-                                input.remove();
-                            });
+                    if (hiddenPeran) {
+                        hiddenPeran.value = peran;
+                        console.log(`Peran diperbarui untuk ID ${komId}: ${peran}`);
+                    }
 
-                    // Tambahkan input metode belajar baru
+                    // Hapus semua input metode belajar sebelumnya
+                    document.querySelectorAll(
+                        `input[name^="kompetensi[${komId}][id_metode_belajar]"]`).forEach(
+                        input => {
+                            input.remove();
+                        });
+
+                    // Tambahkan kembali input metode belajar yang dicentang
                     const hiddenContainer = document.getElementById('hiddenKompetensiInputs');
                     checkedMetodes.forEach(checkbox => {
                         const hiddenInput = document.createElement('input');
                         hiddenInput.type = 'hidden';
-                        hiddenInput.name =
-                            `kompetensi[${komId}][id_metode_belajar][]`; // Gunakan komId di sini
+                        hiddenInput.name = `kompetensi[${komId}][id_metode_belajar][]`;
                         hiddenInput.value = checkbox.value;
                         hiddenInput.className = `hidden_metode_${komId}`;
-                        hiddenInput.setAttribute('data-id_idpKom',
-                            komId); // Perbarui atribut data
+                        hiddenInput.setAttribute('data-id_idpKom', komId);
                         hiddenContainer.appendChild(hiddenInput);
                         console.log(
                             `Menambahkan metode belajar: ${checkbox.value} untuk ID ${komId}`
@@ -441,7 +477,7 @@
                         modal);
                     modalInstance.hide();
 
-                    // Tampilkan pesan sukses
+                    // Notifikasi sukses
                     if (typeof Swal !== 'undefined') {
                         const Toast = Swal.mixin({
                             toast: true,
@@ -457,10 +493,11 @@
                         });
                     }
 
-                    // Debug setelah update
+                    // Debug final
                     debugHiddenInputs();
                 });
             });
+
 
             // Tangani pengiriman form dengan debugging
             document.getElementById('mainForm').addEventListener('submit', function(e) {
@@ -506,6 +543,33 @@
                             `<option value="${item.id_kompetensi}">${item.nama_kompetensi}</option>`);
                     });
                 }
+                const peranDropdown = $('#modalPeranDropdown');
+                peranDropdown.empty().append('<option value="">-- Pilih Peran Kompetensi --</option>');
+                const peranOptions = [{
+                        value: 'umum',
+                        label: 'Kompetensi Umum'
+                    },
+                    {
+                        value: 'utama',
+                        label: 'Kompetensi Utama'
+                    },
+                    {
+                        value: 'kunci_core',
+                        label: 'Kompetensi Kunci Core'
+                    },
+                    {
+                        value: 'kunci_bisnis',
+                        label: 'Kompetensi Kunci Bisnis'
+                    },
+                    {
+                        value: 'kunci_enabler',
+                        label: 'Kompetensi Kunci Enabler'
+                    },
+                ];
+
+                peranOptions.forEach(peran => {
+                    peranDropdown.append(`<option value="${peran.value}">${peran.label}</option>`);
+                });
             }
 
             // Inisialisasi pertama kali dropdown kompetensi dengan Hard Kompetensi
@@ -523,9 +587,15 @@
                 if (jenis === 'Hard Kompetensi') {
                     $('#modalJenjangDropdown').closest('.form-group').show();
                     $('#modalJabatanDropdown').closest('.form-group').show();
+                    $('#formPeranGroup').closest('.form-group').hide(); // Hide Peran Kompetensi for Hard Kompetensi
+                    $('#modalPeranDropdown').val('umum');
+                    renderKompetensiOptions('Hard Kompetensi');
+
                 } else {
                     $('#modalJenjangDropdown').closest('.form-group').hide();
                     $('#modalJabatanDropdown').closest('.form-group').hide();
+                    $('#formPeranGroup').closest('.form-group').show(); // Tampilkan Peran untuk Soft Kompetensi
+                    renderKompetensiOptions('Soft Kompetensi');
                 }
             }
 
@@ -557,19 +627,15 @@
                 <td style="width: 50px;">${newRowNumber}</td>
                 <td>${data.kompetensiText}</td>
                 <td style="width: 50px;">
-                    <div class="d-flex flex-column gap-1">
-                        <button type="button" class="btn btn-warning btn-sm edit-new-kompetensi"
+                        <button type="button" class="btn btn-warning btn-sm edit-new-kompetensi mb-2"
                         data-id="${uniqueId}" data-jenis="${jenis}">
                         <i class="fas fa-edit"></i>
                         </button>
-
-                        <button type="button" class="btn btn-danger btn-sm delete-new-kompetensi"
+                        <button type="button" class="btn btn-danger btn-sm delete-new-kompetensi mb-2"
                         data-id="${uniqueId}">
                         <i class="fas fa-trash"></i>
                         </button>
-                    </div>
                 </td>
-
             </tr>
         `;
 
@@ -606,6 +672,15 @@
                 hiddenAksi.className = `new_kompetensi_${uniqueId}`;
                 hiddenContainer.appendChild(hiddenAksi);
 
+                // Buat input hidden untuk peran
+                const peranValue = document.getElementById('modalPeranDropdown').value;
+                const hiddenPeran = document.createElement('input');
+                hiddenPeran.type = 'hidden';
+                hiddenPeran.name = `kompetensi[new_${uniqueId}][peran]`;
+                hiddenPeran.value = peranValue;
+                hiddenPeran.className = `new_kompetensi_${uniqueId}`;
+                hiddenContainer.appendChild(hiddenPeran);
+
                 // Input untuk metode belajar
                 data.metodeIds.forEach(metodeId => {
                     const hiddenMetode = document.createElement('input');
@@ -635,6 +710,7 @@
 
                 const sasaran = $('#modalSasaran').val();
                 const aksi = $('#modalAksi').val();
+                const peran = $('#modalPeranDropdown').val();
 
                 // Validasi
                 if (!kompetensiId) {
@@ -655,7 +731,8 @@
                     kompetensiText: kompetensiText,
                     metodeIds: metodeIds,
                     sasaran: sasaran,
-                    aksi: aksi
+                    aksi: aksi,
+                    peran: peran
                 };
 
                 // Tambahkan ke tabel yang sudah ada
@@ -735,13 +812,15 @@
                     function() {
                         return $(this).val();
                     }).get();
+                const peran = $(`input[name="kompetensi[new_${uniqueId}][peran]"]`).val();
 
                 // Buat modal dinamis untuk edit
                 createEditModalForNewKompetensi(uniqueId, jenis, {
                     sasaran: sasaran,
                     aksi: aksi,
                     kompetensiId: kompetensiId,
-                    metodeIds: metodeIds
+                    metodeIds: metodeIds,
+                    peran: peran
                 });
             });
 
@@ -769,6 +848,16 @@
                                 <label><strong>Aksi:</strong></label>
                                 <textarea class="form-control" id="editAksi${uniqueId}" style="height:8rem;">${data.aksi}</textarea>
                             </div>
+                             <div class="form-group mt-3">
+                                <label><strong>Peran Kompetensi:</strong></label>
+                                <select class="form-control" id="editPeran${uniqueId}">
+                                    <option value="umum">Kompetensi Umum</option>
+                                    <option value="utama">Kompetensi Utama</option>
+                                    option value="kunci_core">Kompetensi Kunci Core</option>
+                                    <option value="kunci_bisnis">Kompetensi Kunci Bisnis</option>
+                                <option value="kunci_enabler">Kompetensi Kunci Enabler</option>
+                                </select>
+                            </div>
                             <div class="form-group mt-3">
                                 <label><strong>Metode Belajar:</strong></label><br>
                                 ${generateMetodeBelajarCheckboxes(uniqueId, data.metodeIds)}
@@ -788,6 +877,9 @@
 
                 // Tambahkan modal ke body
                 $('body').append(modalHtml);
+                // Set nilai dropdown peran
+                $(`#editPeran${uniqueId}`).val(data.peran);
+
 
                 // Tampilkan modal
                 $(`#modalEditNew${uniqueId}`).modal('show');
@@ -817,9 +909,11 @@
             }
 
             // Fungsi untuk menyimpan perubahan kompetensi baru
+            // Fungsi untuk menyimpan perubahan kompetensi baru
             window.saveEditNewKompetensi = function(uniqueId) {
                 const sasaran = $(`#editSasaran${uniqueId}`).val();
                 const aksi = $(`#editAksi${uniqueId}`).val();
+                const peran = $(`#editPeran${uniqueId}`).val(); // Ambil nilai peran
                 const metodeIds = $(`#modalEditNew${uniqueId} input[type="checkbox"]:checked`).map(function() {
                     return $(this).val();
                 }).get();
@@ -834,18 +928,29 @@
                     return;
                 }
 
+                // PERBAIKAN: Deklarasikan hiddenContainer di awal
+                const hiddenContainer = document.getElementById('hiddenKompetensiInputs');
+
                 // Update hidden inputs
                 $(`input[name="kompetensi[new_${uniqueId}][sasaran]"]`).val(sasaran);
                 $(`input[name="kompetensi[new_${uniqueId}][aksi]"]`).val(aksi);
+
+                // Hapus input peran lama dan buat yang baru
+                $(`input[name="kompetensi[new_${uniqueId}][peran]"]`).remove();
+                const hiddenPeran = document.createElement('input');
+                hiddenPeran.type = 'hidden';
+                hiddenPeran.name = `kompetensi[new_${uniqueId}][peran]`;
+                hiddenPeran.value = peran;
+                hiddenPeran.className = `new_kompetensi_${uniqueId}`;
+                hiddenContainer.appendChild(hiddenPeran);
 
                 // Hapus metode belajar lama dan tambah yang baru
                 $(`.new_kompetensi_${uniqueId}`).filter(
                     `input[name="kompetensi[new_${uniqueId}][id_metode_belajar][]"]`).remove();
 
-                const hiddenContainer = document.getElementById('hiddenKompetensiInputs');
                 metodeIds.forEach(metodeId => {
                     const hiddenMetode = document.createElement('input');
-                    hiddenMetode.type = 'hidden';
+                    hiddenMetode.type = 'hidden'; // PERBAIKAN: Hapus duplikasi yang salah
                     hiddenMetode.name = `kompetensi[new_${uniqueId}][id_metode_belajar][]`;
                     hiddenMetode.value = metodeId;
                     hiddenMetode.className = `new_kompetensi_${uniqueId}`;
@@ -889,7 +994,7 @@
                 $('#modalJenjangDropdown').val('').trigger('change');
                 $('#modalJabatanDropdown').empty().append('<option value="">Pilih Jabatan</option>');
                 $('#modalKompetensiDropdown').empty().append('<option value="">Pilih Kompetensi</option>');
-
+                $('#modalPeranDropdown').val('').trigger('change');
                 if (typeof tomSelectMetodeBelajar !== 'undefined') {
                     tomSelectMetodeBelajar.clear();
                 }
