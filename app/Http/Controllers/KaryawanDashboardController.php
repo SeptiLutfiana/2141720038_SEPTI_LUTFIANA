@@ -19,13 +19,82 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\IdpRekomendasi;
 
 class KaryawanDashboardController extends Controller
 {
     public function index()
     {
+        $idpIds = IDP::where('id_user', Auth::id())
+            ->where('is_template', false) // pastikan bukan bank IDP
+            ->pluck('id_idp');
+        $jumlahIDPGiven = IDP::where('is_template', false)
+            ->where('id_user', Auth::id()) // hanya milik user yang sedang login
+            ->count();
+        $jumlahRekomendasiBelumMuncul = IDP::where('is_template', false) // hanya IDP biasa, bukan bank
+            ->where('id_user', Auth::id()) // hanya milik karyawan yang login
+            ->where(function ($query) {
+                $query->doesntHave('rekomendasis') // tidak ada rekomendasi sama sekali
+                    ->orWhereHas('rekomendasis', function ($q) {
+                        $q->whereNull('hasil_rekomendasi') // ada rekomendasi tapi belum ada hasilnya
+                            ->orWhere('hasil_rekomendasi', '');
+                    });
+            })
+            ->count();
+        // Hitung berdasarkan hasil rekomendasi
+        $jumlahDisarankan = IdpRekomendasi::whereIn('id_idp', $idpIds)
+            ->where('hasil_rekomendasi', 'Disarankan')
+            ->count();
+
+        $jumlahDisarankanDenganPengembangan = IdpRekomendasi::whereIn('id_idp', $idpIds)
+            ->where('hasil_rekomendasi', 'Disarankan dengan Pengembangan')
+            ->count();
+
+        $jumlahTidakDisarankan = IdpRekomendasi::whereIn('id_idp', $idpIds)
+            ->where('hasil_rekomendasi', 'Tidak Disarankan')
+            ->count();
+        $karyawanId = Auth::id(); // ID user login (karyawan)
+
+        $jumlahMenungguPersetujuan = IDP::where('id_user', $karyawanId)
+            ->where('status_approval_mentor', 'Menunggu Persetujuan')
+            ->where('is_template', false)
+            ->count();
+        $user = Auth::user();
+        $rekomendasiData = IdpRekomendasi::with('idp.karyawan.roles')
+            ->get()
+            ->filter(function ($item) use ($user) {
+                return $item->idp
+                    && $item->idp->id_user == $user->id // hanya idp milik user login
+                    && $item->idp->karyawan
+                    && $item->idp->karyawan->roles->contains('id_role', 4);
+            })
+            ->map(function ($item) {
+                return [
+                    'x' => $item->nilai_akhir_hard,
+                    'y' => $item->nilai_akhir_soft,
+                    'label' => ($item->idp->karyawan->name ?? 'Tidak Diketahui') . ' - ' . ($item->idp->proyeksi_karir ?? '-'),
+                ];
+            })
+            ->values();
+        $topKaryawan = IdpRekomendasi::with(['idp.karyawan'])
+            ->where('hasil_rekomendasi', 'Disarankan')
+            ->whereHas('idp', function ($query) use ($user) {
+                $query->where('id_user', $user->id);
+            })
+            ->orderByDesc('nilai_akhir_soft')
+            ->orderByDesc('nilai_akhir_hard')
+            ->take(5)
+            ->get();
         return view('karyawan.dashboard-karyawan', [
-            'type_menu' => 'karyawan',
+            'type_menu' => 'dashboard',
+            'jumlahIDPGiven' => $jumlahIDPGiven,
+            'jumlahRekomendasiBelumMuncul' => $jumlahRekomendasiBelumMuncul,
+            'jumlahDisarankan' => $jumlahDisarankan,
+            'jumlahDisarankanDenganPengembangan' => $jumlahDisarankanDenganPengembangan,
+            'jumlahTidakDisarankan' => $jumlahTidakDisarankan,
+            'jumlahMenungguPersetujuan' => $jumlahMenungguPersetujuan,
+            'dataPoints' => $rekomendasiData,
+            'topKaryawan' => $topKaryawan,
         ]);
     }
     public function indexKaryawan(Request $request)
