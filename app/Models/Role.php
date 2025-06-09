@@ -36,4 +36,16 @@ class Role extends Model
     {
         return $this->hasMany(UserRole::class, 'id_role');
     }
+    public function panduans()
+    {
+        return $this->belongsToMany(Panduan::class, 'panduan_roles', 'id_role', 'id_panduan');
+    }
+
+    /**
+     * Relasi one-to-many dengan PanduanRole
+     */
+    public function panduanRoles()
+    {
+        return $this->hasMany(PanduanRole::class, 'id_role', 'id_role');
+    }
 }

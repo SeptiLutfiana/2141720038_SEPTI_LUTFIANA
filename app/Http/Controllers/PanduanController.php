@@ -1,0 +1,123 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Panduan;
+use App\Models\Role;
+use Illuminate\Http\Request;
+
+class PanduanController extends Controller
+{
+    public function index(Request $request)
+    {
+        $search = $request->query('search');
+
+        $panduan = Panduan::when($search, function ($query, $search) {
+            return $query->where('judul', 'like', "%$search%");
+        })
+            ->orderBy('judul')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('adminsdm.Panduan.index', [
+            'type_menu' => 'idps',
+            'panduan' => $panduan,
+            'search' => $search,
+        ]);
+    }
+    public function create()
+    {
+        $panduan = Panduan::all();
+        $role = Role::all(); // <-- Pastikan ini ada
+        return view('adminsdm.Panduan.cretae', [
+            'type_menu' => 'idps',
+            'jenjang' => $panduan,
+            'role' => $role,
+        ]);
+    }
+    public function store(Request $request)
+    {
+
+        $request->validate([
+            'judul' => 'required|string',
+            'isi' => 'required|string',
+            'id_role' => 'required|exists:roles,id_role', // validasi jenjang
+
+        ], [
+            'judul.required' => 'Judul harus diisi',
+            'isi.required' => 'Isi harus diisi',
+            'id_role.required' => 'Role harus dipilih',
+            'id_role.exists' => 'Role tidak valid',
+        ]);
+
+        $panduan = Panduan::create([
+            'judul' => $request->judul,
+            'isi' => $request->isi,
+
+        ]);
+        // Simpan ke tabel pivot
+        \App\Models\PanduanRole::create([
+            'id_panduan' => $panduan->id_panduan,
+            'id_role' => $request->id_role,
+        ]);
+
+        return redirect()->route('adminsdm.Panduan.index')
+            ->with('msg-success', 'Berhasil menambahkan data Panduan Baru ' . $request->judul);
+    }
+    public function show($id)
+    {
+        // Mengambil data Jabatan berdasarkan ID
+        $panduan = Panduan::with('roles')->findOrFail($id);
+
+        return view('adminsdm.Panduan.detail', [
+            'panduan'    => $panduan,
+            'type_menu' => 'idps',
+        ]);
+    }
+    public function edit($id)
+    {
+        $panduan = Panduan::findOrFail($id);
+        $role = Role::all(); // <-- Pastikan ini ada
+        return view('adminsdm.Panduan.edit', [
+            'panduan'    => $panduan,
+            'role' => $role,
+            'type_menu' => 'idps',
+        ]);
+    }
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'judul' => 'required|string',
+            'isi' => 'required|string',
+            'id_role' => 'required|exists:roles,id_role',
+        ], [
+            'judul.required' => 'Judul harus diisi',
+            'isi.required' => 'Isi harus diisi',
+            'id_role.required' => 'Role harus dipilih',
+            'id_role.exists' => 'Role tidak valid',
+        ]);
+
+        $panduan = \App\Models\Panduan::findOrFail($id);
+
+        // Update data panduan
+        $panduan->update([
+            'judul' => $request->judul,
+            'isi' => $request->isi,
+        ]);
+
+        // Update relasi role di tabel pivot
+        \App\Models\PanduanRole::updateOrCreate(
+            ['id_panduan' => $panduan->id_panduan],
+            ['id_role' => $request->id_role]
+        );
+
+        return redirect()->route('adminsdm.Panduan.index')
+            ->with('msg-success', 'Berhasil memperbarui data Panduan: ' . $request->judul);
+    }
+
+    public function destroy(Panduan $panduan)
+    {
+        $panduan->delete();
+        return redirect()->route('adminsdm.Panduan.index')->with('msg-success', 'Berhasil menghapus data  ' . $panduan->judul);
+    }
+}

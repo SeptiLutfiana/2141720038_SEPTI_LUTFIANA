@@ -15,8 +15,7 @@
 
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a
-                            href="{{ route('adminsdm.data-master.karyawan.penempatan.index') }}">Penempatan</a></div>
+                    <div class="breadcrumb-item"><a>Panduan IDP</a></div>
                 </div>
             </div>
             <div class="section-body">
@@ -36,47 +35,22 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Data Penempatan</h4>
+                                <h4>Panduan IDP</h4>
                                 <div class="card-header-action">
-                                    <div class="dropdown mr-2">
-                                        <button type="button" class="btn btn-danger rounded-pill dropdown-toggle"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-file-export"></i> Ekspor
-                                        </button>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item"
-                                                href="{{ route('adminsdm.data-master.karyawan.penempatan.printPdf') }}"
-                                                target="_blank">
-                                                <i class="fas fa-file-pdf text-danger"></i> PDF
-                                            </a>
-                                            <a class="dropdown-item"
-                                                href="{{ route('adminsdm.data-master.karyawan.penempatan.exportExcel') }}">
-                                                <i class="fas fa-file-excel text-success"></i> Excel
-                                            </a>
-                                            <a class="dropdown-item"
-                                                href="{{ route('adminsdm.data-master.karyawan.penempatan.exportCSV') }}">
-                                                <i class="fas fa-file-csv text-warning"></i> CSV
-                                            </a>
-                                            <a class="dropdown-item"
-                                                href="{{ route('adminsdm.data-master.karyawan.penempatan.exportDocx') }}">
-                                                <i class="fas fa-file-word text-primary"></i> Word (DOCX)
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <a href="{{ route('adminsdm.data-master.karyawan.penempatan.create') }}"
+                                    <a href="{{ route('adminsdm.Panduan.create') }}"
                                         class="btn btn-icon btn-primary icon-left"><i class="fas fa-plus"></i>
                                         Tambah</a>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('adminsdm.data-master.karyawan.penempatan.index') }}"
+                                <form method="GET" action="{{ route('adminsdm.Panduan.index') }}"
                                     class="mb-3">
                                     <div class="input-group w-25">
                                         <input type="text" name="search" class="form-control"
-                                            placeholder="Cari Penempatan..." value="{{ request('search') }}">
+                                            placeholder="Cari Judul Panduan..." value="{{ request('search') }}">
                                     </div>
                                 </form>
-                                @livewire('penempatan-table', ['search' => request('search')])
+                                @livewire('panduan-idp-table', ['search' => request('search')])
                             </div>
                         </div>
                     </div>

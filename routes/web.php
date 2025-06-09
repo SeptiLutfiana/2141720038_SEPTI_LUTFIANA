@@ -19,6 +19,7 @@ use App\Http\Controllers\KompetensiController;
 use App\Http\Controllers\LearninggroupController;
 use App\Http\Controllers\MentorDashboardController;
 use App\Http\Controllers\MetodeBelajarController;
+use App\Http\Controllers\PanduanController;
 use App\Http\Controllers\PenempatanController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SemesterController;
@@ -258,7 +259,16 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::get('/idp/cetak-filter', [AdminDashboardController::class, 'cetakFiltered'])->name('cetakFiltered');
         Route::get('/cetak/pdf', [IdpController::class, 'cetakPdf'])->name('ListIDP.cetakPdf');
         Route::get('/get-soft-kompetensi', [IDPController::class, 'getSoftKompetensi'])->name('getSoftKompetensi');
-
+    });
+    // Panduan IDP
+    Route::prefix('admin/datamaster/panduan/idp')->name('adminsdm.Panduan.')->group(function () {
+        Route::get('/', [PanduanController::class, 'index'])->name('index');
+        Route::get('/create', [PanduanController::class, 'create'])->name('create');
+        Route::post('/store', [PanduanController::class, 'store'])->name('store');
+        Route::get('/{id}/detail', [PanduanController::class, 'show'])->name('show');
+        Route::delete('/{panduan}', [PanduanController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/edit', [PanduanController::class, 'edit'])->name('edit');
+        Route::put('/{id}/update', [PanduanController::class, 'update'])->name('update');
     });
     Route::get('/list-idp', function () {
         return view('adminsdm.BehaviorIDP.ListIDP.list-idp', [

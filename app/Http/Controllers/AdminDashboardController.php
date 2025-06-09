@@ -9,13 +9,113 @@ use App\Models\LearingGroup;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
+use App\Models\IdpRekomendasi;
+use App\Models\Panduan;
+use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
     public function index()
     {
+        $jumlahKaryawan = User::whereHas('userRoles.role', function ($query) {
+            $query->where('nama_role', 'karyawan');
+        })->count();
+
+        $jumlahSpv = User::whereHas('userRoles.role', function ($query) {
+            $query->where('nama_role', 'supervisor');
+        })->count();
+        $jumlahMentor = User::whereHas('userRoles.role', function ($query) {
+            $query->where('nama_role', 'mentor');
+        })->count();
+        $jumlahIDPGiven = IDP::where('is_template', false)->count(); // IDP by karyawan
+        $jumlahIDPBank = IDP::where('is_template', true)->count();   // IDP bank/template
+        $jumlahDisarankan = IdpRekomendasi::where('hasil_rekomendasi', 'Disarankan')->count();
+        $jumlahDisarankanDenganPengembangan = IdpRekomendasi::where('hasil_rekomendasi', 'Disarankan dengan Pengembangan')->count();
+        $jumlahTidakDisarankan = IdpRekomendasi::where('hasil_rekomendasi', 'Tidak Disarankan')->count();
+        $jumlahRekomendasiBelumMuncul = IDP::where('is_template', false) // hanya IDP biasa, bukan bank
+            ->where(function ($query) {
+                $query->doesntHave('rekomendasis') // tidak ada rekomendasi sama sekali
+                    ->orWhereHas('rekomendasis', function ($q) {
+                        $q->whereNull('hasil_rekomendasi') // ada rekomendasi tapi belum ada hasilnya
+                            ->orWhere('hasil_rekomendasi', '');
+                    });
+            })
+            ->count();
+        $jumlahRekomendasiMenunggu = IdpRekomendasi::whereNull('hasil_rekomendasi')->count();
+        $jumlahApplyBankIdp = IDP::where('is_template', false)
+            ->whereNotNull('id_idp_template_asal')
+            ->count();
+        $jenjangData = IDP::select('id_jenjang', DB::raw('count(*) as total'))
+            ->groupBy('id_jenjang')
+            ->with('jenjang')
+            ->get();
+
+        // Buat array kosong jika tidak ada data
+        $jenjangLabels = [];
+        $jenjangTotals = [];
+
+        if ($jenjangData->isNotEmpty()) {
+            foreach ($jenjangData as $data) {
+                $jenjangLabels[] = $data->jenjang ? $data->jenjang->nama_jenjang : 'Tidak diketahui';
+                $jenjangTotals[] = (int) $data->total;
+            }
+        }
+        $LGData = IDP::select('id_LG', DB::raw('count(*) as total'))
+            ->groupBy('id_LG')
+            ->with('learningGroup')
+            ->get();
+
+        // Buat array kosong jika tidak ada data
+        $LGLabels = [];
+        $LGTotals = [];
+
+        if ($LGData->isNotEmpty()) {
+            foreach ($LGData as $data) {
+                $LGLabels[] = $data->learningGroup ? $data->learningGroup->nama_LG : 'Tidak diketahui';
+                $LGTotals[] = (int) $data->total;
+            }
+        }
+        $totalPanduan = Panduan::count();
+        $rekomendasiData = IdpRekomendasi::with('idp.karyawan.roles')
+            ->get()
+            ->filter(function ($item) {
+                // Hanya ambil yang punya IDP, karyawan, dan role karyawan (id_role = 4)
+                return $item->idp && $item->idp->karyawan && $item->idp->karyawan->roles->contains('id_role', 4);
+            })
+            ->map(function ($item) {
+                return [
+                    'x' => $item->nilai_akhir_hard,
+                    'y' => $item->nilai_akhir_soft,
+                    'label' => ($item->idp->karyawan->name ?? 'Tidak Diketahui') . ' - ' . ($item->idp->proyeksi_karir ?? '-'),
+                ];
+            })
+            ->values(); // reset index array
+        $topKaryawan = IdpRekomendasi::with(['idp.karyawan'])
+            ->where('hasil_rekomendasi', 'Disarankan')
+            ->orderByDesc('nilai_akhir_soft')
+            ->orderByDesc('nilai_akhir_hard')
+            ->take(5)
+            ->get();
         return view('adminsdm.dashboard', [
             'type_menu' => 'dashboard',
+            'jumlahKaryawan' => $jumlahKaryawan,
+            'jumlahSpv' => $jumlahSpv,
+            'jumlahMentor' => $jumlahMentor,
+            'jumlahIDPGiven' => $jumlahIDPGiven,
+            'jumlahIDPBank' => $jumlahIDPBank,
+            'jumlahDisarankan' => $jumlahDisarankan,
+            'jumlahDisarankanDenganPengembangan' => $jumlahDisarankanDenganPengembangan,
+            'jumlahTidakDisarankan' => $jumlahTidakDisarankan,
+            'jumlahRekomendasiBelumMuncul' => $jumlahRekomendasiBelumMuncul,
+            'jumlahRekomendasiMenunggu' => $jumlahRekomendasiMenunggu,
+            'jumlahApplyBankIdp' => $jumlahApplyBankIdp,
+            'jenjangLabels' => $jenjangLabels,
+            'jenjangTotals' => $jenjangTotals,
+            'LGLabels' => $LGLabels,
+            'LGTotals' => $LGTotals,
+            'totalPanduan' => $totalPanduan,
+            'dataPoints' => $rekomendasiData,
+            'topKaryawan' =>$topKaryawan,
         ]);
     }
     public function indexRiwayatIdp(Request $request)

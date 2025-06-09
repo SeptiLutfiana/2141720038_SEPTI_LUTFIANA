@@ -10,7 +10,7 @@
         </div>
         <ul class="sidebar-menu">
             <li class="menu-header">MENU UTAMA</li>
-            <li class="nav-item dropdown {{ $type_menu === 'index' ? 'active' : '' }}">
+            <li class="nav-item dropdown {{ $type_menu === 'dashboard' ? 'active' : '' }}">
                 {{-- <a href="{{ url('adminsdm-dashboard') }}" --}}
                 <a href="{{ Auth::user()->id_role == 1
                     ? route('adminsdm.dashboard')
@@ -47,10 +47,11 @@
                                 List Perencanaan IDP</a>
                         </li>
                         <li class="{{ Request::is('admin/datamaster/behavior/idp/riwayat/idp') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/riwayat/idp') }}">Riwayat Perencanaan IDP</a>
+                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/riwayat/idp') }}">Riwayat
+                                Perencanaan IDP</a>
                         </li>
-                        <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('panduan-idp') }}">Panduan</a>
+                        <li class="{{ Request::is('admin/datamaster/panduan/idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/panduan/idp') }}">Panduan</a>
                         </li>
                     </ul>
                 </li>
