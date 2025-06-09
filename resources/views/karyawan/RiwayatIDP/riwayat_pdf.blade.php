@@ -153,7 +153,7 @@
                     <td>Hasil Rekomendasi IDP</td>
                     <td colspan="4">
                         <div style="font-weight: bold;">
-                            {{ $idp->rekomendasis->first()->hasil_rekomendasi}}
+                            {{ $idp->rekomendasis->first()->hasil_rekomendasi }}
                         </div>
                         <div>
                             {{ $idp->rekomendasis->first()->deskripsi_rekomendasi }}
@@ -265,7 +265,7 @@
 
                 <tr>
                     <th colspan="4">Nilai Hard Kompetensi</th>
-                    <th class="text-center">{{ $idp->rekomendasis->first()->nilai_akhir_hard}}</th>
+                    <th class="text-center">{{ $idp->rekomendasis->first()->nilai_akhir_hard }}</th>
                 </tr>
             </table>
 

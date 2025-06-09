@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Panduan;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PanduanController extends Controller
 {
@@ -119,5 +120,30 @@ class PanduanController extends Controller
     {
         $panduan->delete();
         return redirect()->route('adminsdm.Panduan.index')->with('msg-success', 'Berhasil menghapus data  ' . $panduan->judul);
+    }
+    public function autoShowPanduanKaryawan()
+    {
+        $user = Auth::user();
+
+        // Pastikan user punya role karyawan
+        $isKaryawan = $user->roles->contains('id_role', 4);
+
+        if (!$isKaryawan) {
+            abort(403, 'Anda tidak memiliki akses ke panduan ini.');
+        }
+
+        // Ambil panduan pertama yang ditujukan untuk role karyawan
+        $panduan = Panduan::whereHas('roles', function ($query) {
+            $query->where('nama_role', 'karyawan');
+        })->first();
+
+        if (!$panduan) {
+            return view('karyawan.Panduan.kosong'); // bisa isi dengan "Panduan belum tersedia"
+        }
+
+        return view('karyawan.Panduan.detail', [
+            'panduan' => $panduan,
+            'type_menu' => 'karyawan',
+        ]);
     }
 }

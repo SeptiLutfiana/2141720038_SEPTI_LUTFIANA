@@ -8,8 +8,8 @@
             <div class="section-header">
                 <h1>Detail IDP Karyawan</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.RiwayatIDP.indexRiwayatIdp') }}">Data
+                    <div class="breadcrumb-item active"><a href="{{ route('karyawan.dashboard-karyawan') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('karyawan.IDP.RiwayatIDP.indexRiwayatIdp') }}">Data
                             IDP</a></div>
                     <div class="breadcrumb-item">Detail IDP</div>
                 </div>
@@ -210,7 +210,7 @@
                     </div>
                     <div class="card-footer text-right">
                         <a class="btn btn-primary"
-                            href="{{ route('adminsdm.BehaviorIDP.RiwayatIDP.indexRiwayatIdp') }}">Kembali</a>
+                            href="{{ route('karyawan.IDP.RiwayatIDP.indexRiwayatIdp') }}">Kembali</a>
                     </div>
                 </div>
             </div>

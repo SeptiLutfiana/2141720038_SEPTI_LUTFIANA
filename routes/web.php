@@ -341,6 +341,13 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::get('/bank-idp', [KaryawanDashboardController::class, 'bankIdp'])->name('bankIdp');
         Route::post('/apply-idp/{id}', [KaryawanDashboardController::class, 'applyBankIdp'])->name('applyBankIdp');
         Route::get('/{id}/detail/idp', [KaryawanDashboardController::class, 'detailKaryawan'])->name('detailKaryawan');
+        Route::get('/riwayat', [KaryawanDashboardController::class, 'indexRiwayatIdp'])->name('RiwayatIDP.indexRiwayatIdp');
+        Route::get('/{id}/riwayat', [KaryawanDashboardController::class, 'showRiwayatIDP'])->name('RiwayatIDP.showRiwayatIdp');
+        Route::get('/idp/cetak-filter', [KaryawanDashboardController::class, 'cetakFiltered'])->name('cetakFiltered');
+    });
+    // PANDUAN IDP KARYWAN
+    Route::prefix('karyawan/panduan/idp')->name('karyawan.Panduan.')->group(function () {
+        Route::get('/panduan/karyawan', [PanduanController::class, 'autoShowPanduanKaryawan'])->name('autoShowPanduanKaryawan');
     });
 });
 // PROFILE

@@ -1,13 +1,14 @@
 <div>
     <table class="table table-striped">
         <thead>
-            <tr class="">
+            <tr class="text-center">
                 <th>No</th>
                 <th>Proyeksi Karir</th>
                 <th>Mentor</th>
                 <th>Supervisor</th>
                 <th>Persetujuan Mentor</th>
                 <th>Status Pengajuan IDP</th>
+                <th>Hasil Rekomendasi</th>
                 <th>Progres IDP</th>
                 <th>Aksi</th>
             </tr>
@@ -39,7 +40,7 @@
                             @endphp
 
                             <span
-                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 4px 10px; border-radius: 9999px;">
+                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 10px; border-radius: 9999px;">
                                 {{ $status }}
                             </span>
                         </td>
@@ -65,8 +66,33 @@
                             @endphp
 
                             <span
-                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 4px 10px; border-radius: 9999px;">
+                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 10px; border-radius: 9999px;">
                                 {{ $status }}
+                            </span>
+                        </td>
+                        @php
+                            $hasil = $item->rekomendasis->first()->hasil_rekomendasi ?? null;
+                            $bgColor = '#fef3c7'; // default: kuning muda (Menunggu Penilaian)
+                            $textColor = '#92400e'; // default: coklat gelap
+
+                            if ($hasil === 'Disarankan') {
+                                $bgColor = '#dbeafe'; // biru muda
+                                $textColor = '#1e3a8a'; // biru tua
+                            } elseif ($hasil === 'Disarankan dengan Pengembangan') {
+                                $bgColor = '#d1fae5'; // hijau muda
+                                $textColor = '#065f46'; // hijau tua
+                            } elseif ($hasil === 'Tidak Disarankan') {
+                                $bgColor = '#fee2e2'; // merah muda
+                                $textColor = '#991b1b'; // merah tua
+                            } elseif (!$hasil) {
+                                $hasil = 'Menunggu Penilaian';
+                            }
+                        @endphp
+
+                        <td class="text-center">
+                            <span
+                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 10px; border-radius: 20px; display: inline-block;">
+                                {{ $hasil }}
                             </span>
                         </td>
                         <td>
@@ -115,7 +141,7 @@
                             <br>
                             <br>
                         </td> --}}
-                        <td class="text-left" style="width: 150px;">
+                        <td class="text-left" style="width: 120px;">
                             @if ($item->status_pengajuan_idp === 'Disetujui' || $item->status_approval_mentor === 'Disetujui')
                                 <a href="{{ route('karyawan.IDP.showKaryawan', ['id' => $item->id_idp, 'pengerjaan' => $item->id_pengerjaan ?? '']) }}"
                                     class="btn btn-primary btn-sm">

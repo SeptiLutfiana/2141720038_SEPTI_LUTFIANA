@@ -2,14 +2,12 @@
 
 namespace App\Livewire;
 
-use App\Models\IDP;
-use App\Models\User;
-use Livewire\WithPagination;
 use Livewire\Component;
+use Livewire\WithPagination;
+use App\Models\User;
+use App\Models\IDP;
 use Illuminate\Support\Facades\Auth;
-
-
-class KaryawanGivenIdp extends Component
+class RiwayatIdpKaryawanTable extends Component
 {
     use WithPagination;
     public $search;
@@ -37,15 +35,23 @@ class KaryawanGivenIdp extends Component
 
     public function render()
     {
-
-        $userId = Auth::id();
-        $idps = IDP::with(['mentor', 'supervisor', 'karyawan'])
-            ->where('id_user', $userId) // Filter utama untuk Bank IDP
-            ->doesntHave('rekomendasis') // Tidak punya data rekomendasi sama sekali
-            ->when($this->search, function ($query) {
-                return $query->where(function ($q) {
-                    $q->where('proyeksi_karir', 'like', "%{$this->search}%")
-                        ->orWhere('npk', 'like', "%{$this->search}%");
+        $user = Auth::user(); // Ambil user yang sedang login
+        $idps = IDP::query()
+            ->where('is_template', false) // Filter utama untuk Bank IDP
+            ->where('id_user', $user->id) // Ambil IDP hanya milik user login
+            ->whereHas('rekomendasis', function ($q) {
+                $q->whereNotNull('hasil_rekomendasi')
+                    ->where('hasil_rekomendasi', '!=', '');
+            })
+            ->when($this->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('karyawan', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('mentor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('supervisor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    });
                 });
             })
             ->when($this->jenjang, function ($query) {
@@ -60,7 +66,8 @@ class KaryawanGivenIdp extends Component
             ->orderBy('proyeksi_karir')
             ->paginate(5)
             ->withQueryString();
-        return view('livewire.karyawan-given-idp', [
+
+        return view('livewire.riwayat-idp-karyawan-table', [
             'idps' => $idps,
         ]);
     }
