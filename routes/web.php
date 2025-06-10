@@ -344,6 +344,10 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::get('/riwayat', [KaryawanDashboardController::class, 'indexRiwayatIdp'])->name('RiwayatIDP.indexRiwayatIdp');
         Route::get('/{id}/riwayat', [KaryawanDashboardController::class, 'showRiwayatIDP'])->name('RiwayatIDP.showRiwayatIdp');
         Route::get('/idp/cetak-filter', [KaryawanDashboardController::class, 'cetakFiltered'])->name('cetakFiltered');
+        Route::get('/create', [KaryawanDashboardController::class, 'create'])->name('create');
+        Route::post('/store', [KaryawanDashboardController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [KaryawanDashboardController::class, 'editIdp'])->name('editIdp');
+        Route::put('/{id}/update', [KaryawanDashboardController::class, 'updateIdp'])->name('updateIdp');
     });
     // PANDUAN IDP KARYWAN
     Route::prefix('karyawan/panduan/idp')->name('karyawan.Panduan.')->group(function () {

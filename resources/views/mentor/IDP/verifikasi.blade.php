@@ -61,7 +61,8 @@
                                 <!-- Ganti dengan select status approval mentor yang bisa diedit -->
                                 <div class="form-group col-md-12">
                                     <label>Status Approval Mentor</label>
-                                    <select name="status_approval_mentor" class="form-control" required>
+                                    <select name="status_approval_mentor" class="form-control"
+                                        {{ $idps->status_approval_mentor == 'Disetujui' ? 'disabled' : '' }} required>
                                         <option value="Menunggu Persetujuan"
                                             {{ $idps->status_approval_mentor == 'Menunggu Persetujuan' ? 'selected' : '' }}>
                                             Menunggu Persetujuan
@@ -75,8 +76,13 @@
                                             Ditolak
                                         </option>
                                     </select>
+                                    @if ($idps->status_approval_mentor == 'Disetujui')
+                                        <input type="hidden" name="status_approval_mentor"
+                                            value="{{ $idps->status_approval_mentor }}">
+                                    @else
+                                        {{-- Kalau belum disetujui, tetap gunakan select untuk input --}}
+                                    @endif
                                 </div>
-
                                 <!-- Status Pengajuan IDP -->
                                 <div class="form-group col-md-12">
                                     <label>Status Pengajuan IDP</label>
@@ -162,7 +168,7 @@
                             </div>
                         </div>
                         <div class="card-footer text-right">
-                            <a href="{{ route('mentor.IDP.indexMentor') }}" class="btn btn-secondary mr-2">Batal</a>
+                            <a href="{{ route('mentor.IDP.indexMentor') }}" class="btn btn-warning mr-2">Kembali</a>
                             <button type="submit" class="btn btn-primary">Simpan Verifikasi</button>
                         </div>
                     </form>

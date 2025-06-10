@@ -165,9 +165,9 @@ class MentorDashboardController extends Controller
     public function updateVerifikasi(Request $request, $id)
     {
         $request->validate([
-            'status_approval_mentor' => 'required|in:Disetujui,Ditolak',
-            'status_pengajuan_idp' => 'required|in:Revisi,Disetujui,Tidak Disetujui',
-            'saran' => 'nullable|string|max:1000',
+            'status_approval_mentor' => 'required|in:Menunggu Persetujuan,Disetujui,Ditolak',
+            'status_pengajuan_idp' => 'required|in:Menunggu Persetujuan,Revisi,Disetujui,Tidak Disetujui',
+            'saran_idp' => 'nullable|string|max:1000',
         ]);
 
         $idps = IDP::findOrFail($id);

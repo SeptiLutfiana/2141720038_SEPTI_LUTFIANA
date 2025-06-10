@@ -254,6 +254,7 @@
                                                 </table>
                                             </div>
                                         </div>
+                                    </div>
                                 @endforeach
                             </div>
                             <div class="form-group col-md-12">

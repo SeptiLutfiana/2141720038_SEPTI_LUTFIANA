@@ -64,12 +64,33 @@
                                     'border' => 'border-dark',
                                 ],
                                 [
-                                    'title' => 'IDP Menunggu Persetujuan Mentor',
+                                    'title' => 'Persetujuan Mentor',
                                     'count' => $jumlahMenungguPersetujuan,
                                     'icon' => 'fa-book', // ikon buku atau dokumen
                                     'bg' => 'bg-info', // biru muda, kesan informatif
                                     'border' => 'border-info',
                                 ],
+                                [
+                                    'title' => 'Pengajuan IDP Revisi',
+                                    'count' => $jumlahIDPRevisi,
+                                    'icon' => 'fa-edit',
+                                    'bg' => 'bg-warning',
+                                    'border' => 'border-warning',
+                                ],
+                                [
+                                    'title' => 'Pengajuan IDP Tidak Disetujui',
+                                    'count' => $jumlahIdpTidakDisetujui,
+                                    'icon' => 'fa-times-circle',
+                                    'bg' => 'bg-danger',
+                                    'border' => 'border-danger',
+                                ],
+                                // [
+                                //     'title' => 'IDP Menunggu Persetujuan Mentor',
+                                //     'count' => $jumlahIdpMenungguPersetujuan,
+                                //     'icon' => 'fa-user-clock',
+                                //     'bg' => 'bg-indigo',
+                                //     'border' => 'border-indigo',
+                                // ],
                             ];
                         @endphp
                         @foreach ($dataProgres as $item)

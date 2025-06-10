@@ -8,7 +8,8 @@
             <div class="section-header">
                 <h1>Detail IDP Karyawan</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('karyawan.dashboard-karyawan') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('karyawan.dashboard-karyawan') }}">Dashboard</a>
+                    </div>
                     <div class="breadcrumb-item"><a href="{{ route('karyawan.IDP.indexKaryawan') }}">Data IDP</a></div>
                     <div class="breadcrumb-item">Detail IDP</div>
                 </div>
@@ -73,7 +74,7 @@
                             </div>
                             <div class="form-group col-md-12">
                                 <label>Saran Pengajuan IDP</label>
-                                <input readonly type="text" class="form-control" value="{{ $idps->saran_idp }}">
+                                <textarea readonly class="form-control" style="height:6rem;">{{ $idps->saran_idp}}</textarea>
                             </div>
                             <div class="form-group col-md-12">
                                 <label>Daftar Kompetensi</label> <br>

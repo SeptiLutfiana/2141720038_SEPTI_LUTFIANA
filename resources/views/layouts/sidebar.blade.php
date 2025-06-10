@@ -173,7 +173,7 @@
         @if (Auth::user()->id_role == 3)
             <!-- Mentor -->
             <ul class="sidebar-menu">
-                <li class="nav-item dropdown {{ $type_menu === 'karyawan' ? 'active' : '' }}">
+                <li class="nav-item dropdown {{ $type_menu === 'mentor' ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                             class="fas fa-columns"></i> <span>Behavior IDP</span></a>
                     <ul class="dropdown-menu">
@@ -209,8 +209,8 @@
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                             class="fas fa-columns"></i> <span>Behavior IDP</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('tambah-idp') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('tambah-idp') }}">Tambah IDP</a>
+                        <li class="{{ Request::is('karyawan/behavior/idp/create') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('karyawan/behavior/idp/create') }}">Tambah IDP</a>
                         </li>
                         <li class="{{ Request::is('karyawan/behavior/idp/bank-id') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('karyawan/behavior/idp/bank-idp') }}">Bank IDP</a>

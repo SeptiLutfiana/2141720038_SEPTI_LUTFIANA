@@ -12,8 +12,9 @@
             <div class="section-header">
                 <h1>Edit Data IDP</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Data IDP</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('karyawan.dashboard-karyawan') }}">Dashboard</a>
+                    </div>
+                    <div class="breadcrumb-item active"><a href="{{ route('karyawan.IDP.indexKaryawan') }}">Data IDP</a></div>
                     <div class="breadcrumb-item">Edit Data IDP</div>
                 </div>
             </div>
@@ -33,9 +34,13 @@
                         </div>
                     </div>
                 @endif
+                @php
+                    $isDitolak = $idp->status_approval_mentor === 'Ditolak';
+                    $punyaTemplateAsal = !is_null($idp->id_idp_template_asal);
+                    $mentorOnlyEdit = $isDitolak && $punyaTemplateAsal;
+                @endphp
                 <div class="card">
-                    <form action="{{ route('adminsdm.BehaviorIDP.updateGiven', $idp->id_idp) }}" method="POST"
-                        id="mainForm">
+                    <form action="{{ route('karyawan.IDP.updateIdp', $idp->id_idp) }}" method="POST" id="mainForm">
                         @csrf
                         @method('PUT')
                         <div class="card-body">
@@ -51,86 +56,104 @@
                                 {{ $idp->angkatanpsp->bulan ?? '-' }} {{ $idp->angkatanpsp->tahun ?? '-' }}
                             </small>
                             <br>
+                            {{-- Hidden field untuk id_idp_template_asal jika ada --}}
+                            @if ($punyaTemplateAsal)
+                                <input type="hidden" name="id_idp_template_asal" value="{{ $idp->id_idp_template_asal }}">
+                            @endif
 
+                            {{-- Proyeksi Karir --}}
                             <div class="form-group">
                                 <label>Proyeksi Karir</label>
                                 <input type="text" name="proyeksi_karir"
-                                    class="form-control @if (old('proyeksi_karir')) is-valid @endif
-                                @error('proyeksi_karir') is-invalid @enderror"
-                                    value="{{ old('proyeksi_karir', $idp->proyeksi_karir) }}">
+                                    class="form-control @error('proyeksi_karir') is-invalid @enderror"
+                                    value="{{ old('proyeksi_karir', $idp->proyeksi_karir) }}"
+                                    {{ $mentorOnlyEdit ? 'readonly' : '' }}>
+                                @error('proyeksi_karir')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
+                            {{-- Deskripsi IDP --}}
                             <div class="form-group">
                                 <label>Deskripsi IDP</label>
-                                <textarea name="deskripsi_idp"
-                                    class="form-control @if (old('deskripsi_idp')) is-valid @endif
-                                @error('deskripsi_idp') is-invalid @enderror"
-                                    style="height:8rem;">{{ old('deskripsi_idp', $idp->deskripsi_idp) }}</textarea>
+                                <textarea name="deskripsi_idp" class="form-control @error('deskripsi_idp') is-invalid @enderror" style="height:8rem;"
+                                    {{ $mentorOnlyEdit ? 'readonly' : '' }}>{{ old('deskripsi_idp', $idp->deskripsi_idp) }}</textarea>
+                                @error('deskripsi_idp')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
+                            {{-- Mentor --}}
                             <div class="form-group">
                                 <label>Mentor <span class="text-danger">*</span></label>
-                                <select name="id_mentor" class="form-control @error('id_mentor') is-invalid @enderror"
-                                    required>
-                                    @if (empty($idp->id_mentor))
-                                        <option value="">-- Pilih Mentor --</option>
-                                    @endif
-                                    @foreach ($mentors as $item)
-                                        <option value="{{ $item->id }}"
-                                            {{ old('id_mentor', $idp->id_mentor) == $item->id ? 'selected' : '' }}>
-                                            {{ $item->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('id_mentor')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                @if (!empty($idp->id_mentor))
-                                    <small class="text-muted">Mentor saat ini:
-                                        {{ $idp->mentor->name ?? 'Data tidak ditemukan' }}</small>
+                                @if ($idp->status_approval_mentor === 'Disetujui')
+                                    <input type="hidden" name="id_mentor" value="{{ $idp->id_mentor }}">
+                                    <input type="text" class="form-control"
+                                        value="{{ $idp->mentor->name ?? 'Data tidak ditemukan' }}" readonly>
                                 @else
-                                    <small class="text-warning">Belum ada mentor yang dipilih</small>
+                                    <select name="id_mentor" class="form-control @error('id_mentor') is-invalid @enderror"
+                                        required>
+                                        <option value="">-- Pilih Mentor --</option>
+                                        @foreach ($mentors as $item)
+                                            <option value="{{ $item->id }}"
+                                                {{ old('id_mentor', $idp->id_mentor) == $item->id ? 'selected' : '' }}>
+                                                {{ $item->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('id_mentor')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 @endif
                             </div>
+                            {{-- Supervisor --}}
                             <div class="form-group">
                                 <label>Supervisor <span class="text-danger">*</span></label>
-                                <select name="id_supervisor"
-                                    class="form-control @error('id_supervisor') is-invalid @enderror" required>
-                                    @if (empty($idp->id_supervisor))
-                                        <option value="">-- Pilih Supervisor --</option>
-                                    @endif
-                                    @foreach ($supervisors as $item)
-                                        <option value="{{ $item->id }}"
-                                            {{ old('id_supervisor', $idp->id_supervisor) == $item->id ? 'selected' : '' }}>
-                                            {{ $item->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('id_supervisor')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                @if (!empty($idp->id_supervisor))
-                                    <small class="text-muted">Supervisor saat ini:
-                                        {{ $idp->supervisor->name ?? 'Data tidak ditemukan' }}</small>
+                                @if ($idp->status_approval_mentor === 'Disetujui')
+                                    <input type="hidden" name="id_supervisor" value="{{ $idp->id_supervisor }}">
+                                    <input type="text" class="form-control"
+                                        value="{{ $idp->supervisor->name ?? 'Data tidak ditemukan' }}" readonly>
                                 @else
-                                    <small class="text-warning">Belum ada supervisor yang dipilih</small>
+                                    <select name="id_supervisor"
+                                        class="form-control @error('id_supervisor') is-invalid @enderror"
+                                        {{ $mentorOnlyEdit ? 'disabled' : '' }} required>
+                                        <option value="">-- Pilih Supervisor --</option>
+                                        @foreach ($supervisors as $item)
+                                            <option value="{{ $item->id }}"
+                                                {{ old('id_supervisor', $idp->id_supervisor) == $item->id ? 'selected' : '' }}>
+                                                {{ $item->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @if ($mentorOnlyEdit)
+                                        <input type="hidden" name="id_supervisor" value="{{ $idp->id_supervisor }}">
+                                    @endif
+                                    @error('id_supervisor')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 @endif
                             </div>
+
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label>Waktu Mulai</label>
                                     <input type="date" name="waktu_mulai"
-                                        class="form-control @if (old('waktu_mulai')) is-valid @endif
-                                @error('waktu_mulai') is-invalid @enderror"
-                                        value="{{ old('waktu_mulai', $idp->waktu_mulai) }}">
+                                        class="form-control @if (old('waktu_mulai')) is-valid @endif @error('waktu_mulai') is-invalid @enderror"
+                                        value="{{ old('waktu_mulai', $idp->waktu_mulai) }}"
+                                        {{ $mentorOnlyEdit ? 'readonly' : '' }}>
+                                    @error('waktu_mulai')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Waktu Selesai</label>
                                     <input type="date" name="waktu_selesai"
-                                        class="form-control @if (old('waktu_selesai')) is-valid @endif
-                                @error('waktu_selesai') is-invalid @enderror"
-                                        value="{{ old('waktu_selesai', $idp->waktu_selesai) }}">
+                                        class="form-control @if (old('waktu_selesai')) is-valid @endif @error('waktu_selesai') is-invalid @enderror"
+                                        value="{{ old('waktu_selesai', $idp->waktu_selesai) }}"
+                                        {{ $mentorOnlyEdit ? 'readonly' : '' }}>
+                                    @error('waktu_selesai')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
-
                             <div id="hiddenKompetensiInputs">
                                 @foreach ($idp->idpKompetensis as $kom)
                                     <input type="hidden" name="kompetensi[{{ $kom->id_idpKom }}][id]"
@@ -150,7 +173,8 @@
                             <div class="form-group">
                                 <label>Kompetensi</label> <br>
                                 <button type="button" id="btn-tambah-kompetensi" class="btn btn-primary mb-3"
-                                    data-toggle="modal" data-target="#modalTambahKompetensi">
+                                    data-toggle="modal" data-target="#modalTambahKompetensi"
+                                    {{ $punyaTemplateAsal ? 'disabled' : '' }}>
                                     <i class="fas fa-plus-circle"></i> Tambah Kompetensi
                                 </button>
                                 <br>
@@ -212,6 +236,7 @@
                             </div>
                         </div>
                         <div class="card-footer text-right">
+                            <a class="btn btn-warning" href="{{ route('karyawan.IDP.indexKaryawan') }}">Kembali</a>
                             <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
                     </form>
@@ -242,23 +267,26 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
+
                     <div class="modal-body">
                         <p><strong>Keterangan:</strong> {{ $kom->kompetensi->keterangan }}</p>
 
                         <div class="form-group">
                             <label><strong>Sasaran:</strong></label>
-                            <textarea class="form-control modal-sasaran" data-id="{{ $kom->id_idpKom }}" style="height:8rem;">{{ old('kompetensi.' . $kom->id_idpKom . '.sasaran', $kom->sasaran) }}</textarea>
+                            <textarea class="form-control modal-sasaran" data-id="{{ $kom->id_idpKom }}" style="height:8rem;"
+                                {{ $punyaTemplateAsal ? 'readonly' : '' }}>{{ old('kompetensi.' . $kom->id_idpKom . '.sasaran', $kom->sasaran) }}</textarea>
                         </div>
 
                         <div class="form-group mt-3">
                             <label><strong>Aksi:</strong></label>
-                            <textarea class="form-control modal-aksi" data-id="{{ $kom->id_idpKom }}" style="height:8rem;">{{ old('kompetensi.' . $kom->id_idpKom . '.aksi', $kom->aksi) }}</textarea>
+                            <textarea class="form-control modal-aksi" data-id="{{ $kom->id_idpKom }}" style="height:8rem;"
+                                {{ $punyaTemplateAsal ? 'readonly' : '' }}>{{ old('kompetensi.' . $kom->id_idpKom . '.aksi', $kom->aksi) }}</textarea>
                         </div>
 
-                        {{-- TAMBAHAN: Field untuk edit peran kompetensi --}}
                         <div class="form-group mt-3">
                             <label><strong>Peran Kompetensi:</strong></label>
-                            <select class="form-control modal-peran" data-id="{{ $kom->id_idpKom }}">
+                            <select class="form-control modal-peran" data-id="{{ $kom->id_idpKom }}"
+                                {{ $punyaTemplateAsal ? 'disabled' : '' }}>
                                 <option value="umum" {{ ($kom->peran ?? 'umum') === 'umum' ? 'selected' : '' }}>
                                     Kompetensi Umum</option>
                                 <option value="utama" {{ ($kom->peran ?? '') === 'utama' ? 'selected' : '' }}>Kompetensi
@@ -266,11 +294,11 @@
                                 <option value="kunci_core" {{ ($kom->peran ?? '') === 'kunci_core' ? 'selected' : '' }}>
                                     Kompetensi Kunci Core</option>
                                 <option value="kunci_bisnis"
-                                    {{ ($kom->peran ?? '') === 'kunci_bisnis' ? 'selected' : '' }}>Kompetensi Kunci Bisnis
-                                </option>
+                                    {{ ($kom->peran ?? '') === 'kunci_bisnis' ? 'selected' : '' }}>
+                                    Kompetensi Kunci Bisnis</option>
                                 <option value="kunci_enabler"
-                                    {{ ($kom->peran ?? '') === 'kunci_enabler' ? 'selected' : '' }}>Kompetensi Kunci
-                                    Enabler</option>
+                                    {{ ($kom->peran ?? '') === 'kunci_enabler' ? 'selected' : '' }}>
+                                    Kompetensi Kunci Enabler</option>
                             </select>
                         </div>
 
@@ -280,21 +308,26 @@
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input modal-metode" type="checkbox"
                                         data-id="{{ $kom->id_idpKom }}" value="{{ $metode->id_metodeBelajar }}"
-                                        {{ $kom->metodeBelajars->contains('id_metodeBelajar', $metode->id_metodeBelajar) ? 'checked' : '' }}>
+                                        {{ $kom->metodeBelajars->contains('id_metodeBelajar', $metode->id_metodeBelajar) ? 'checked' : '' }}
+                                        {{ $punyaTemplateAsal ? 'disabled' : '' }}>
                                     <label class="form-check-label">{{ $metode->nama_metodeBelajar }}</label>
                                 </div>
                             @endforeach
                         </div>
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        <button type="button" class="btn btn-primary btn-simpan-kompetensi"
-                            data-id="{{ $kom->id_idpKom }}">Simpan</button>
+                        @unless ($punyaTemplateAsal)
+                            <button type="button" class="btn btn-primary btn-simpan-kompetensi"
+                                data-id="{{ $kom->id_idpKom }}">Simpan</button>
+                        @endunless
                     </div>
                 </div>
             </div>
         </div>
     @endforeach
+
     <!-- Modal Tambah Kompetensi -->
     <div class="modal fade" id="modalTambahKompetensi" tabindex="-1" role="dialog"
         aria-labelledby="modalTambahKompetensiLabel">

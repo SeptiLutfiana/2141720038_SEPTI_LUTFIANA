@@ -40,7 +40,7 @@
                             @endphp
 
                             <span
-                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 10px; border-radius: 9999px;">
+                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 4px; border-radius: 9999px;">
                                 {{ $status }}
                             </span>
                         </td>
@@ -66,7 +66,7 @@
                             @endphp
 
                             <span
-                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 10px; border-radius: 9999px;">
+                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 4px; border-radius: 9999px;">
                                 {{ $status }}
                             </span>
                         </td>
@@ -91,7 +91,7 @@
 
                         <td class="text-center">
                             <span
-                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 10px; border-radius: 20px; display: inline-block;">
+                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 4px; border-radius: 9999px">
                                 {{ $hasil }}
                             </span>
                         </td>
@@ -141,11 +141,26 @@
                             <br>
                             <br>
                         </td> --}}
-                        <td class="text-left" style="width: 120px;">
-                            @if ($item->status_pengajuan_idp === 'Disetujui' || $item->status_approval_mentor === 'Disetujui')
+                        <td class="text-left" style="width: 125px;">
+                            @if (
+                                ($item->status_pengajuan_idp === 'Revisi' && $item->status_approval_mentor === 'Disetujui') ||
+                                    ($item->status_pengajuan_idp === 'Tidak Disetujui' && $item->status_approval_mentor === 'Ditolak') ||
+                                    ($item->status_pengajuan_idp === 'Tidak Disetujui' && $item->status_approval_mentor === 'Disetujui'))
+                                <a href="{{ route('karyawan.IDP.editIdp', $item->id_idp) }}"
+                                    class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                            @elseif ($item->status_pengajuan_idp === 'Disetujui' && $item->status_approval_mentor === 'Disetujui')
                                 <a href="{{ route('karyawan.IDP.showKaryawan', ['id' => $item->id_idp, 'pengerjaan' => $item->id_pengerjaan ?? '']) }}"
                                     class="btn btn-primary btn-sm">
                                     <i class="fas fa-external-link-alt"></i> Kerjakan
+                                </a>
+                            @elseif (
+                                $item->status_pengajuan_idp === 'Menunggu Persetujuan' &&
+                                    in_array($item->status_approval_mentor, ['Menunggu Persetujuan', 'Disetujui']))
+                                <a href="{{ route('karyawan.IDP.detailKaryawan', $item->id_idp) }}"
+                                    class="btn btn-info btn-sm">
+                                    <i class="fas fa-eye"></i> Detail
                                 </a>
                             @else
                                 <a href="{{ route('karyawan.IDP.detailKaryawan', $item->id_idp) }}"
