@@ -329,6 +329,10 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::get('/{id}/riwayat', [MentorDashboardController::class, 'showRiwayatIDP'])->name('RiwayatIDP.showRiwayatIdp');
         Route::get('/idp/cetak-filter', [MentorDashboardController::class, 'cetakFiltered'])->name('RiwayatIDP.cetakFiltered');
     });
+    // PANDUAN IDP MENTOR
+    Route::prefix('mentor/panduan/idp')->name('karyawan.Panduan.')->group(function () {
+        Route::get('/', [PanduanController::class, 'autoShowPanduanMentor'])->name('autoShowPanduanMentor');
+    });
 });
 // KARYAWAN
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {

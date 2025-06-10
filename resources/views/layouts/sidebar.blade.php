@@ -183,8 +183,8 @@
                         <li class="{{ Request::is('mentor/behavior/idp/riwayat') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('mentor/behavior/idp/riwayat') }}">Riwayat Perencanaan IDP</a>
                         </li>
-                        <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('panduan-idp') }}">Panduan</a>
+                        <li class="{{ Request::is('mentor/panduan/idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('mentor/panduan/idp') }}">Panduan</a>
                         </li>
                     </ul>
                 </li>

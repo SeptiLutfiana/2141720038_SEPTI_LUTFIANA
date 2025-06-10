@@ -146,4 +146,24 @@ class PanduanController extends Controller
             'type_menu' => 'karyawan',
         ]);
     }
+    public function autoShowPanduanMentor()
+    {
+        $user = Auth::user();
+
+        // Pastikan user punya role karyawan
+        $isKaryawan = $user->roles->contains('id_role', 3);
+
+        if (!$isKaryawan) {
+            abort(403, 'Anda tidak memiliki akses ke panduan ini.');
+        }
+
+        // Ambil panduan pertama yang ditujukan untuk role karyawan
+        $panduan = Panduan::whereHas('roles', function ($query) {
+            $query->where('nama_role', 'mentor');
+        })->first();
+        return view('mentor.Panduan.index', [
+            'panduan' => $panduan,
+            'type_menu' => 'mentor',
+        ]);
+    }
 }

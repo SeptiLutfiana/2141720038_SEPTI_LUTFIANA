@@ -19,7 +19,7 @@ class MentorDashboardController extends Controller
     public function index()
     {
         return view('mentor.dashboard-mentor', [
-            'type_menu' => 'mentor',
+            'type_menu' => 'dashboard',
         ]);
     }
     public function indexMentor(Request $request)
