@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\User;
 use App\Models\IDP;
 use Illuminate\Support\Facades\Auth;
+
 class RiwayatIdpKaryawanTable extends Component
 {
     use WithPagination;
@@ -51,7 +52,11 @@ class RiwayatIdpKaryawanTable extends Component
                         $q2->where('name', 'like', "%$search%");
                     })->orWhereHas('supervisor', function ($q2) use ($search) {
                         $q2->where('name', 'like', "%$search%");
-                    });
+                    })->orWhereHas('learninggroup', function ($q2) use ($search) {
+                        $q2->where('nama_LG', 'like', "%$search%");
+                    })->orWhereHas('rekomendasis', function ($q2) use ($search) {
+                        $q2->where('hasil_rekomendasi', 'like', "%$search%");
+                    })->orWhere('proyeksi_karir', 'like', "%$search%");
                 });
             })
             ->when($this->jenjang, function ($query) {

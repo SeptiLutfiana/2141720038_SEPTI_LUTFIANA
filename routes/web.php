@@ -325,6 +325,9 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::put('/penilaian/idp/{id}', [MentorDashboardController::class, 'updatePenilaian'])->name('updatePenilaian');
         Route::get('/verifikasi/{id}', [MentorDashboardController::class, 'verifikasi'])->name('verfikasi');
         Route::put('/update/verifikasi/{id}', [MentorDashboardController::class, 'updateVerifikasi'])->name('updateVerifikasi');
+        Route::get('/riwayat', [MentorDashboardController::class, 'indexRiwayatIdp'])->name('RiwayatIDP.indexRiwayatIdp');
+        Route::get('/{id}/riwayat', [MentorDashboardController::class, 'showRiwayatIDP'])->name('RiwayatIDP.showRiwayatIdp');
+        Route::get('/idp/cetak-filter', [MentorDashboardController::class, 'cetakFiltered'])->name('RiwayatIDP.cetakFiltered');
     });
 });
 // KARYAWAN

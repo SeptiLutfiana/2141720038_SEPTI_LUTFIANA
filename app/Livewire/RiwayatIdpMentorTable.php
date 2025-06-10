@@ -4,10 +4,11 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use App\Models\IDP;
+use App\Models\User;
 
-class RiwayatIdpTable extends Component
+class RiwayatIdpMentorTable extends Component
 {
     use WithPagination;
     public $search;
@@ -35,8 +36,10 @@ class RiwayatIdpTable extends Component
 
     public function render()
     {
+        $user = Auth::user(); // Ambil user yang sedang login
         $idps = IDP::query()
             ->where('is_template', false) // Filter utama untuk Bank IDP
+            ->where('id_mentor', $user->id) // Ambil IDP hanya milik user login
             ->whereHas('rekomendasis', function ($q) {
                 $q->whereNotNull('hasil_rekomendasi')
                     ->where('hasil_rekomendasi', '!=', '');
@@ -49,7 +52,7 @@ class RiwayatIdpTable extends Component
                         $q2->where('name', 'like', "%$search%");
                     })->orWhereHas('supervisor', function ($q2) use ($search) {
                         $q2->where('name', 'like', "%$search%");
-                    })->orWhereHas('learninggroup', function ($q2) use ($search) {
+                    })->orWhereHas('learningGroup', function ($q2) use ($search) {
                         $q2->where('nama_LG', 'like', "%$search%");
                     })->orWhereHas('rekomendasis', function ($q2) use ($search) {
                         $q2->where('hasil_rekomendasi', 'like', "%$search%");
@@ -69,7 +72,7 @@ class RiwayatIdpTable extends Component
             ->paginate(5)
             ->withQueryString();
 
-        return view('livewire.riwayat-idp-table', [
+        return view('livewire.riwayat-idp-mentor-table', [
             'idps' => $idps,
         ]);
     }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Livewire;
+
 use Livewire\WithPagination;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -39,6 +40,7 @@ class MentorIdp extends Component
         $mentorId = Auth::id();
         $idps = IDP::with(['mentor', 'supervisor', 'karyawan'])
             ->where('id_mentor', $mentorId) // Filter utama untuk Bank IDP
+            ->doesntHave('rekomendasis') // Tidak punya data rekomendasi sama sekali
             ->when($this->search, function ($query) {
                 return $query->where(function ($q) {
                     $q->where('proyeksi_karir', 'like', "%{$this->search}%")

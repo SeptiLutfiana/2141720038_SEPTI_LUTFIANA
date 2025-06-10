@@ -4,21 +4,20 @@
 @push('style')
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/select.bootstrap4.min.css') }}">
+    @livewireStyles()
 @endpush
 
 @section('main')
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Behavior Individual Development Plan</h1>
+                <h1>Riwayat Perencanaan Individual Development Plan</h1>
 
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('karyawan.dashboard-karyawan') }}">Dashboard</a>
-                    </div>
+                    <div class="breadcrumb-item active"><a href="{{ route('mentor.dashboard-mentor') }}">Dashboard</a></div>
                     <div class="breadcrumb-item">Data IDP</div>
                 </div>
             </div>
-
             <div class="section-body">
                 @if (session('msg-success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -32,20 +31,26 @@
                         </div>
                     </div>
                 @endif
-
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Data Individual Development Plan</h4>
+                                <h4>Riwayat Individual Development Plan</h4>
                                 <div class="card-header-action">
-                                    <a href="#" class="btn btn-icon btn-danger icon-left" target="_blank">
+                                    <a href="{{ route('mentor.IDP.RiwayatIDP.cetakFiltered', [
+                                        'search' => request('search'),
+                                        'id_jenjang' => request('id_jenjang'),
+                                        'id_LG' => request('id_LG'),
+                                        'tahun' => request('tahun'),
+                                    ]) }}"
+                                        class="btn btn-icon btn-danger icon-left" target="_blank">
                                         <i class="fas fa-print"></i> Print PDF
                                     </a>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('mentor.IDP.indexMentor') }}" class="mb-3">
+                                <form method="GET" action="{{ route('mentor.IDP.RiwayatIDP.indexRiwayatIdp') }}"
+                                    class="mb-3">
                                     <div class="form-row">
                                         <div class="col-md-3">
                                             <label>Cari Karyawan</label>
@@ -92,7 +97,7 @@
                                     </div>
                                 </form>
                                 <div class="table-responsive">
-                                    @livewire('mentor-idp', [
+                                    @livewire('riwayat-idp-mentor-table', [
                                         'search' => request('search'),
                                         'jenjang' => request('id_jenjang'),
                                         'lg' => request('id_LG'),
@@ -104,7 +109,20 @@
                     </div>
                 </div>
             </div>
-
         </section>
     </div>
 @endsection
+@push('scripts')
+    @livewireScripts()
+    <script>
+        Livewire.on('idpDeleted', message => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses',
+                text: message,
+                timer: 3000,
+                showConfirmButton: false
+            });
+        });
+    </script>
+@endpush

@@ -28,7 +28,8 @@ class HardKompetensiTable extends Component
         $kompetensi = Kompetensi::where('jenis_kompetensi', 'Hard Kompetensi')
             ->when($this->search, function ($query) {
                 return $query->where('nama_kompetensi', 'like', "%{$this->search}%")
-                    ->orWhere('keterangan', 'like', "%{$this->search}%");
+                    ->orWhere('keterangan', 'like', "%{$this->search}%")
+                    ->orWhere('proyeksi_karir', 'like', "%{$this->search}%");
             })
             ->when($this->jenjang, function ($query) {
                 return $query->where('id_jenjang', $this->jenjang);

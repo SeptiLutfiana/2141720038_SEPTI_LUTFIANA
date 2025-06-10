@@ -115,7 +115,7 @@ class AdminDashboardController extends Controller
             'LGTotals' => $LGTotals,
             'totalPanduan' => $totalPanduan,
             'dataPoints' => $rekomendasiData,
-            'topKaryawan' =>$topKaryawan,
+            'topKaryawan' => $topKaryawan,
         ]);
     }
     public function indexRiwayatIdp(Request $request)
@@ -238,8 +238,25 @@ class AdminDashboardController extends Controller
 
         // Filter: Nama karyawan (search)
         if ($request->filled('search')) {
-            $query->whereHas('karyawan', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('karyawan', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%$search%");
+                })
+                    ->orWhereHas('supervisor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })
+                     ->orWhereHas('mentor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })
+                    ->orWhereHas('rekomendasis', function ($q2) use ($search) {
+                        $q2->where('hasil_rekomendasi', 'like', "%$search%");
+                    })
+                    ->orWhereHas('learningGroup', function ($q2) use ($search) {
+                        $q2->where('nama_LG', 'like', "%$search%");
+                    })
+                    ->orWhere('proyeksi_karir', 'like', "%$search%");
             });
         }
 

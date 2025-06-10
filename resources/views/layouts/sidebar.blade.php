@@ -180,8 +180,8 @@
                         <li class="{{ Request::is('mentor/behavior/idp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('mentor/behavior/idp') }}">List Perencanaan IDP</a>
                         </li>
-                        <li class="{{ Request::is('layout-top-navigation') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('layout-top-navigation') }}">Riwayat Perencanaan IDP</a>
+                        <li class="{{ Request::is('mentor/behavior/idp/riwayat') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('mentor/behavior/idp/riwayat') }}">Riwayat Perencanaan IDP</a>
                         </li>
                         <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('panduan-idp') }}">Panduan</a>

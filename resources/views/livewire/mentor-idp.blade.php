@@ -8,6 +8,7 @@
                 <th>Persetujuan Mentor</th>
                 <th>Persetujuan IDP</th>
                 <th>Supervisor</th>
+                <th>Hasil Rekomendasi</th>
                 <th>Progres IDP</th>
                 <th>Aksi</th>
             </tr>
@@ -70,6 +71,31 @@
                         </td>
 
                         <td>{{ $item->supervisor->name }}</td>
+                        @php
+                            $hasil = $item->rekomendasis->first()->hasil_rekomendasi ?? null;
+                            $bgColor = '#fef3c7'; // default: kuning muda (Menunggu Penilaian)
+                            $textColor = '#92400e'; // default: coklat gelap
+
+                            if ($hasil === 'Disarankan') {
+                                $bgColor = '#dbeafe'; // biru muda
+                                $textColor = '#1e3a8a'; // biru tua
+                            } elseif ($hasil === 'Disarankan dengan Pengembangan') {
+                                $bgColor = '#d1fae5'; // hijau muda
+                                $textColor = '#065f46'; // hijau tua
+                            } elseif ($hasil === 'Tidak Disarankan') {
+                                $bgColor = '#fee2e2'; // merah muda
+                                $textColor = '#991b1b'; // merah tua
+                            } elseif (!$hasil) {
+                                $hasil = 'Menunggu Penilaian';
+                            }
+                        @endphp
+
+                        <td class="text-center">
+                            <span
+                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 4px; border-radius: 9999px">
+                                {{ $hasil }}
+                            </span>
+                        </td>
                         <td>
                             @php
                                 $idpKompetensis = $item->idpKompetensis;
@@ -109,7 +135,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="text-left" style="width: 150px;">
+                        <td class="text-left" style="width: 130px;">
                             @if (
                                 ($item->status_approval_mentor === 'Menunggu Persetujuan' &&
                                     $item->status_pengajuan_idp === 'Menunggu Persetujuan') ||
