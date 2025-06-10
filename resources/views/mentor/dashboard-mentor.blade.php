@@ -4,307 +4,206 @@
 
 @push('style')
     <!-- CSS Libraries -->
-    <link rel="stylesheet"
-        href="{{ asset('library/jqvmap/dist/jqvmap.min.css') }}">
-    <link rel="stylesheet"
-        href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('library/jqvmap/dist/jqvmap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
 @endpush
 
 @section('main')
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Dashboard Mentor</h1>
+                <h1>Dashboard Karyawan</h1>
             </div>
             <div class="section-body">
             </div>
             @include('components.alert') {{-- Tampilkan notifikasi jika ada --}}
+            {{-- Progres Behavior IDP --}}
+            <div class="card">
+                <div class="card-header d-flex align-items-center">
+                    <i class="fas fa-chart-line text-primary mr-2"></i>
+                    <h4 class="mb-0">Progres Behavior IDP</h4>
+                </div>
+                <hr class="m-0">
+                <div class="card-body">
+                    <div class="row">
+                        @php
+                            $dataProgres = [
+                                [
+                                    'title' => 'Individual Development Plan',
+                                    'count' => $jumlahIDPGiven,
+                                    'icon' => 'fa-user',
+                                    'bg' => 'bg-primary',
+                                    'border' => 'border-primary',
+                                ],
+                                [
+                                    'title' => 'IDP Menunggu Persetujuan Supervisor',
+                                    'count' => $jumlahRekomendasiBelumMuncul,
+                                    'icon' => 'fa-hourglass-half',
+                                    'bg' => 'bg-warning',
+                                    'border' => 'border-warning',
+                                ],
+                                [
+                                    'title' => 'IDP Disarankan',
+                                    'count' => $jumlahDisarankan,
+                                    'icon' => 'fa-check',
+                                    'bg' => 'bg-success',
+                                    'border' => 'border-success',
+                                ],
+                                [
+                                    'title' => 'IDP Disarankan Dengan Pengembangan',
+                                    'count' => $jumlahDisarankanDenganPengembangan,
+                                    'icon' => 'fa-tools',
+                                    'bg' => 'bg-secondary',
+                                    'border' => 'border-secondary',
+                                ],
+                                [
+                                    'title' => 'IDP Tidak Disarankan',
+                                    'count' => $jumlahTidakDisarankan,
+                                    'icon' => 'fa-ban',
+                                    'bg' => 'bg-dark',
+                                    'border' => 'border-dark',
+                                ],
+                                [
+                                    'title' => 'Persetujuan Mentor',
+                                    'count' => $jumlahMenungguPersetujuan,
+                                    'icon' => 'fa-book', // ikon buku atau dokumen
+                                    'bg' => 'bg-info', // biru muda, kesan informatif
+                                    'border' => 'border-info',
+                                ],
+                            ];
+                        @endphp
+                        @foreach ($dataProgres as $item)
+                            <div class="col-lg-4 col-md-6 col-sm-6 col-12 mb-3">
+                                <div class="card card-statistic-1 {{ $item['border'] }}">
+                                    <div class="card-icon {{ $item['bg'] }}">
+                                        <i class="fas {{ $item['icon'] }}"></i>
+                                    </div>
+                                    <div class="card-wrap">
+                                        <div class="card-header">
+                                            <h4>{{ $item['title'] }}</h4>
+                                        </div>
+                                        <div class="card-body">
+                                            {{ $item['count'] }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
             <div class="row">
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1">
-                        <div class="card-icon bg-primary">
-                            <i class="far fa-user"></i>
+                {{-- Chart IDP per Jenjang --}}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <i class="fas fa-layer-group text-primary mr-2"></i>
+                            <h4 class="mb-0">Jenjang</h4>
                         </div>
-                        <div class="card-wrap">
-                            <div class="card-header">
-                                <h4>Total Admin</h4>
-                            </div>
-                            <div class="card-body">
-                                10
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1">
-                        <div class="card-icon bg-danger">
-                            <i class="far fa-newspaper"></i>
-                        </div>
-                        <div class="card-wrap">
-                            <div class="card-header">
-                                <h4>News</h4>
-                            </div>
-                            <div class="card-body">
-                                42
+                        <hr class="m-0">
+                        <div class="card-body">
+                            <div style="position: relative; height: 300px;">
+                                <canvas id="chartJenjang"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1">
-                        <div class="card-icon bg-warning">
-                            <i class="far fa-file"></i>
+
+                {{-- Chart IDP per Learning Group --}}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <i class="fas fa-layer-group text-primary mr-2"></i>
+                            <h4 class="mb-0">Learning Group</h4>
                         </div>
-                        <div class="card-wrap">
-                            <div class="card-header">
-                                <h4>Reports</h4>
-                            </div>
-                            <div class="card-body">
-                                1,201
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1">
-                        <div class="card-icon bg-success">
-                            <i class="fas fa-circle"></i>
-                        </div>
-                        <div class="card-wrap">
-                            <div class="card-header">
-                                <h4>Online Users</h4>
-                            </div>
-                            <div class="card-body">
-                                47
+                        <hr class="m-0">
+                        <div class="card-body">
+                            <div style="position: relative; height: 300px;">
+                                <canvas id="chartLG"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-lg-5 col-md-12 col-12 col-sm-12">
-                    <form method="post"
-                        class="needs-validation"
-                        novalidate="">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Quick Draft</h4>
-                            </div>
-                            <div class="card-body pb-0">
-                                <div class="form-group">
-                                    <label>Title</label>
-                                    <input type="text"
-                                        name="title"
-                                        class="form-control"
-                                        required>
-                                    <div class="invalid-feedback">
-                                        Please fill in the title
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Content</label>
-                                    <textarea class="summernote-simple"></textarea>
-                                </div>
-                            </div>
-                            <div class="card-footer pt-0">
-                                <button class="btn btn-primary">Save Draft</button>
-                            </div>
-                        </div>
-                    </form>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Grafik Nilai Karyawan (Hard vs Soft)</h4>
                 </div>
-                <div class="col-lg-7 col-md-12 col-12 col-sm-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Latest Posts</h4>
-                            <div class="card-header-action">
-                                <a href="#"
-                                    class="btn btn-primary">View All</a>
-                            </div>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table-striped mb-0 table">
-                                    <thead>
-                                        <tr>
-                                            <th>Title</th>
-                                            <th>Author</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                Introduction Laravel 5
-                                                <div class="table-links">
-                                                    in <a href="#">Web Development</a>
-                                                    <div class="bullet"></div>
-                                                    <a href="#">View</a>
+                <div class="card-body">
+                    <canvas id="chartKaryawan" height="100"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Top 5 Perencanaan IDP (Hasil Rekomendasi: Disarankan)</h4>
+                </div>
+                <div class="card-body">
+                    @if ($topKaryawan->isEmpty())
+                        <p>Tidak ada data yang memenuhi kriteria.</p>
+                    @else
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Nama Karyawan</th>
+                                    <th>Proyeksi Karir</th>
+                                    <th>Nilai Soft</th>
+                                    <th>Nilai Hard</th>
+                                    <th>Hasil Rekomendasi</th>
+                                    <th>Progres IDP</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($topKaryawan as $rek)
+                                    @php
+                                        $idp = $rek->idp;
+                                        $idpKompetensis = $idp->idpKompetensis;
+                                        $totalKompetensi = $idpKompetensis->count();
+                                        $jumlahSelesai = 0;
+
+                                        foreach ($idpKompetensis as $kom) {
+                                            $totalUpload = $kom->pengerjaans->count();
+                                            $jumlahDisetujui = $kom->pengerjaans
+                                                ->where('status_pengerjaan', 'Disetujui Mentor')
+                                                ->count();
+
+                                            if ($totalUpload > 0 && $totalUpload === $jumlahDisetujui) {
+                                                $jumlahSelesai++;
+                                            }
+                                        }
+
+                                        $persen =
+                                            $totalKompetensi > 0 ? round(($jumlahSelesai / $totalKompetensi) * 100) : 0;
+
+                                        $warna = 'bg-danger';
+                                        if ($persen >= 80) {
+                                            $warna = 'bg-success';
+                                        } elseif ($persen >= 50) {
+                                            $warna = 'bg-warning';
+                                        }
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $idp->karyawan->name ?? 'Tidak diketahui' }}</td>
+                                        <td>{{ $idp->proyeksi_karir ?? '-' }}</td>
+                                        <td>{{ $rek->nilai_akhir_soft }}</td>
+                                        <td>{{ $rek->nilai_akhir_hard }}</td>
+                                        <td>{{ $rek->hasil_rekomendasi }}</td>
+                                        <td>
+                                            <div style="font-size: 10px;" class="text-muted mb-1">
+                                                {{ $jumlahSelesai }}/{{ $totalKompetensi }} | {{ $persen }}%
+                                            </div>
+                                            <div class="progress" style="height: 6px; border-radius: 999px;">
+                                                <div class="progress-bar {{ $warna }}" role="progressbar"
+                                                    style="width: {{ $persen }}%; border-radius: 999px;"
+                                                    aria-valuenow="{{ $persen }}" aria-valuemin="0"
+                                                    aria-valuemax="100">
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <a href="#"
-                                                    class="font-weight-600"><img
-                                                        src="{{ asset('img/avatar/avatar-1.png') }}"
-                                                        alt="avatar"
-                                                        width="30"
-                                                        class="rounded-circle mr-1"> Bagus Dwi Cahya</a>
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-primary btn-action mr-1"
-                                                    data-toggle="tooltip"
-                                                    title="Edit"><i class="fas fa-pencil-alt"></i></a>
-                                                <a class="btn btn-danger btn-action"
-                                                    data-toggle="tooltip"
-                                                    title="Delete"
-                                                    data-confirm="Are You Sure?|This action can not be undone. Do you want to continue?"
-                                                    data-confirm-yes="alert('Deleted')"><i class="fas fa-trash"></i></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                Laravel 5 Tutorial - Installation
-                                                <div class="table-links">
-                                                    in <a href="#">Web Development</a>
-                                                    <div class="bullet"></div>
-                                                    <a href="#">View</a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <a href="#"
-                                                    class="font-weight-600"><img
-                                                        src="{{ asset('img/avatar/avatar-1.png') }}"
-                                                        alt="avatar"
-                                                        width="30"
-                                                        class="rounded-circle mr-1"> Bagus Dwi Cahya</a>
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-primary btn-action mr-1"
-                                                    data-toggle="tooltip"
-                                                    title="Edit"><i class="fas fa-pencil-alt"></i></a>
-                                                <a class="btn btn-danger btn-action"
-                                                    data-toggle="tooltip"
-                                                    title="Delete"
-                                                    data-confirm="Are You Sure?|This action can not be undone. Do you want to continue?"
-                                                    data-confirm-yes="alert('Deleted')"><i class="fas fa-trash"></i></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                Laravel 5 Tutorial - MVC
-                                                <div class="table-links">
-                                                    in <a href="#">Web Development</a>
-                                                    <div class="bullet"></div>
-                                                    <a href="#">View</a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <a href="#"
-                                                    class="font-weight-600"><img
-                                                        src="{{ asset('img/avatar/avatar-1.png') }}"
-                                                        alt="avatar"
-                                                        width="30"
-                                                        class="rounded-circle mr-1"> Bagus Dwi Cahya</a>
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-primary btn-action mr-1"
-                                                    data-toggle="tooltip"
-                                                    title="Edit"><i class="fas fa-pencil-alt"></i></a>
-                                                <a class="btn btn-danger btn-action"
-                                                    data-toggle="tooltip"
-                                                    title="Delete"
-                                                    data-confirm="Are You Sure?|This action can not be undone. Do you want to continue?"
-                                                    data-confirm-yes="alert('Deleted')"><i class="fas fa-trash"></i></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                Laravel 5 Tutorial - Migration
-                                                <div class="table-links">
-                                                    in <a href="#">Web Development</a>
-                                                    <div class="bullet"></div>
-                                                    <a href="#">View</a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <a href="#"
-                                                    class="font-weight-600"><img
-                                                        src="{{ asset('img/avatar/avatar-1.png') }}"
-                                                        alt="avatar"
-                                                        width="30"
-                                                        class="rounded-circle mr-1"> Bagus Dwi Cahya</a>
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-primary btn-action mr-1"
-                                                    data-toggle="tooltip"
-                                                    title="Edit"><i class="fas fa-pencil-alt"></i></a>
-                                                <a class="btn btn-danger btn-action"
-                                                    data-toggle="tooltip"
-                                                    title="Delete"
-                                                    data-confirm="Are You Sure?|This action can not be undone. Do you want to continue?"
-                                                    data-confirm-yes="alert('Deleted')"><i class="fas fa-trash"></i></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                Laravel 5 Tutorial - Deploy
-                                                <div class="table-links">
-                                                    in <a href="#">Web Development</a>
-                                                    <div class="bullet"></div>
-                                                    <a href="#">View</a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <a href="#"
-                                                    class="font-weight-600"><img
-                                                        src="{{ asset('img/avatar/avatar-1.png') }}"
-                                                        alt="avatar"
-                                                        width="30"
-                                                        class="rounded-circle mr-1"> Bagus Dwi Cahya</a>
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-primary btn-action mr-1"
-                                                    data-toggle="tooltip"
-                                                    title="Edit"><i class="fas fa-pencil-alt"></i></a>
-                                                <a class="btn btn-danger btn-action"
-                                                    data-toggle="tooltip"
-                                                    title="Delete"
-                                                    data-confirm="Are You Sure?|This action can not be undone. Do you want to continue?"
-                                                    data-confirm-yes="alert('Deleted')"><i class="fas fa-trash"></i></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                Laravel 5 Tutorial - Closing
-                                                <div class="table-links">
-                                                    in <a href="#">Web Development</a>
-                                                    <div class="bullet"></div>
-                                                    <a href="#">View</a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <a href="#"
-                                                    class="font-weight-600"><img
-                                                        src="{{ asset('img/avatar/avatar-1.png') }}"
-                                                        alt="avatar"
-                                                        width="30"
-                                                        class="rounded-circle mr-1"> Bagus Dwi Cahya</a>
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-primary btn-action mr-1"
-                                                    data-toggle="tooltip"
-                                                    title="Edit"><i class="fas fa-pencil-alt"></i></a>
-                                                <a class="btn btn-danger btn-action"
-                                                    data-toggle="tooltip"
-                                                    title="Delete"
-                                                    data-confirm="Are You Sure?|This action can not be undone. Do you want to continue?"
-                                                    data-confirm-yes="alert('Deleted')"><i class="fas fa-trash"></i></a>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
                 </div>
             </div>
         </section>
@@ -312,14 +211,179 @@
 @endsection
 
 @push('scripts')
-    <!-- JS Libraies -->
-    <script src="{{ asset('library/simpleweather/jquery.simpleWeather.min.js') }}"></script>
-    <script src="{{ asset('library/chart.js/dist/Chart.min.js') }}"></script>
-    <script src="{{ asset('library/jqvmap/dist/jquery.vmap.min.js') }}"></script>
-    <script src="{{ asset('library/jqvmap/dist/maps/jquery.vmap.world.js') }}"></script>
-    <script src="{{ asset('library/summernote/dist/summernote-bs4.min.js') }}"></script>
-    <script src="{{ asset('library/chocolat/dist/js/jquery.chocolat.min.js') }}"></script>
-
-    <!-- Page Specific JS File -->
     <script src="{{ asset('js/page/index-0.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ambil data dari PHP
+            const jenjangLabels = @json($jenjangLabels ?? []);
+            const jenjangTotals = @json($jenjangTotals ?? []);
+
+            // Debug di console
+            console.log('Labels:', jenjangLabels);
+            console.log('Totals:', jenjangTotals);
+
+            // Cek apakah data ada
+            if (!jenjangLabels || !jenjangTotals || jenjangLabels.length === 0) {
+                console.error('Data chart kosong atau tidak valid');
+                document.getElementById('chartJenjang').parentElement.innerHTML =
+                    '<p class="text-center text-muted">Tidak ada data untuk ditampilkan</p>';
+                return;
+            }
+
+            // Buat chart
+            const ctxJenjang = document.getElementById('chartJenjang').getContext('2d');
+            const chartJenjang = new Chart(ctxJenjang, {
+                type: 'doughnut',
+                data: {
+                    labels: jenjangLabels,
+                    datasets: [{
+                        label: 'Jenjang',
+                        data: jenjangTotals,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 205, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 205, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Jenjang'
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {}
+                }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ambil data dari PHP
+            const LGLabels = @json($LGLabels ?? []);
+            const LGTotals = @json($LGTotals ?? []);
+
+            // Debug di console
+            console.log('Labels:', LGLabels);
+            console.log('Totals:', LGTotals);
+
+            // Cek apakah data ada
+            if (!LGLabels || !LGTotals || LGLabels.length === 0) {
+                console.error('Data chart kosong atau tidak valid');
+                document.getElementById('chartLG').parentElement.innerHTML =
+                    '<p class="text-center text-muted">Tidak ada data untuk ditampilkan</p>';
+                return;
+            }
+
+            // Buat chart
+            const ctxJenjang = document.getElementById('chartLG').getContext('2d');
+            const chartJenjang = new Chart(ctxJenjang, {
+                type: 'doughnut',
+                data: {
+                    labels: LGLabels,
+                    datasets: [{
+                        label: 'Learning Group',
+                        data: LGTotals,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 205, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 205, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Learning Group'
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {}
+                }
+            });
+        });
+        const dataPoints = {!! json_encode($dataPoints) !!};
+
+        const ctx = document.getElementById('chartKaryawan').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Karyawan',
+                    data: dataPoints,
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Nilai Hard'
+                        },
+                        min: 0,
+                        max: 5
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Nilai Soft'
+                        },
+                        min: 0,
+                        max: 5
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const point = context.raw;
+                                return `${point.label}\nHard: ${point.x}, Soft: ${point.y}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 @endpush
