@@ -267,126 +267,69 @@ class SupervisorDashboardController extends Controller
                 'request_data' => $request->all()
             ]);
 
-            $validated = $request->validate(
-                [
-                    'rating' => 'required|in:1,2,3,4,5',
-                    'saran' => 'required|string',
-                    'id_idpKomPeng' => 'required|exists:idp_kompetensi_pengerjaans,id_idpKomPeng',
-                ],
-                [
-                    'rating.required' => 'Rating wajib diisi.',
-                    'saran.required' => 'Saran wajib diisi.',
-                ]
-            );
+            $validated = $request->validate([
+                'rating' => 'required|in:1,2,3,4,5',
+                'saran' => 'required|string',
+                'id_idpKomPeng' => 'required|exists:idp_kompetensi_pengerjaans,id_idpKomPeng',
+            ]);
 
-            Log::info('Validasi berhasil', $validated);
-
-            // Simpan atau update nilai pengerjaan (tanpa limit upload)
             $nilai = NilaiPengerjaanIdp::create([
                 'id_idpKomPeng' => $validated['id_idpKomPeng'],
                 'rating' => $validated['rating'],
                 'saran' => $validated['saran'],
             ]);
 
-            Log::info('Nilai berhasil disimpan', [
-                'id_nilai' => $nilai->id ?? 'unknown',
-                'was_created' => $nilai->wasRecentlyCreated
-            ]);
-
-            // Ambil data IDP terkait melalui relasi
+            // Baru ambil IDP setelah simpan nilai
             $idpKomPeng = $nilai->idpKompetensiPengerjaan;
             $idp = $idpKomPeng->idpKompetensi->idp;
 
-            Log::info('Data IDP ditemukan', [
-                'id_idp' => $idp->id_idp,
-                'nama_idp' => $idp->nama_idp ?? 'unknown'
-            ]);
-
-            // Load relasi untuk hitung pengerjaan
-            $idp->load([
-                'idpKompetensis.kompetensi',
-                'idpKompetensis.pengerjaans.nilaiPengerjaanIdp',
-            ]);
-
-            Log::info('Relasi berhasil di-load');
-
-            // Hitung total pengerjaan dan yang sudah dinilai (minimal satu penilaian)
-            $totalPengerjaan = 0;
-            $jumlahDinilai = 0;
-            $detailKompetensi = [];
+            $idp->refresh();
+            // Hitung total dan yang sudah dinilai
+            $total = 0;
+            $dinilai = 0;
 
             foreach ($idp->idpKompetensis as $kompetensi) {
-                $kompDetail = [
-                    'nama_kompetensi' => $kompetensi->kompetensi->nama_kompetensi ?? 'unknown',
-                    'jenis' => $kompetensi->kompetensi->jenis_kompetensi ?? 'unknown',
-                    'pengerjaans' => []
-                ];
-
                 foreach ($kompetensi->pengerjaans as $pengerjaan) {
-                    $totalPengerjaan++;
-                    $sudahDinilai = $pengerjaan->nilaiPengerjaanIdp()->exists();
-
-                    if ($sudahDinilai) {
-                        $jumlahDinilai++;
+                    $total++;
+                    if ($pengerjaan->nilaiPengerjaanIdp !== null) {
+                        $dinilai++;
                     }
-
-                    $kompDetail['pengerjaans'][] = [
-                        'id_pengerjaan' => $pengerjaan->id_idpKomPeng,
-                        'sudah_dinilai' => $sudahDinilai,
-                        'jumlah_penilaian' => $pengerjaan->nilaiPengerjaanIdp()->count()
-                    ];
                 }
-
-                $detailKompetensi[] = $kompDetail;
             }
-
-            Log::info('Perhitungan pengerjaan selesai', [
+            Log::info('📊 Rekap penilaian', [
                 'id_idp' => $idp->id_idp,
-                'total_pengerjaan' => $totalPengerjaan,
-                'jumlah_dinilai' => $jumlahDinilai,
-                'kondisi_terpenuhi' => $totalPengerjaan > 0 && $jumlahDinilai === $totalPengerjaan,
-                'detail_kompetensi' => $detailKompetensi
+                'total_pengerjaan' => $total,
+                'jumlah_dinilai' => $dinilai,
+                'kondisi_terpenuhi' => $total > 0 && $dinilai === $total
             ]);
 
-            // Jika semua pengerjaan sudah ada penilaian minimal satu, hitung rekomendasi
-            if ($totalPengerjaan > 0 && $jumlahDinilai === $totalPengerjaan) {
-                Log::info('🚀 KONDISI TERPENUHI - Menjalankan perhitungan rekomendasi', [
-                    'id_idp' => $idp->id_idp
-                ]);
-
+            // Jalankan rekomendasi jika terpenuhi
+            if ($total > 0 && $dinilai === $total) {
+                Log::info('🚀 Menjalankan perhitungan rekomendasi', ['id_idp' => $idp->id_idp]);
                 $this->rekomendasiService->hitungRekomendasi($idp);
-
-                Log::info('✅ Perhitungan rekomendasi selesai', [
-                    'id_idp' => $idp->id_idp
-                ]);
+                Log::info('✅ Perhitungan rekomendasi selesai', ['id_idp' => $idp->id_idp]);
             } else {
-                Log::info('❌ KONDISI BELUM TERPENUHI - Tidak menjalankan perhitungan rekomendasi', [
-                    'id_idp' => $idp->id_idp,
-                    'total_pengerjaan' => $totalPengerjaan,
-                    'jumlah_dinilai' => $jumlahDinilai,
-                    'kekurangan' => $totalPengerjaan - $jumlahDinilai
+                Log::info('❌ Belum semua dinilai, rekomendasi belum dihitung', [
+                    'sisa' => $total - $dinilai
                 ]);
             }
-
-            Log::info('=== SELESAI PROSES STORE PENILAIAN ===');
 
             if ($request->ajax()) {
                 return response()->json([
                     'message' => 'Penilaian berhasil disimpan.',
                     'debug_info' => [
-                        'total_pengerjaan' => $totalPengerjaan,
-                        'jumlah_dinilai' => $jumlahDinilai,
-                        'rekomendasi_dihitung' => $totalPengerjaan > 0 && $jumlahDinilai === $totalPengerjaan
+                        'total' => $total,
+                        'dinilai' => $dinilai,
+                        'rekomendasi_dihitung' => $total > 0 && $dinilai === $total
                     ]
                 ]);
             }
 
             return redirect()->back()->with('msg-success', 'Penilaian berhasil disimpan.');
         } catch (\Exception $e) {
-            Log::error('❌ ERROR dalam store penilaian', [
+            Log::error('❌ ERROR saat store penilaian', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
+                'trace' => $e->getTraceAsString()
             ]);
 
             if ($request->ajax()) {
@@ -399,6 +342,7 @@ class SupervisorDashboardController extends Controller
             return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat menyimpan penilaian.');
         }
     }
+
     public function indexRiwayatIdp(Request $request)
     {
         $user = Auth::user(); // Ambil user yang sedang login

@@ -15,10 +15,16 @@ class IdpRekomendasiService
      * @param Idp $idp
      * @return void
      */
+
     public function hitungRekomendasi(Idp $idp)
     {
         try {
             Log::info('=== Mulai proses perhitungan rekomendasi IDP ===', ['id_idp' => $idp->id_idp]);
+
+            $idp = $idp->fresh([
+                'idpKompetensis.kompetensi',
+                'idpKompetensis.pengerjaans.nilaiPengerjaanIdp'
+            ]);
 
             $softs = [];
             $hards = [];
@@ -27,55 +33,64 @@ class IdpRekomendasiService
                 $komp = $idpKomp->kompetensi;
                 $jenis = $komp->jenis_kompetensi;
 
-                $allRatings = $idpKomp->pengerjaans->flatMap(function ($pengerjaan) {
-                    return $pengerjaan->nilaiPengerjaanIdp->pluck('rating')->map(fn($r) => (int)$r);
-                });
+                $ratings = collect();
 
-                if ($allRatings->count() == 0) continue;
+                foreach ($idpKomp->pengerjaans as $pengerjaan) {
+                    $ratings = $ratings->merge(
+                        $pengerjaan->nilaiPengerjaanIdp
+                            ->pluck('rating')
+                            ->filter()
+                            ->map(fn($r) => (int) $r)
+                    );
+                }
 
-                $finalRating = $allRatings->avg();
+                if ($ratings->isEmpty()) {
+                    Log::warning('⛔ Kompetensi dilewati karena tidak ada rating valid', [
+                        'kompetensi' => $komp->nama_kompetensi ?? 'unknown'
+                    ]);
+                    continue;
+                }
+
+                $avgRating = $ratings->avg();
 
                 Log::info('Kompetensi ditemukan', [
                     'nama' => $komp->nama_kompetensi ?? '-',
                     'jenis' => $jenis,
-                    'rating_rata2' => $finalRating
+                    'rating_rata2' => $avgRating,
+                    'rating_detail' => $ratings->toArray(),
                 ]);
 
                 if ($jenis === 'Soft Kompetensi') {
                     $softs[] = [
                         'peran' => $idpKomp->peran,
-                        'rating' => $finalRating,
+                        'ratings' => $ratings->toArray()
                     ];
                 } elseif ($jenis === 'Hard Kompetensi') {
-                    $hards[] = $finalRating;
+                    $hards = array_merge($hards, $ratings->toArray());
                 }
             }
 
-            // Hitung hasil soft kompetensi dengan aturan bisnis yang BENAR
             $hasilSoft = $this->hitungHasilSoftKompetensi($softs);
             $hasilHard = $this->hitungHasilHardKompetensi($hards);
-
-            // Tentukan hasil final
             $finalHasil = $this->tentukanHasilFinal($hasilSoft, $hasilHard);
 
-            // Hitung nilai rata-rata
-            $nilaiHasilSoft = $this->hitungNilaiAkhirSoft($idp);
-            $nilaiHasilHard = $this->hitungNilaiAkhirHard($idp);
+            $nilaiSoft = $this->hitungNilaiAkhirSoft($idp);
+            $nilaiHard = $this->hitungNilaiAkhirHard($idp);
 
             Log::info('Final hasil rekomendasi', [
                 'hasil_rekomendasi' => $finalHasil['hasil'],
                 'deskripsi' => $finalHasil['deskripsi'],
-                'nilai_soft' => $nilaiHasilSoft,
-                'nilai_hard' => $nilaiHasilHard
+                'nilai_soft' => $nilaiSoft,
+                'nilai_hard' => $nilaiHard
             ]);
 
-            $rekomendasi = IdpRekomendasi::updateOrCreate(
+            IdpRekomendasi::updateOrCreate(
                 ['id_idp' => $idp->id_idp],
                 [
                     'hasil_rekomendasi' => $finalHasil['hasil'],
                     'deskripsi_rekomendasi' => $finalHasil['deskripsi'],
-                    'nilai_akhir_soft' => $nilaiHasilSoft,
-                    'nilai_akhir_hard' => $nilaiHasilHard,
+                    'nilai_akhir_soft' => $nilaiSoft,
+                    'nilai_akhir_hard' => $nilaiHard,
                 ]
             );
 
@@ -90,87 +105,59 @@ class IdpRekomendasiService
         }
     }
 
-    /**
-     * Hitung hasil soft kompetensi berdasarkan aturan bisnis yang BENAR
-     */
     private function hitungHasilSoftKompetensi($softs)
     {
-        if (empty($softs)) {
-            return [
-                'hasil' => 'Menunggu Hasil',
-                'deskripsi' => 'Menunggu hasil soft kompetensi.'
-            ];
-        }
-
+        $ratings = [];
         $totalKompetensi = count($softs);
-        $ratings = array_column($softs, 'rating');
-
-        // Hitung berdasarkan rating
-        $rating3to5 = array_filter($ratings, fn($r) => $r >= 3 && $r <= 5);
-        $rating2 = array_filter($ratings, fn($r) => $r == 2);
-        $rating1 = array_filter($ratings, fn($r) => $r == 1);
-
-        $count3to5 = count($rating3to5);
-        $count2 = count($rating2);
-        $count1 = count($rating1);
-
-        // Cek kompetensi utama dan kunci
         $utamaKurang3 = false;
         $kunciKurang3 = false;
         $utamaAtauKunciRating2 = false;
 
         foreach ($softs as $soft) {
-            if ($soft['peran'] === 'utama' && $soft['rating'] < 3) {
-                $utamaKurang3 = true;
-                if ($soft['rating'] == 2) {
-                    $utamaAtauKunciRating2 = true;
+            foreach ($soft['ratings'] as $r) {
+                $ratings[] = intval(round($r));
+                if ($soft['peran'] === 'utama' && $r < 3) {
+                    $utamaKurang3 = true;
+                    if ($r == 2) $utamaAtauKunciRating2 = true;
                 }
-            }
-            if (in_array($soft['peran'], ['kunci_core', 'kunci_bisnis', 'kunci_enabler']) && $soft['rating'] < 3) {
-                $kunciKurang3 = true;
-                if ($soft['rating'] == 2) {
-                    $utamaAtauKunciRating2 = true;
+                if (in_array($soft['peran'], ['kunci_core', 'kunci_bisnis', 'kunci_enabler']) && $r < 3) {
+                    $kunciKurang3 = true;
+                    if ($r == 2) $utamaAtauKunciRating2 = true;
                 }
             }
         }
 
-        Log::info('Analisis soft kompetensi (ATURAN ADAPTIF)', [
-            'total_kompetensi' => $totalKompetensi,
-            'rating_3_to_5' => $count3to5,
-            'rating_2' => $count2,
-            'rating_1' => $count1,
-            'utama_kurang_3' => $utamaKurang3,
-            'kunci_kurang_3' => $kunciKurang3,
-            'utama_atau_kunci_rating_2' => $utamaAtauKunciRating2
-        ]);
+        $count1 = count(array_filter($ratings, fn($r) => $r == 1));
+        $count2 = count(array_filter($ratings, fn($r) => $r == 2));
+        $count3to5 = count(array_filter($ratings, fn($r) => $r >= 3 && $r <= 5));
 
-        // ===== ATURAN BISNIS ADAPTIF =====
+        Log::info('Analisis soft kompetensi', compact(
+            'totalKompetensi',
+            'count3to5',
+            'count2',
+            'count1',
+            'utamaKurang3',
+            'kunciKurang3',
+            'utamaAtauKunciRating2'
+        ));
 
-        // PRIORITAS PERTAMA: Kondisi yang PASTI TIDAK DISARANKAN
-        if (
-            $count1 > 0 ||                          // Terdapat rating 1 (langsung tolak)
-            ($utamaKurang3 && $kunciKurang3)        // Rating kompetensi utama DAN kunci di bawah 3
-        ) {
+        if ($count1 > 0 || ($utamaKurang3 && $kunciKurang3)) {
             return [
                 'hasil' => 'Tidak Disarankan',
                 'deskripsi' => 'Soft skill tidak memenuhi standar minimum yang diperlukan.'
             ];
         }
 
-        // Untuk kompetensi sedikit (< 6), gunakan logika persentase
         if ($totalKompetensi < 6) {
             return $this->evaluasiKompetensiSedikit($count3to5, $count2, $count1, $utamaKurang3, $kunciKurang3, $utamaAtauKunciRating2, $totalKompetensi);
         }
 
-        // Untuk kompetensi 6-11, gunakan logika proporsional
         if ($totalKompetensi < 12) {
             return $this->evaluasiKompetensiSedang($count3to5, $count2, $count1, $utamaKurang3, $kunciKurang3, $utamaAtauKunciRating2, $totalKompetensi);
         }
 
-        // Untuk kompetensi ≥ 12, gunakan aturan asli
         return $this->evaluasiKompetensiLengkap($count3to5, $count2, $count1, $utamaKurang3, $kunciKurang3, $utamaAtauKunciRating2);
     }
-
     /**
      * Evaluasi untuk kompetensi sedikit (< 6 kompetensi)
      */
@@ -384,56 +371,63 @@ class IdpRekomendasiService
      */
     private function hitungNilaiAkhirSoft(Idp $idp)
     {
-        $softRatings = [];
+        $allSoftRatings = collect();
 
         foreach ($idp->idpKompetensis as $idpKomp) {
             $komp = $idpKomp->kompetensi;
 
             if ($komp->jenis_kompetensi === 'Soft Kompetensi') {
-                $allRatings = $idpKomp->pengerjaans->flatMap(function ($pengerjaan) {
-                    return $pengerjaan->nilaiPengerjaanIdp->pluck('rating')->map(fn($r) => (int)$r);
-                });
-
-                if ($allRatings->count() > 0) {
-                    $softRatings[] = $allRatings->avg();
+                foreach ($idpKomp->pengerjaans as $pengerjaan) {
+                    // Pastikan hanya mengambil satu rating per pengerjaan
+                    $nilaiPengerjaan = $pengerjaan->nilaiPengerjaanIdp;
+                    if ($nilaiPengerjaan && $nilaiPengerjaan->rating !== null) {
+                        $allSoftRatings->push((int) $nilaiPengerjaan->rating);
+                    }
                 }
             }
         }
 
-        if (empty($softRatings)) {
-            return 0;
-        }
+        Log::info('Debug nilai akhir soft', [
+            'all_soft_ratings' => $allSoftRatings->toArray(),
+            'count' => $allSoftRatings->count(),
+            'avg' => $allSoftRatings->count() > 0 ? $allSoftRatings->avg() : 0
+        ]);
 
-        $nilaiAkhir = array_sum($softRatings) / count($softRatings);
-        return round($nilaiAkhir, 2);
+        if ($allSoftRatings->count() === 0) return 0;
+
+        return round($allSoftRatings->avg(), 2);
     }
 
     /**
-     * Hitung nilai akhir hard kompetensi
+     * FIX: Hitung nilai akhir hard kompetensi  
+     * Pastikan konsisten dengan pengumpulan data
      */
     private function hitungNilaiAkhirHard(Idp $idp)
     {
-        $hardRatings = [];
+        $allHardRatings = collect();
 
         foreach ($idp->idpKompetensis as $idpKomp) {
             $komp = $idpKomp->kompetensi;
 
             if ($komp->jenis_kompetensi === 'Hard Kompetensi') {
-                $allRatings = $idpKomp->pengerjaans->flatMap(function ($pengerjaan) {
-                    return $pengerjaan->nilaiPengerjaanIdp->pluck('rating')->map(fn($r) => (int)$r);
-                });
-
-                if ($allRatings->count() > 0) {
-                    $hardRatings[] = $allRatings->avg();
+                foreach ($idpKomp->pengerjaans as $pengerjaan) {
+                    // Pastikan hanya mengambil satu rating per pengerjaan
+                    $nilaiPengerjaan = $pengerjaan->nilaiPengerjaanIdp;
+                    if ($nilaiPengerjaan && $nilaiPengerjaan->rating !== null) {
+                        $allHardRatings->push((int) $nilaiPengerjaan->rating);
+                    }
                 }
             }
         }
 
-        if (empty($hardRatings)) {
-            return 0;
-        }
+        Log::info('Debug nilai akhir hard', [
+            'all_hard_ratings' => $allHardRatings->toArray(),
+            'count' => $allHardRatings->count(),
+            'avg' => $allHardRatings->count() > 0 ? $allHardRatings->avg() : 0
+        ]);
 
-        $nilaiAkhir = array_sum($hardRatings) / count($hardRatings);
-        return round($nilaiAkhir, 2);
+        if ($allHardRatings->count() === 0) return 0;
+
+        return round($allHardRatings->avg(), 2);
     }
 }

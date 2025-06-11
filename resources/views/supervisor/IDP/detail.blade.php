@@ -8,7 +8,7 @@
             <div class="section-header">
                 <h1>Detail IDP Karyawan</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('supervisor-dashboard') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('supervisor.spv-dashboard') }}">Dashboard</a></div>
                     <div class="breadcrumb-item"><a href="{{ route('supervisor.IDP.indexSupervisor') }}">Data IDP</a></div>
                     <div class="breadcrumb-item">Detail IDP</div>
                 </div>
@@ -90,41 +90,35 @@
                                 @foreach ($idps->idpKompetensis->where('kompetensi.jenis_kompetensi', 'Soft Kompetensi') as $kom)
                                     <div class="accordion border-bottom mb-2 pb-2">
                                         @php
-                                            $statuses = $kom->pengerjaans->pluck('status_pengerjaan');
+                                            $sudahDiratingSemua = $kom->pengerjaans->every(function ($peng) {
+                                                return $peng->nilaiPengerjaanIdp &&
+                                                    $peng->nilaiPengerjaanIdp->rating !== null;
+                                            });
+
+                                            $statusText = $sudahDiratingSemua
+                                                ? 'Sudah Dinilai Supervisor'
+                                                : 'Menunggu Rating Supervisor';
+                                            $statusColor = $sudahDiratingSemua ? '#3b82f6' : '#f59e0b';
                                         @endphp
 
                                         <button class="accordion-button text-start w-100 d-flex align-items-center"
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
-
                                             <span class="accordion-icon me-2">›</span>
-
                                             <span class="kompetensi-nama">
                                                 {{ $kom->kompetensi->nama_kompetensi }}
 
-                                                @if ($statuses->isNotEmpty())
-                                                    @php
-                                                        if ($statuses->every(fn($s) => $s === 'Disetujui Mentor')) {
-                                                            $statusText = 'Disetujui Mentor';
-                                                            $statusColor = '#3b82f6'; // biru
-                                                        } else {
-                                                            $statusText = 'Menunggu Persetujuan';
-                                                            $statusColor = '#22c55e'; // hijau
-                                                        }
-                                                    @endphp
-                                                    <span
-                                                        style="
-                                                            padding: 3px 8px; 
-                                                            border-radius: 12px; 
-                                                            color: white;
-                                                            font-weight: 600;
-                                                            background-color: {{ $statusColor }};
-                                                        ">
-                                                        {{ $statusText }}
-                                                    </span>
-                                                @endif
+                                                <span
+                                                    style="padding: 3px 8px;
+                                                        border-radius: 12px;
+                                                        color: white;
+                                                        font-weight: 600;
+                                                        background-color: {{ $statusColor }};">
+                                                    {{ $statusText }}
+                                                </span>
                                             </span>
                                         </button>
+
                                         <div class="accordion-content ps-4 mt-2" style="display: none;">
                                             <p><span>{{ $kom->kompetensi->keterangan }}</span></p>
                                             <p><strong>Metode Belajar:</strong>
@@ -262,41 +256,35 @@
                                 @foreach ($idps->idpKompetensis->where('kompetensi.jenis_kompetensi', 'Hard Kompetensi') as $kom)
                                     <div class="accordion border-bottom mb-2 pb-2">
                                         @php
-                                            $statuses = $kom->pengerjaans->pluck('status_pengerjaan');
+                                            $sudahDiratingSemua = $kom->pengerjaans->every(function ($peng) {
+                                                return $peng->nilaiPengerjaanIdp &&
+                                                    $peng->nilaiPengerjaanIdp->rating !== null;
+                                            });
+
+                                            $statusText = $sudahDiratingSemua
+                                                ? 'Sudah Dinilai Supervisor'
+                                                : 'Menunggu Rating Supervisor';
+                                            $statusColor = $sudahDiratingSemua ? '#3b82f6' : '#f59e0b';
                                         @endphp
 
                                         <button class="accordion-button text-start w-100 d-flex align-items-center"
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
-
                                             <span class="accordion-icon me-2">›</span>
-
                                             <span class="kompetensi-nama">
                                                 {{ $kom->kompetensi->nama_kompetensi }}
 
-                                                @if ($statuses->isNotEmpty())
-                                                    @php
-                                                        if ($statuses->every(fn($s) => $s === 'Disetujui Mentor')) {
-                                                            $statusText = 'Disetujui Mentor';
-                                                            $statusColor = '#3b82f6'; // biru
-                                                        } else {
-                                                            $statusText = 'Menunggu Persetujuan';
-                                                            $statusColor = '#22c55e'; // hijau
-                                                        }
-                                                    @endphp
-                                                    <span
-                                                        style="
-                                                            padding: 3px 8px; 
-                                                            border-radius: 12px; 
-                                                            color: white;
-                                                            font-weight: 600;
-                                                            background-color: {{ $statusColor }};
-                                                        ">
-                                                        {{ $statusText }}
-                                                    </span>
-                                                @endif
+                                                <span
+                                                    style="padding: 3px 8px;
+                                                        border-radius: 12px;
+                                                        color: white;
+                                                        font-weight: 600;
+                                                        background-color: {{ $statusColor }};">
+                                                    {{ $statusText }}
+                                                </span>
                                             </span>
                                         </button>
+
 
                                         <div class="accordion-content ps-4 mt-2" style="display: none;">
                                             <p><span>{{ $kom->kompetensi->keterangan }}</span></p>
