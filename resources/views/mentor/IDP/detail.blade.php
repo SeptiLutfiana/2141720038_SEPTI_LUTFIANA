@@ -8,7 +8,7 @@
             <div class="section-header">
                 <h1>Detail IDP Karyawan</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('mentor.dashboard-mentor') }}">Dashboard</a></div>
                     <div class="breadcrumb-item"><a href="{{ route('mentor.IDP.indexMentor') }}">Data IDP</a></div>
                     <div class="breadcrumb-item">Detail IDP</div>
                 </div>

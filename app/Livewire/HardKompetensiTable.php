@@ -16,7 +16,7 @@ class HardKompetensiTable extends Component
     public $jabatan;
     protected string $paginationTheme = 'bootstrap';
     protected $updatesQueryString = ['search'];
-    
+
     public function mount()
     {
         // Ambil search dari URL
@@ -26,10 +26,18 @@ class HardKompetensiTable extends Component
     public function render()
     {
         $kompetensi = Kompetensi::where('jenis_kompetensi', 'Hard Kompetensi')
-            ->when($this->search, function ($query) {
-                return $query->where('nama_kompetensi', 'like', "%{$this->search}%")
-                    ->orWhere('keterangan', 'like', "%{$this->search}%")
-                    ->orWhere('proyeksi_karir', 'like', "%{$this->search}%");
+            ->when($this->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('karyawan', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('supervisor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('learninggroup', function ($q2) use ($search) {
+                        $q2->where('nama_LG', 'like', "%$search%");
+                    })->orWhereHas('jenjang', function ($q2) use ($search) {
+                        $q2->where('nama_jenjang', 'like', "%$search%");
+                    })->orWhere('proyeksi_karir', 'like', "%$search%");
+                });
             })
             ->when($this->jenjang, function ($query) {
                 return $query->where('id_jenjang', $this->jenjang);

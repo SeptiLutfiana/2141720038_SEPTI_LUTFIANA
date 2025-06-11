@@ -4,6 +4,7 @@
             <tr class="text-center">
                 <th>No</th>
                 <th>Nama Karyawan</th>
+                <th>NPK Karyawan</th>
                 <th>Jenjang Karyawan</th>
                 <th>Learning Group</th>
                 <th>Proyeksi Karir</th>
@@ -18,12 +19,37 @@
                 @forelse($idps as $i => $item)
                     <tr class="text-center">
                         <td class="text-center" style="width: 30px;">{{ $i + 1 }}</td>
-                        <td>{{ $item->karyawan->name ?? '-' }}</td>
+                        <td>{{ $item->karyawan->name ?? 'Menunggu Applay IDP' }}</td>
+                        <td>{{ $item->karyawan->npk ?? 'Menunggu Applay IDP' }}</td>
                         <td>{{ $item->jenjang->nama_jenjang }}</td>
                         <td>{{ $item->learningGroup->nama_LG }}</td>
                         <td>{{ $item->proyeksi_karir }}</td>
-                        <td>{{ $item->mentor->name ?? '-' }}</td>
-                        <td>{{ $item->rekomendasis->first()->hasil_rekomendasi ?? 'menunggu penilaian' }}</td>
+                        <td>{{ $item->mentor->name ?? 'Menunggu Persetujuan Mentor' }}</td>
+                        @php
+                            $hasil = $item->rekomendasis->first()->hasil_rekomendasi ?? null;
+                            $bgColor = '#fef3c7'; // default: kuning muda (Menunggu Penilaian)
+                            $textColor = '#92400e'; // default: coklat gelap
+
+                            if ($hasil === 'Disarankan') {
+                                $bgColor = '#dbeafe'; // biru muda
+                                $textColor = '#1e3a8a'; // biru tua
+                            } elseif ($hasil === 'Disarankan dengan Pengembangan') {
+                                $bgColor = '#d1fae5'; // hijau muda
+                                $textColor = '#065f46'; // hijau tua
+                            } elseif ($hasil === 'Tidak Disarankan') {
+                                $bgColor = '#fee2e2'; // merah muda
+                                $textColor = '#991b1b'; // merah tua
+                            } elseif (!$hasil) {
+                                $hasil = 'Menunggu Penilaian';
+                            }
+                        @endphp
+
+                        <td class="text-center">
+                            <span
+                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 4px; border-radius: 9999px">
+                                {{ $hasil }}
+                            </span>
+                        </td>
                         <td>
                             @php
                                 $idpKompetensis = $item->idpKompetensis;
@@ -78,7 +104,7 @@
                 @endforelse
             @else
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-3">
+                    <td colspan="12" class="text-center text-muted py-3">
                         Data Tidak Ditemukan
                     </td>
                 </tr>

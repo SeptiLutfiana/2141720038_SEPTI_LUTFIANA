@@ -166,4 +166,24 @@ class PanduanController extends Controller
             'type_menu' => 'mentor',
         ]);
     }
+    public function autoShowPanduanSupervisor()
+    {
+        $user = Auth::user();
+
+        // Pastikan user punya role karyawan
+        $isKaryawan = $user->roles->contains('id_role', 2);
+
+        if (!$isKaryawan) {
+            abort(403, 'Anda tidak memiliki akses ke panduan ini.');
+        }
+
+        // Ambil panduan pertama yang ditujukan untuk role karyawan
+        $panduan = Panduan::whereHas('roles', function ($query) {
+            $query->where('nama_role', 'supervisor');
+        })->first();
+        return view('supervisor.Panduan.index', [
+            'panduan' => $panduan,
+            'type_menu' => 'supervisor',
+        ]);
+    }
 }

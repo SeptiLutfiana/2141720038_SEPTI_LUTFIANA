@@ -8,8 +8,8 @@
             <div class="section-header">
                 <h1>Detail IDP Karyawan</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('mentor.dashboard-mentor') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('mentor.IDP.RiwayatIDP.indexRiwayatIdp') }}">Data
+                    <div class="breadcrumb-item active"><a href="{{ route('supervisor.spv-dashboard') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('supervisor.IDP.RiwayatIDP.indexRiwayatIdp') }}">Data
                             IDP</a></div>
                     <div class="breadcrumb-item">Detail IDP</div>
                 </div>
@@ -61,6 +61,9 @@
                             </tr>
                             <tr>
                                 <td>Hasil Rekomendasi</td>
+                                {{-- <td colspan="4" style="font-weight: bold;">
+                                    {{ $idps->rekomendasis->first()->hasil_rekomendasi }} <br>
+                                    {{ $idps->rekomendasis->first()->deskripsi_rekomendasi }}</td> --}}
                                 <td colspan="4">
                                     <div style="font-weight: bold;">
                                         {{ $idps->rekomendasis->first()->hasil_rekomendasi }}
@@ -222,7 +225,8 @@
 
                     </div>
                     <div class="card-footer text-right">
-                        <a class="btn btn-primary" href="{{ route('mentor.IDP.RiwayatIDP.indexRiwayatIdp') }}">Kembali</a>
+                        <a class="btn btn-primary"
+                            href="{{ route('supervisor.IDP.RiwayatIDP.indexRiwayatIdp') }}">Kembali</a>
                     </div>
                 </div>
             </div>

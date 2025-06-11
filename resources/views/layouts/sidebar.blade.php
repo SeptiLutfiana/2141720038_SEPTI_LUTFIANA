@@ -160,11 +160,12 @@
                         <li class="{{ Request::is('supervisor/behavior/idp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('supervisor/behavior/idp') }}">List Perencanaan IDP</a>
                         </li>
-                        <li class="{{ Request::is('layout-top-navigation') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('layout-top-navigation') }}">Riwayat Perencanaan IDP</a>
+                        <li class="{{ Request::is('supervisor/behavior/idp/riwayat') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('supervisor/behavior/idp/riwayat') }}">Riwayat
+                                Perencanaan IDP</a>
                         </li>
-                        <li class="{{ Request::is('panduan-idp') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('panduan-idp') }}">Panduan</a>
+                        <li class="{{ Request::is('supervisor/panduan/idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('supervisor/panduan/idp') }}">Panduan</a>
                         </li>
                     </ul>
                 </li>
@@ -181,7 +182,8 @@
                             <a class="nav-link" href="{{ url('mentor/behavior/idp') }}">List Perencanaan IDP</a>
                         </li>
                         <li class="{{ Request::is('mentor/behavior/idp/riwayat') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('mentor/behavior/idp/riwayat') }}">Riwayat Perencanaan IDP</a>
+                            <a class="nav-link" href="{{ url('mentor/behavior/idp/riwayat') }}">Riwayat Perencanaan
+                                IDP</a>
                         </li>
                         <li class="{{ Request::is('mentor/panduan/idp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('mentor/panduan/idp') }}">Panduan</a>
@@ -219,7 +221,8 @@
                             <a class="nav-link" href="{{ url('karyawan/behavior/idp') }}">List Perencanaan IDP</a>
                         </li>
                         <li class="{{ Request::is('karyawan/behavior/idp/riwayat') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('karyawan/behavior/idp/riwayat') }}">Riwayat Perencanaan IDP</a>
+                            <a class="nav-link" href="{{ url('karyawan/behavior/idp/riwayat') }}">Riwayat Perencanaan
+                                IDP</a>
                         </li>
                         <li class="{{ Request::is('karyawan/panduan/idp/panduan/karyawan') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('karyawan/panduan/idp/panduan/karyawan') }}">Panduan</a>

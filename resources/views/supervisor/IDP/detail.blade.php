@@ -8,8 +8,8 @@
             <div class="section-header">
                 <h1>Detail IDP Karyawan</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('mentor.IDP.indexMentor') }}">Data IDP</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('supervisor-dashboard') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('supervisor.IDP.indexSupervisor') }}">Data IDP</a></div>
                     <div class="breadcrumb-item">Detail IDP</div>
                 </div>
             </div>
@@ -235,8 +235,10 @@
                                                                     {{ $peng->status_pengerjaan }}
                                                                 </span>
                                                             </td>
-                                                            <td class="text-center">{{ $peng->nilaiPengerjaanIdp->rating ?? '-' }}</td>
-                                                            <td class="text-center">{{ $peng->nilaiPengerjaanIdp->saran ?? '-' }}</td>
+                                                            <td class="text-center">
+                                                                {{ $peng->nilaiPengerjaanIdp->rating ?? '-' }}</td>
+                                                            <td class="text-center">
+                                                                {{ $peng->nilaiPengerjaanIdp->saran ?? '-' }}</td>
                                                             <td class="text-center">
                                                                 <button type="button" class="btn btn-primary btn-nilai"
                                                                     data-toggle="modal" data-target="#nilaiModal"
@@ -403,12 +405,18 @@
 
                                                             <td class="text-center">
                                                                 <span
-                                                                    style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 4px 10px; border-radius: 9999px;">
+                                                                    style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 8px; border-radius: 9999px;">
                                                                     {{ $peng->status_pengerjaan }}
                                                                 </span>
                                                             </td>
-                                                            <td>{{ $peng->nilaiPengerjaanIdp->rating ?? '-' }}</td>
-                                                            <td>{{ $peng->nilaiPengerjaanIdp->saran ?? '-' }}</td>
+                                                            <td class="text-center"
+                                                                id="rating-{{ $peng->id_idpKomPeng }}">
+                                                                {{ $peng->nilaiPengerjaanIdp->rating ?? 'belum dinilai' }}
+                                                            </td>
+                                                            <td class="text-center"
+                                                                id="saran-{{ $peng->id_idpKomPeng }}">
+                                                                {{ $peng->nilaiPengerjaanIdp->saran ?? 'telum ada saran' }}
+                                                            </td>
                                                             <td class="text-center">
                                                                 <button type="button" class="btn btn-primary btn-nilai"
                                                                     data-toggle="modal" data-target="#nilaiModal"
@@ -469,9 +477,12 @@
                                 </div>
                             @endforeach
                         </div>
+                        <div class="invalid-feedback d-block" id="error-rating"></div>
                         <div class="form-group">
                             <label for="saran">Saran</label>
-                            <textarea name="saran" id="saran" class="form-control" rows="3" style="height:6rem;"></textarea>
+                            <textarea name="saran" id="saran" class="form-control @error('saran') is-invalid @enderror" rows="3"
+                                style="height:6rem;">{{ old('saran') }}</textarea>
+                            <div class="invalid-feedback d-block" id="error-saran"></div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -508,38 +519,76 @@
 
             // Ketika modal dibuka lewat tombol "Nilai"
             document.querySelectorAll('.btn-nilai').forEach(button => {
-                document.querySelectorAll('.btn-nilai').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const id = this.getAttribute('data-id');
-                        const kompetensi = this.getAttribute('data-kompetensi');
-                        const rating = this.getAttribute('data-rating');
-                        const saran = this.getAttribute('data-saran');
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const kompetensi = this.getAttribute('data-kompetensi');
+                    const rating = this.getAttribute('data-rating');
+                    const saran = this.getAttribute('data-saran');
 
-                        document.getElementById('id_idpKomPeng_input').value = id;
+                    document.getElementById('id_idpKomPeng_input').value = id;
 
-                        // Set rating
-                        document.querySelectorAll('input[name="rating"]').forEach(radio => {
-                            radio.checked = (radio.value === rating);
-                        });
-
-                        // Set saran
-                        document.getElementById('saran').value = saran || '';
+                    // Set rating
+                    document.querySelectorAll('input[name="rating"]').forEach(radio => {
+                        radio.checked = (radio.value === rating);
                     });
-                });
 
+                    // Set saran
+                    document.getElementById('saran').value = saran || '';
+                });
             });
 
         });
     </script>
-    @if (session('msg-success'))
-        < script>
-            Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: '{{ session('msg-success') }}',
-            timer: 2500,
-            showConfirmButton: false
-            });
-            </script>
-    @endif
+    <script>
+        $(document).ready(function() {
+        $('#nilaiForm').submit(function(e) {
+            e.preventDefault();
+
+            // Hapus error sebelumnya
+            $('#error-rating').text('');
+            $('#error-saran').text('');
+
+            var formData = $(this).serialize();
+
+            $.ajax({
+                        url: $(this).attr('action'),
+                        method: 'POST',
+                        data: formData,
+                        success: function(response) {
+                            $('#nilaiModal').modal('hide'); // Tutup modal
+
+                            // Tampilkan alert sukses
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: response.message, // ← ini dari controller kamu
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        }).then(() => {
+                        // Setelah alert selesai → reload halaman
+                        location.reload();
+                    });
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        if (errors.rating) {
+                            $('#error-rating').text(errors.rating[0]);
+                        }
+                        if (errors.saran) {
+                            $('#error-saran').text(errors.saran[0]);
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: 'Terjadi kesalahan. Silakan coba lagi.',
+                        });
+                    }
+                }
+        });
+        });
+        });
+    </script>
 @endpush

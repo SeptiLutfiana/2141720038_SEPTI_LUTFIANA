@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Models\IDP;
 use Illuminate\Support\Facades\DB;
+
 class SupervisorIdpTable extends Component
 {
     use WithPagination;
@@ -57,12 +58,30 @@ class SupervisorIdpTable extends Component
                 $join->on('idps.id_idp', '=', 'selesai.id_idp');
             })
             ->where('id_supervisor', $supervisorId)
-            ->when(
-                $this->search,
-                fn($q) =>
-                $q->where('proyeksi_karir', 'like', "%{$this->search}%")
-                    ->orWhere('npk', 'like', "%{$this->search}%")
-            )
+            ->doesntHave('rekomendasis') // Tidak punya data rekomendasi sama sekali
+            ->when($this->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('karyawan', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('mentor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('supervisor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('learninggroup', function ($q2) use ($search) {
+                        $q2->where('nama_LG', 'like', "%$search%");
+                    })->orWhereHas('jenjang', function ($q2) use ($search) {
+                        $q2->where('nama_jenjang', 'like', "%$search%");
+                    })->orWhereHas('karyawan', function ($q2) use ($search) {
+                        $q2->where('npk', 'like', "%$search%");
+                    })->orWhereHas('mentor', function ($q2) use ($search) {
+                        $q2->where('npk', 'like', "%$search%");
+                    })->orWhereHas('supervisor', function ($q2) use ($search) {
+                        $q2->where('npk', 'like', "%$search%");
+                    })->orWhereHas('rekomendasis', function ($q2) use ($search) {
+                        $q2->where('hasil_rekomendasi', 'like', "%$search%");
+                    })->orWhere('proyeksi_karir', 'like', "%$search%");
+                });
+            })
             ->when($this->jenjang, fn($q) => $q->where('id_jenjang', $this->jenjang))
             ->when($this->lg, fn($q) => $q->where('id_LG', $this->lg))
             ->when($this->tahun, fn($q) => $q->whereYear('waktu_mulai', $this->tahun))

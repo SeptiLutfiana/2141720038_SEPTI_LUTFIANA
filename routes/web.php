@@ -270,39 +270,6 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::get('/{id}/edit', [PanduanController::class, 'edit'])->name('edit');
         Route::put('/{id}/update', [PanduanController::class, 'update'])->name('update');
     });
-    Route::get('/list-idp', function () {
-        return view('adminsdm.BehaviorIDP.ListIDP.list-idp', [
-            'type_menu' => 'listidp'
-        ]);
-    })->name('adminsdm-list-idp');
-
-    Route::get('/tambah-idp', function () {
-        return view('adminsdm.BehaviorIDP.TambahIDP.tambah', [
-            'type_menu' => 'tambah'
-        ]);
-    })->name('adminsdm-tambah-idp');
-
-    Route::get('/panduan-idp', function () {
-        return view('adminsdm.BehaviorIDP.Panduan.panduan', [
-            'type_menu' => 'panduan'
-        ]);
-    })->name('adminsdm-panduan-idp');
-
-    // SUPERVISOR
-    Route::get('/supervisor-dashboard', function () {
-        return view('supervisor.dashboard', [
-            'type_menu' => 'dashboard',
-            'user' => Auth::user()
-        ]);
-    })->name('supervisor-dashboard');
-
-    // MENTOR
-    Route::get('/mentor-dashboard', function () {
-        return view('mentor.dashboard-mentor', [
-            'type_menu' => 'dashboard',
-            'user' => Auth::user()
-        ]);
-    })->name('mentor-dashboard');
 });
 Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
     // SUPERVISOR
@@ -312,6 +279,12 @@ Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
         Route::get('/', [SupervisorDashboardController::class, 'indexSupervisor'])->name('indexSupervisor');
         Route::get('/detail/{id}', [SupervisorDashboardController::class, 'showSupervisor'])->name('showSupervisor');
         Route::post('/penilaian/store', [SupervisorDashboardController::class, 'store'])->name('store');
+        Route::get('/riwayat', [SupervisorDashboardController::class, 'indexRiwayatIdp'])->name('RiwayatIDP.indexRiwayatIdp');
+        Route::get('/{id}/riwayat', [SupervisorDashboardController::class, 'showRiwayatIDP'])->name('RiwayatIDP.showRiwayatIdp');
+        Route::get('/idp/cetak-filter', [SupervisorDashboardController::class, 'cetakFiltered'])->name('RiwayatIDP.cetakFiltered');
+    });
+    Route::prefix('supervisor/panduan/idp')->name('supervisor.Panduan.')->group(function () {
+        Route::get('/', [PanduanController::class, 'autoShowPanduanSupervisor'])->name('autoShowPanduanSupervisor');
     });
 });
 // MENTOR

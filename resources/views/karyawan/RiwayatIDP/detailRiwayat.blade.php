@@ -8,7 +8,8 @@
             <div class="section-header">
                 <h1>Detail IDP Karyawan</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('karyawan.dashboard-karyawan') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('karyawan.dashboard-karyawan') }}">Dashboard</a>
+                    </div>
                     <div class="breadcrumb-item"><a href="{{ route('karyawan.IDP.RiwayatIDP.indexRiwayatIdp') }}">Data
                             IDP</a></div>
                     <div class="breadcrumb-item">Detail IDP</div>
@@ -61,14 +62,22 @@
                             </tr>
                             <tr>
                                 <td>Hasil Rekomendasi</td>
-                                <td colspan="4">{{ $idps->rekomendasis->first()->hasil_rekomendasi }} <br>
-                                    {{ $idps->rekomendasis->first()->deskripsi_rekomendasi }}</td>
+                                <td colspan="4">
+                                    <div style="font-weight: bold;">
+                                        {{ $idps->rekomendasis->first()->hasil_rekomendasi }}
+                                    </div>
+                                    <div>
+                                        {{ $idps->rekomendasis->first()->deskripsi_rekomendasi }}
+                                    </div>
+                                </td>
                             </tr>
                             <tr class="text-center">
-                                <th colspan="4" style="background-color: #1d6c0e; color: #fff; font-weight: bold;">Development Area</th>
+                                <th colspan="4" style="background-color: #1d6c0e; color: #fff; font-weight: bold;">
+                                    Development Area</th>
                             </tr>
                             <tr>
-                                <th colspan="4" style="background-color: #a6c73a; color: #fff; font-weight: bold;">Soft Kompetensi</th>
+                                <th colspan="4" style="background-color: #a6c73a; color: #fff; font-weight: bold;">Soft
+                                    Kompetensi</th>
                             </tr>
                             @foreach ($idps->idpKompetensis->where('kompetensi.jenis_kompetensi', 'Soft Kompetensi') as $kom)
                                 <tr>
@@ -133,11 +142,14 @@
                                 </tr>
                             @endforeach
                             <tr>
-                                <th colspan="3" style="background-color: #688509; color: #fff; font-weight: bold;">Nilai Soft Kompetensi</th>
-                                <th class="text-center" style="background-color: #688509; color: #fff; font-weight: bold;">{{ $idps->rekomendasis->first()->nilai_akhir_soft }}</th>
+                                <th colspan="3" style="background-color: #688509; color: #fff; font-weight: bold;">Nilai
+                                    Soft Kompetensi</th>
+                                <th class="text-center" style="background-color: #688509; color: #fff; font-weight: bold;">
+                                    {{ $idps->rekomendasis->first()->nilai_akhir_soft }}</th>
                             </tr>
                             <tr>
-                                <th colspan="4" style="background-color: #a6c73a; color: #fff; font-weight: bold;">Hard Kompetensi</th>
+                                <th colspan="4" style="background-color: #a6c73a; color: #fff; font-weight: bold;">Hard
+                                    Kompetensi</th>
                             </tr>
                             @foreach ($idps->idpKompetensis->where('kompetensi.jenis_kompetensi', 'Hard Kompetensi') as $kom)
                                 <tr>
@@ -202,8 +214,10 @@
                                 </tr>
                             @endforeach
                             <tr>
-                                <th colspan="3" style="background-color: #688509; color: #fff; font-weight: bold;">Nilai Hard Kompetensi</th>
-                                <th class="text-center" style="background-color: #688509; color: #fff; font-weight: bold;">{{ $idps->rekomendasis->first()->nilai_akhir_hard }}</th>
+                                <th colspan="3" style="background-color: #688509; color: #fff; font-weight: bold;">Nilai
+                                    Hard Kompetensi</th>
+                                <th class="text-center" style="background-color: #688509; color: #fff; font-weight: bold;">
+                                    {{ $idps->rekomendasis->first()->nilai_akhir_hard }}</th>
                             </tr>
                         </table>
 

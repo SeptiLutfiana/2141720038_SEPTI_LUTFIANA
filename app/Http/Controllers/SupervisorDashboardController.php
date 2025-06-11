@@ -12,13 +12,139 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\NilaiPengerjaanIdp;
 use App\Services\IdpRekomendasiService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
+use App\Models\IdpRekomendasi;
 
 class SupervisorDashboardController extends Controller
 {
     public function index()
     {
+        $idpIds = IDP::where('id_supervisor', Auth::id())
+            ->where('is_template', false) // pastikan bukan bank IDP
+            ->pluck('id_idp');
+        $jumlahIDPGiven = IDP::where('is_template', false)
+            ->where('id_supervisor', Auth::id()) // hanya milik user yang sedang login
+            ->count();
+        $jumlahRekomendasiBelumMuncul = IDP::where('is_template', false) // hanya IDP biasa, bukan bank
+            ->where('id_supervisor', Auth::id()) // hanya milik karyawan yang login
+            ->where(function ($query) {
+                $query->doesntHave('rekomendasis') // tidak ada rekomendasi sama sekali
+                    ->orWhereHas('rekomendasis', function ($q) {
+                        $q->whereNull('hasil_rekomendasi') // ada rekomendasi tapi belum ada hasilnya
+                            ->orWhere('hasil_rekomendasi', '');
+                    });
+            })
+            ->count();
+        // Hitung berdasarkan hasil rekomendasi
+        $jumlahDisarankan = IdpRekomendasi::whereIn('id_idp', $idpIds)
+            ->where('hasil_rekomendasi', 'Disarankan')
+            ->count();
+
+        $jumlahDisarankanDenganPengembangan = IdpRekomendasi::whereIn('id_idp', $idpIds)
+            ->where('hasil_rekomendasi', 'Disarankan dengan Pengembangan')
+            ->count();
+
+        $jumlahTidakDisarankan = IdpRekomendasi::whereIn('id_idp', $idpIds)
+            ->where('hasil_rekomendasi', 'Tidak Disarankan')
+            ->count();
+        $karyawanId = Auth::id(); // ID user login (karyawan)
+
+        $jumlahMenungguPersetujuan = IDP::where('id_supervisor', $karyawanId)
+            ->where('status_approval_mentor', 'Menunggu Persetujuan')
+            ->where('is_template', false)
+            ->count();
+        $user = Auth::user();
+        $jumlahIDPRevisi = IDP::where('id_supervisor', $karyawanId)
+            ->where('status_pengajuan_idp', 'Revisi')
+            ->where('is_template', false)
+            ->count();
+        $jumlahIdpTidakDisetujui = IDP::where('id_supervisor', $karyawanId)
+            ->where('status_pengajuan_idp', 'Tidak Disetujui')
+            ->where('is_template', false)
+            ->count();
+        $jumlahIdpMenungguPersetujuan = IDP::where('id_supervisor', $karyawanId)
+            ->where('status_pengajuan_idp', 'Menunggu Persetujuan')
+            ->where('is_template', false)
+            ->count();
+        $user = Auth::user();
+        $rekomendasiData = IdpRekomendasi::with('idp.karyawan.roles')
+            ->get()
+            ->filter(function ($item) use ($user) {
+                return $item->idp
+                    && $item->idp->id_supervisor == $user->id // hanya idp milik user login
+                    && $item->idp->karyawan
+                    && $item->idp->karyawan->roles->contains('id_role', 4);
+            })
+            ->map(function ($item) {
+                return [
+                    'x' => $item->nilai_akhir_hard,
+                    'y' => $item->nilai_akhir_soft,
+                    'label' => ($item->idp->karyawan->name ?? 'Tidak Diketahui') . ' - ' . ($item->idp->proyeksi_karir ?? '-'),
+                ];
+            })
+            ->values();
+        $topKaryawan = IdpRekomendasi::with(['idp.karyawan'])
+            ->where('hasil_rekomendasi', 'Disarankan')
+            ->whereHas('idp', function ($query) use ($user) {
+                $query->where('id_supervisor', $user->id);
+            })
+            ->orderByDesc('nilai_akhir_soft')
+            ->orderByDesc('nilai_akhir_hard')
+            ->take(5)
+            ->get();
+        $jenjangData = IDP::select('id_jenjang', DB::raw('count(*) as total'))
+            ->where('id_supervisor', $user->id)
+            ->where('is_template', 0) // Tambahkan ini
+            ->groupBy('id_jenjang')
+            ->with('jenjang')
+            ->get();
+
+        // Buat array kosong jika tidak ada data
+        $jenjangLabels = [];
+        $jenjangTotals = [];
+
+        if ($jenjangData->isNotEmpty()) {
+            foreach ($jenjangData as $data) {
+                $jenjangLabels[] = $data->jenjang ? $data->jenjang->nama_jenjang : 'Tidak diketahui';
+                $jenjangTotals[] = (int) $data->total;
+            }
+        }
+        $LGData = IDP::select('id_LG', DB::raw('count(*) as total'))
+            ->where('id_supervisor', $user->id)
+            ->where('is_template', 0) // Tambahkan ini
+            ->groupBy('id_LG')
+            ->with('learningGroup')
+            ->get();
+
+        // Buat array kosong jika tidak ada data
+        $LGLabels = [];
+        $LGTotals = [];
+
+        if ($LGData->isNotEmpty()) {
+            foreach ($LGData as $data) {
+                $LGLabels[] = $data->learningGroup ? $data->learningGroup->nama_LG : 'Tidak diketahui';
+                $LGTotals[] = (int) $data->total;
+            }
+        }
         return view('supervisor.spv-dashboard', [
-            'type_menu' => 'supervisor',
+            'type_menu' => 'dashboard',
+            'jumlahIDPGiven' => $jumlahIDPGiven,
+            'jumlahRekomendasiBelumMuncul' => $jumlahRekomendasiBelumMuncul,
+            'jumlahDisarankan' => $jumlahDisarankan,
+            'jumlahDisarankanDenganPengembangan' => $jumlahDisarankanDenganPengembangan,
+            'jumlahTidakDisarankan' => $jumlahTidakDisarankan,
+            'jumlahMenungguPersetujuan' => $jumlahMenungguPersetujuan,
+            'dataPoints' => $rekomendasiData,
+            'topKaryawan' => $topKaryawan,
+            'jumlahIDPRevisi' => $jumlahIDPRevisi,
+            'jumlahIdpTidakDisetujui' => $jumlahIdpTidakDisetujui,
+            // 'jumlahIdpMenungguPersetujuan' =>$jumlahIdpMenungguPersetujuan,
+            'jenjangLabels' => $jenjangLabels,
+            'jenjangTotals' => $jenjangTotals,
+            'LGLabels' => $LGLabels,
+            'LGTotals' => $LGTotals,
         ]);
     }
     public function indexSupervisor(Request $request)
@@ -127,7 +253,7 @@ class SupervisorDashboardController extends Controller
             'type_menu' => 'karyawan',
         ]);
     }
-    protected $rekomendasiService;
+    private $rekomendasiService;
 
     public function __construct(IdpRekomendasiService $rekomendasiService)
     {
@@ -136,52 +262,303 @@ class SupervisorDashboardController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate(
-            [
-                'rating' => 'required|in:1,2,3,4,5',
-                'saran' => 'required|string',
-                'id_idpKomPeng' => 'required|exists:idp_kompetensi_pengerjaans,id_idpKomPeng',
-            ],
-            [
-                'rating.required' => 'Rating wajib diisi.',
-                'saran.required' => 'Saran wajib diisi.',
-            ]
-        );
+        try {
+            Log::info('=== MULAI PROSES STORE PENILAIAN ===', [
+                'request_data' => $request->all()
+            ]);
 
-        // Simpan atau update nilai pengerjaan (tanpa limit upload)
-        $nilai = NilaiPengerjaanIdp::create([
-            'id_idpKomPeng' => $validated['id_idpKomPeng'],
-            'rating' => $validated['rating'],
-            'saran' => $validated['saran'],
-        ]);
+            $validated = $request->validate(
+                [
+                    'rating' => 'required|in:1,2,3,4,5',
+                    'saran' => 'required|string',
+                    'id_idpKomPeng' => 'required|exists:idp_kompetensi_pengerjaans,id_idpKomPeng',
+                ],
+                [
+                    'rating.required' => 'Rating wajib diisi.',
+                    'saran.required' => 'Saran wajib diisi.',
+                ]
+            );
 
-        // Ambil data IDP terkait melalui relasi
-        $idpKomPeng = $nilai->idpKompetensiPengerjaan;
-        $idp = $idpKomPeng->idpKompetensi->idp;
+            Log::info('Validasi berhasil', $validated);
 
-        // Load relasi untuk hitung pengerjaan
-        $idp->load([
-            'idpKompetensis.kompetensi',
-            'idpKompetensis.pengerjaans.nilaiPengerjaanIdp',
-        ]);
-        // Hitung total pengerjaan dan yang sudah dinilai (minimal satu penilaian)
-        $totalPengerjaan = 0;
-        $jumlahDinilai = 0;
+            // Simpan atau update nilai pengerjaan (tanpa limit upload)
+            $nilai = NilaiPengerjaanIdp::create([
+                'id_idpKomPeng' => $validated['id_idpKomPeng'],
+                'rating' => $validated['rating'],
+                'saran' => $validated['saran'],
+            ]);
 
-        foreach ($idp->idpKompetensis as $kompetensi) {
-            foreach ($kompetensi->pengerjaans as $pengerjaan) {
-                $totalPengerjaan++;
-                if ($pengerjaan->nilaiPengerjaanIdp()->exists()) {
-                    $jumlahDinilai++;
+            Log::info('Nilai berhasil disimpan', [
+                'id_nilai' => $nilai->id ?? 'unknown',
+                'was_created' => $nilai->wasRecentlyCreated
+            ]);
+
+            // Ambil data IDP terkait melalui relasi
+            $idpKomPeng = $nilai->idpKompetensiPengerjaan;
+            $idp = $idpKomPeng->idpKompetensi->idp;
+
+            Log::info('Data IDP ditemukan', [
+                'id_idp' => $idp->id_idp,
+                'nama_idp' => $idp->nama_idp ?? 'unknown'
+            ]);
+
+            // Load relasi untuk hitung pengerjaan
+            $idp->load([
+                'idpKompetensis.kompetensi',
+                'idpKompetensis.pengerjaans.nilaiPengerjaanIdp',
+            ]);
+
+            Log::info('Relasi berhasil di-load');
+
+            // Hitung total pengerjaan dan yang sudah dinilai (minimal satu penilaian)
+            $totalPengerjaan = 0;
+            $jumlahDinilai = 0;
+            $detailKompetensi = [];
+
+            foreach ($idp->idpKompetensis as $kompetensi) {
+                $kompDetail = [
+                    'nama_kompetensi' => $kompetensi->kompetensi->nama_kompetensi ?? 'unknown',
+                    'jenis' => $kompetensi->kompetensi->jenis_kompetensi ?? 'unknown',
+                    'pengerjaans' => []
+                ];
+
+                foreach ($kompetensi->pengerjaans as $pengerjaan) {
+                    $totalPengerjaan++;
+                    $sudahDinilai = $pengerjaan->nilaiPengerjaanIdp()->exists();
+
+                    if ($sudahDinilai) {
+                        $jumlahDinilai++;
+                    }
+
+                    $kompDetail['pengerjaans'][] = [
+                        'id_pengerjaan' => $pengerjaan->id_idpKomPeng,
+                        'sudah_dinilai' => $sudahDinilai,
+                        'jumlah_penilaian' => $pengerjaan->nilaiPengerjaanIdp()->count()
+                    ];
                 }
+
+                $detailKompetensi[] = $kompDetail;
             }
+
+            Log::info('Perhitungan pengerjaan selesai', [
+                'id_idp' => $idp->id_idp,
+                'total_pengerjaan' => $totalPengerjaan,
+                'jumlah_dinilai' => $jumlahDinilai,
+                'kondisi_terpenuhi' => $totalPengerjaan > 0 && $jumlahDinilai === $totalPengerjaan,
+                'detail_kompetensi' => $detailKompetensi
+            ]);
+
+            // Jika semua pengerjaan sudah ada penilaian minimal satu, hitung rekomendasi
+            if ($totalPengerjaan > 0 && $jumlahDinilai === $totalPengerjaan) {
+                Log::info('🚀 KONDISI TERPENUHI - Menjalankan perhitungan rekomendasi', [
+                    'id_idp' => $idp->id_idp
+                ]);
+
+                $this->rekomendasiService->hitungRekomendasi($idp);
+
+                Log::info('✅ Perhitungan rekomendasi selesai', [
+                    'id_idp' => $idp->id_idp
+                ]);
+            } else {
+                Log::info('❌ KONDISI BELUM TERPENUHI - Tidak menjalankan perhitungan rekomendasi', [
+                    'id_idp' => $idp->id_idp,
+                    'total_pengerjaan' => $totalPengerjaan,
+                    'jumlah_dinilai' => $jumlahDinilai,
+                    'kekurangan' => $totalPengerjaan - $jumlahDinilai
+                ]);
+            }
+
+            Log::info('=== SELESAI PROSES STORE PENILAIAN ===');
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Penilaian berhasil disimpan.',
+                    'debug_info' => [
+                        'total_pengerjaan' => $totalPengerjaan,
+                        'jumlah_dinilai' => $jumlahDinilai,
+                        'rekomendasi_dihitung' => $totalPengerjaan > 0 && $jumlahDinilai === $totalPengerjaan
+                    ]
+                ]);
+            }
+
+            return redirect()->back()->with('msg-success', 'Penilaian berhasil disimpan.');
+        } catch (\Exception $e) {
+            Log::error('❌ ERROR dalam store penilaian', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Terjadi kesalahan saat menyimpan penilaian.',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat menyimpan penilaian.');
+        }
+    }
+    public function indexRiwayatIdp(Request $request)
+    {
+        $user = Auth::user(); // Ambil user yang sedang login
+        $search = $request->query('search');
+        $id_jenjang = $request->query('id_jenjang');
+        $id_LG = $request->query('lg');
+        $tahun = $request->query('tahun');
+        $listTahun = IDP::whereNotNull('waktu_mulai')
+            ->selectRaw('YEAR(waktu_mulai) as tahun')
+            ->distinct()
+            ->orderByDesc('tahun')
+            ->pluck('tahun');
+        $listJenjang = Jenjang::all();
+        $listLG = LearingGroup::all();
+        // $listSemester = Semester::all();
+        $idps = IDP::query(); // Mulai dengan query dasar
+        $idps->where('is_template', false)
+            ->where('id_mentor', $user->id) // Ambil IDP hanya milik user login
+            ->with(['karyawan', 'karyawan.jenjang', 'karyawan.learningGroup', 'rekomendasis'])
+            ->whereHas('rekomendasis', function ($q) {
+                $q->whereNotNull('hasil_rekomendasi')
+                    ->where('hasil_rekomendasi', '!=', '');
+            })
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('karyawan', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('mentor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })->orWhereHas('supervisor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    });
+                });
+            })
+            ->when($id_jenjang, function ($query, $id_jenjang) {
+                return $query->whereHas('karyawan', function ($q) use ($id_jenjang) {
+                    $q->where('id_jenjang', $id_jenjang);
+                });
+            })
+            ->when($id_LG, function ($query, $id_LG) {
+                return $query->whereHas('karyawan', function ($q) use ($id_LG) {
+                    $q->where('lg', $id_LG);
+                });
+            })
+            ->when($tahun, function ($query, $tahun) {
+                return $query->whereYear('waktu_mulai', $tahun);
+            })
+            ->orderByDesc('created_at')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('supervisor.RiwayatIDP.riwayat', [
+            'idps' => $idps,
+            'listJenjang' => $listJenjang,
+            'listLG' => $listLG,
+            'listTahun' => $listTahun,
+            'search' => $search,
+            'id_jenjang' => $id_jenjang,
+            'lg' => $id_LG,
+            'tahun' => $tahun,
+            'type_menu' => 'supervisor',
+        ]);
+    }
+    public function showRiwayatIdp($id)
+    {
+        // Mengambil data Divisi berdasarkan ID
+        $idps = IDP::with([
+            'karyawan',      // relasi banyak karyawan jika ada
+            'mentor',
+            'supervisor',
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.metodeBelajars' // relasi kompetensi beserta metode belajar
+        ])->findOrFail($id);
+        return view('supervisor.RiwayatIDP.detailRiwayat', [
+            'idps'    => $idps,
+            'type_menu' => 'supervisor',
+        ]);
+    }
+    public function cetakFiltered(Request $request)
+    {
+        $user = Auth::user(); // Ambil user yang sedang login
+        $query = Idp::with([
+            'karyawan',
+            'jenjang',
+            'jabatan',
+            'divisi',
+            'penempatan',
+            'learninggroup',
+            'semester',
+            'angkatanpsp',
+            'mentor',
+            'supervisor',
+            'rekomendasis',
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.metodeBelajars',
+            'idpKompetensis.pengerjaans.nilaiPengerjaanIdp'
+        ])
+            ->where('id_supervisor', $user->id); // Ambil IDP hanya milik user login
+
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('karyawan', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%$search%");
+                })
+                    ->orWhereHas('supervisor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })
+                    ->orWhereHas('rekomendasis', function ($q2) use ($search) {
+                        $q2->where('hasil_rekomendasi', 'like', "%$search%");
+                    })
+                    ->orWhereHas('learningGroup', function ($q2) use ($search) {
+                        $q2->where('nama_LG', 'like', "%$search%");
+                    })
+                    ->orWhere('proyeksi_karir', 'like', "%$search%");
+            });
+        }
+        // Filter: Jenjang
+        if ($request->filled('id_jenjang')) {
+            $query->whereHas('karyawan', function ($q) use ($request) {
+                $q->where('id_jenjang', $request->id_jenjang);
+            });
         }
 
-        // Jika semua pengerjaan sudah ada penilaian minimal satu, hitung reksomendasi
-        if ($totalPengerjaan > 0 && $jumlahDinilai === $totalPengerjaan) {
-            $this->rekomendasiService->hitungRekomendasi($idp);
+        // Filter: Learning Group
+        if ($request->filled('id_LG')) {
+            $query->whereHas('karyawan.learningGroup', function ($q) use ($request) {
+                $q->where('id_LG', $request->id_LG);
+            });
         }
 
-        return redirect()->back()->with('msg-success', 'Penilaian berhasil disimpan.');
+        // Filter: Tahun
+        if ($request->filled('tahun')) {
+            $query->whereYear('created_at', $request->tahun);
+        }
+
+        // Tambahkan filter wajib hasil_rekomendasi ada
+        $query->whereHas('rekomendasis', function ($q) {
+            $q->whereNotNull('hasil_rekomendasi')->where('hasil_rekomendasi', '!=', '');
+        });
+        // Ambil hasil query
+        $idps = $query->get();
+
+        // Jika hasil kosong, bisa diberi feedback (opsional)
+        if ($idps->isEmpty()) {
+            return redirect()->back()->with('error', 'Data IDP tidak ditemukan.');
+        }
+
+        // Waktu cetak
+        $waktuCetak = Carbon::now()->translatedFormat('d F Y H:i');
+
+        // Render PDF
+        $pdf = Pdf::loadView('supervisor.RiwayatIDP.riwayat_pdf', [
+            'idps' => $idps,
+            'type_menu' => 'supervisor',
+            'waktuCetak' => $waktuCetak,
+        ]);
+
+        return $pdf->stream('Data-IDP.pdf');
     }
 }
