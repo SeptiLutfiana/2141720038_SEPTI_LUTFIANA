@@ -2,9 +2,8 @@
 
 @section('title', 'Halaman Data Supervisor')
 @push('style')
-    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/select.bootstrap4.min.css') }}">
-    @livewireStyles()
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap4.min.css">
 @endpush
 
 @section('main')
@@ -15,7 +14,8 @@
 
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.supervisor.index') }}">Supervisor</a></div>
+                    <div class="breadcrumb-item"><a
+                            href="{{ route('adminsdm.data-master.supervisor.index') }}">Supervisor</a></div>
                 </div>
             </div>
             <div class="section-body">
@@ -62,21 +62,23 @@
                                             </a>
                                         </div>
                                     </div>
-                                    <a href="{{ route('adminsdm.data-master.supervisor.create') }}" class="btn btn-icon btn-primary icon-left"><i
-                                            class="fas fa-plus"></i>
+                                    <a href="{{ route('adminsdm.data-master.supervisor.create') }}"
+                                        class="btn btn-icon btn-primary icon-left"><i class="fas fa-plus"></i>
                                         Tambah</a>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('adminsdm.data-master.supervisor.index') }}" class="mb-3">
+                                <form method="GET" action="{{ route('adminsdm.data-master.supervisor.index') }}"
+                                    class="mb-3">
                                     <div class="form-row">
                                         <div class="col-md-4">
                                             <label>Cari Supervisor</label>
-                                            <input type="text" name="search" class="form-control" placeholder="Cari nama supervisor.." 
-                                                   value="{{ request('search') }}" oninput="this.form.submit()">
+                                            <input type="text" name="search" class="form-control"
+                                                placeholder="Cari nama supervisor.." value="{{ request('search') }}"
+                                                oninput="this.form.submit()">
                                         </div>
                                     </div>
-                                </form>                             
+                                </form>
                                 @livewire('supervisor-role-table', [
                                     'search' => request('search'),
                                 ])
@@ -89,7 +91,6 @@
     </div>
 @endsection
 @push('scripts')
-    @livewireScripts()
     <script>
         Livewire.on('supervisorroleDeleted', message => {
             Swal.fire({

@@ -2,16 +2,14 @@
 
 @section('title', 'Halaman Panduan IDP')
 @push('style')
-    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/select.bootstrap4.min.css') }}">
-    @livewireStyles()
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap4.min.css">
 @endpush
-
 @section('main')
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1> Data Penempatan</h1>
+                <h1> Data Panduan</h1>
 
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
@@ -43,8 +41,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('adminsdm.Panduan.index') }}"
-                                    class="mb-3">
+                                <form method="GET" action="{{ route('adminsdm.Panduan.index') }}" class="mb-3">
                                     <div class="input-group w-25">
                                         <input type="text" name="search" class="form-control"
                                             placeholder="Cari Judul Panduan..." value="{{ request('search') }}">
@@ -60,7 +57,6 @@
     </div>
 @endsection
 @push('scripts')
-    @livewireScripts()
     <script>
         Livewire.on('penempatanDeleted', message => {
             Swal.fire({

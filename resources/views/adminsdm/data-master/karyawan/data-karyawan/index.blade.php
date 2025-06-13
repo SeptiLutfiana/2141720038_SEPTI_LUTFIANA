@@ -2,9 +2,8 @@
 
 @section('title', 'Halaman Data Karyawan')
 @push('style')
-    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/select.bootstrap4.min.css') }}">
-    @livewireStyles()
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap4.min.css">
 @endpush
 
 @section('main')
@@ -15,7 +14,8 @@
 
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.karyawan.data-karyawan.index') }}">Data Karyawan</a></div>
+                    <div class="breadcrumb-item"><a
+                            href="{{ route('adminsdm.data-master.karyawan.data-karyawan.index') }}">Data Karyawan</a></div>
                 </div>
             </div>
             <div class="section-body">
@@ -57,30 +57,34 @@
                                                 <i class="fas fa-file-csv text-warning"></i> CSV
                                             </a>
                                             <a class="dropdown-item"
-                                                href="{{route('adminsdm.data-master.karyawan.data-karyawan.exportDocx') }}">
+                                                href="{{ route('adminsdm.data-master.karyawan.data-karyawan.exportDocx') }}">
                                                 <i class="fas fa-file-word text-primary"></i> Word (DOCX)
                                             </a>
                                         </div>
                                     </div>
-                                    <a href="{{ route('adminsdm.data-master.karyawan.data-karyawan.create') }}" class="btn btn-icon btn-primary icon-left"><i
-                                            class="fas fa-plus"></i>
+                                    <a href="{{ route('adminsdm.data-master.karyawan.data-karyawan.create') }}"
+                                        class="btn btn-icon btn-primary icon-left"><i class="fas fa-plus"></i>
                                         Tambah</a>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('adminsdm.data-master.karyawan.data-karyawan.index') }}" class="mb-3">
+                                <form method="GET"
+                                    action="{{ route('adminsdm.data-master.karyawan.data-karyawan.index') }}"
+                                    class="mb-3">
                                     <div class="form-row">
                                         <div class="col-md-3">
                                             <label>Cari Karyawan</label>
-                                            <input type="text" name="search" class="form-control" placeholder="Cari nama karyawan..." 
-                                                   value="{{ request('search') }}" oninput="this.form.submit()">
+                                            <input type="text" name="search" class="form-control"
+                                                placeholder="Cari nama karyawan..." value="{{ request('search') }}"
+                                                oninput="this.form.submit()">
                                         </div>
                                         <div class="col-md-3">
                                             <label>Pilih Jenjang</label>
                                             <select name="id_jenjang" class="form-control" onchange="this.form.submit()">
                                                 <option value="">-- Semua Jenjang --</option>
                                                 @foreach ($listJenjang as $j)
-                                                    <option value="{{ $j->id_jenjang }}" {{ request('id_jenjang') == $j->id_jenjang ? 'selected' : '' }}>
+                                                    <option value="{{ $j->id_jenjang }}"
+                                                        {{ request('id_jenjang') == $j->id_jenjang ? 'selected' : '' }}>
                                                         {{ $j->nama_jenjang }}
                                                     </option>
                                                 @endforeach
@@ -91,7 +95,8 @@
                                             <select name="lg" class="form-control" onchange="this.form.submit()">
                                                 <option value="">-- Pilih Learning Group --</option>
                                                 @foreach ($listLG as $lg)
-                                                    <option value="{{ $lg->id_LG }}" {{ request('lg') == $lg->id_LG ? 'selected' : '' }}>
+                                                    <option value="{{ $lg->id_LG }}"
+                                                        {{ request('lg') == $lg->id_LG ? 'selected' : '' }}>
                                                         {{ $lg->nama_LG }}
                                                     </option>
                                                 @endforeach
@@ -102,7 +107,8 @@
                                             <select name="role" class="form-control" onchange="this.form.submit()">
                                                 <option value="">-- Pilih Role User --</option>
                                                 @foreach ($listRole as $roleUser)
-                                                    <option value="{{ $roleUser->id_role }}" {{ request('role') == $roleUser->id_role ? 'selected' : '' }}>
+                                                    <option value="{{ $roleUser->id_role }}"
+                                                        {{ request('role') == $roleUser->id_role ? 'selected' : '' }}>
                                                         {{ $roleUser->nama_role }}
                                                     </option>
                                                 @endforeach
@@ -121,16 +127,16 @@
                                         </div> --}}
                                     </div>
                                 </form>
-                                <div class="table-responsive">                                                                              
-                                @livewire('karyawan-table', [
-                                    'search' => request('search'),
-                                    'jenjang' => request('id_jenjang'),
-                                    'lg' => request('lg'),
-                                    'role' => request('role'),
-                                    // 'semester' => request('semester'),
-                                ])
+                                <div class="table-responsive">
+                                    @livewire('karyawan-table', [
+                                        'search' => request('search'),
+                                        'jenjang' => request('id_jenjang'),
+                                        'lg' => request('lg'),
+                                        'role' => request('role'),
+                                        // 'semester' => request('semester'),
+                                    ])
                                 </div>
-                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -139,7 +145,6 @@
     </div>
 @endsection
 @push('scripts')
-    @livewireScripts()
     <script>
         Livewire.on('karyawanDeleted', message => {
             Swal.fire({

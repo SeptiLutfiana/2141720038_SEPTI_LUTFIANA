@@ -2,9 +2,8 @@
 
 @section('title', 'Halaman Data Semester')
 @push('style')
-    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/select.bootstrap4.min.css') }}">
-    @livewireStyles()
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap4.min.css">
 @endpush
 
 @section('main')
@@ -15,7 +14,8 @@
 
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.data-idp.semester.index') }}">Semester</a></div>
+                    <div class="breadcrumb-item"><a
+                            href="{{ route('adminsdm.data-master.data-idp.semester.index') }}">Semester</a></div>
                 </div>
             </div>
             <div class="section-body">
@@ -62,17 +62,20 @@
                                             </a>
                                         </div>
                                     </div>
-                                    <a href="{{ route('adminsdm.data-master.data-idp.semester.create') }}" class="btn btn-icon btn-primary icon-left"><i
-                                            class="fas fa-plus"></i>
+                                    <a href="{{ route('adminsdm.data-master.data-idp.semester.create') }}"
+                                        class="btn btn-icon btn-primary icon-left"><i class="fas fa-plus"></i>
                                         Tambah</a>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('adminsdm.data-master.data-idp.semester.index') }}" class="mb-3">
+                                <form method="GET" action="{{ route('adminsdm.data-master.data-idp.semester.index') }}"
+                                    class="mb-3">
                                     <div class="input-group w-25">
-                                        <input type="text" name="search" class="form-control" placeholder="Cari semester..." value="{{ request('search') }}" onkeydown="if (event.key === 'Enter') this.form.submit()">
+                                        <input type="text" name="search" class="form-control"
+                                            placeholder="Cari semester..." value="{{ request('search') }}"
+                                            onkeydown="if (event.key === 'Enter') this.form.submit()">
                                     </div>
-                                </form>                                
+                                </form>
                                 @livewire('semester-table', ['search' => request('search')])
                             </div>
                         </div>
@@ -83,7 +86,6 @@
     </div>
 @endsection
 @push('scripts')
-    @livewireScripts()
     <script>
         Livewire.on('semesterDeleted', message => {
             Swal.fire({

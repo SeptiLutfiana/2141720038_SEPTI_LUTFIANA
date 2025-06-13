@@ -2,9 +2,8 @@
 
 @section('title', 'Halaman Data Hard Kompetensi')
 @push('style')
-    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/select.bootstrap4.min.css') }}">
-    @livewireStyles()
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap4.min.css">
 @endpush
 
 @section('main')
@@ -110,7 +109,7 @@
                                     'search' => request('search'),
                                     'jenis' => request('jenis_kompetensi'),
                                     'jenjang' => request('id_jenjang'),
-                                    'jabatan' => request('id_jabatan')
+                                    'jabatan' => request('id_jabatan'),
                                 ])
                             </div>
                         </div>
@@ -121,7 +120,6 @@
     </div>
 @endsection
 @push('scripts')
-    @livewireScripts()
     <script>
         Livewire.on('kompetensiDeleted', message => {
             Swal.fire({

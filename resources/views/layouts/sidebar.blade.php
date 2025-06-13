@@ -139,12 +139,18 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item dropdown {{ $type_menu === 'modules' ? 'active' : '' }}">
+                <li class="nav-item dropdown {{ $type_menu === 'evaluasi' ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown"><i class="fas fa-clipboard-check"></i> <span>Data
                             Evaluasi</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('modules-calendar') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('modules-calendar') }}">Bank Evaluasi</a>
+                        <li class="{{ Request::is('admin/datamaster/bank/evaluasi') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/bank/evaluasi') }}">Bank Evaluasi</a>
+                        </li>
+                    </ul>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('admin/datamaster/bank/evaluasi/pasca/idp') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('admin/datamaster/bank/evaluasi/pasca/idp') }}">Evaluasi
+                                Pasca IDP</a>
                         </li>
                     </ul>
                 </li>
@@ -198,8 +204,8 @@
                         <li class="{{ Request::is('evaluasi-onboarding') ? 'active' : '' }}">
                             <a href="{{ url('evaluasi-onboarding') }}">Evaluasi On Boarding</a>
                         </li>
-                        <li class="{{ Request::is('evaluasi-pasca-idp') ? 'active' : '' }}">
-                            <a href="{{ url('evaluasi-pasca-idp') }}">Evaluasi Pasca IDP</a>
+                        <li class="{{ Request::is('mentor/bank/evaluasi/idp') ? 'active' : '' }}">
+                            <a href="{{ url('mentor/bank/evaluasi/idp') }}">Evaluasi Pasca IDP</a>
                         </li>
                     </ul>
                 </li>
@@ -234,11 +240,12 @@
                     <a href="#" class="nav-link has-dropdown"><i class="fas fa-poll"></i>
                         <span>Evaluasi</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('evaluasi-onboarding') ? 'active' : '' }}">
-                            <a href="{{ url('evaluasi-onboarding') }}">Evaluasi On Boarding</a>
+                        <li
+                            class="{{ Request::is('admin/datamaster/bank/evaluasi/pasca/idp/create') ? 'active' : '' }}">
+                            <a href="{{ url('karyawan/bank/evaluasi/idp/create') }}">Evaluasi On Boarding</a>
                         </li>
-                        <li class="{{ Request::is('evaluasi-pasca-idp') ? 'active' : '' }}">
-                            <a href="{{ url('evaluasi-pasca-idp') }}">Evaluasi Pasca IDP</a>
+                        <li class="{{ Request::is('karyawan/bank/evaluasi/idp') ? 'active' : '' }}">
+                            <a href="{{ url('karyawan/bank/evaluasi/idp') }}">Evaluasi Pasca IDP</a>
                         </li>
                     </ul>
                 </li>

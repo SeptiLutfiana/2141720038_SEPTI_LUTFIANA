@@ -107,4 +107,8 @@ class User extends Authenticatable implements MustVerifyEmail
       $query->where('nama_role', $roleName);
     })->exists();
   }
+  public function idp()
+  {
+    return $this->hasMany(IDP::class, 'id_user', 'id');
+  }
 }

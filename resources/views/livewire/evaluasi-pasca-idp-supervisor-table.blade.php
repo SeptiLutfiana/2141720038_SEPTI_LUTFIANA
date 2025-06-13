@@ -1,0 +1,39 @@
+<div>
+    <div class="form-group mb-2" style="max-width: 350px;"> <input wire:model.debounce.300ms="search" type="text"
+            class="form-control" placeholder="Cari nama pengguna...">
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama Pengisi</th>
+                <th>Tanggal Evaluasi</th>
+                <th>Jenis Evaluasi</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($evaluasiPasca as $item)
+                <tr>
+                    <td>{{ $loop->iteration + ($evaluasiPasca->currentPage() - 1) * $evaluasiPasca->perPage() }}</td>
+                    <td>{{ $item->user->name ?? '-' }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->tanggal_evaluasi)->format('d M Y') }}</td>
+                    <td>{{ ucfirst($item->jenis_evaluasi) }}</td>
+                    <td>
+                        <button wire:click="deleteId({{ $item->id_evaluasi_idp }})" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Yakin ingin menghapus data ini?')">
+                            Hapus
+                        </button>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="5" class="text-center text-muted">Belum ada data evaluasi pasca IDP.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    {{ $evaluasiPasca->links() }}
+</div>

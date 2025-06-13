@@ -9,7 +9,9 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AngkatanPspController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\BankEvaluasiController;
 use App\Http\Controllers\DivisiController;
+use App\Http\Controllers\EvaluasiPascaIdpController;
 use App\Http\Controllers\IdpController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\JenjangController;
@@ -270,6 +272,23 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::get('/{id}/edit', [PanduanController::class, 'edit'])->name('edit');
         Route::put('/{id}/update', [PanduanController::class, 'update'])->name('update');
     });
+    Route::prefix('admin/datamaster/bank/evaluasi')->name('adminsdm.BankEvaluasi.')->group(function () {
+        Route::get('/', [BankEvaluasiController::class, 'index'])->name('index');
+        Route::get('/create', [BankEvaluasiController::class, 'create'])->name('create');
+        Route::post('/store', [BankEvaluasiController::class, 'store'])->name('store');
+        Route::get('/{id}/detail', [BankEvaluasiController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [BankEvaluasiController::class, 'edit'])->name('edit');
+        Route::put('/{id}/update', [BankEvaluasiController::class, 'update'])->name('update');
+        Route::delete('/{bankEvaluasi}', [BankEvaluasiController::class, 'destroy'])->name('destroy');
+        Route::get('/pasca/idp', [EvaluasiPascaIdpController::class, 'index'])->name('EvaluasiPascaIdp.index');
+        Route::get('/cetak/pdf', [BankEvaluasiController::class, 'printPdf'])->name('printPdf');
+        Route::get('/export/excel', [BankEvaluasiController::class, 'exportExcel'])->name('exportExcel');
+        Route::get('/export/csv', [BankEvaluasiController::class, 'exportCSV'])->name('exportCSV');
+        Route::get('/export/docx', [BankEvaluasiController::class, 'exportDocx'])->name('exportDocx');
+        Route::get('/idp/create', [EvaluasiPascaIdpController::class, 'create'])->name('EvaluasiPascaIdp.create');
+        Route::post('/idp/store', [EvaluasiPascaIdpController::class, 'store'])->name('EvaluasiPascaIdp.store');
+        Route::get('/{id}/detail/jawaban', [EvaluasiPascaIdpController::class, 'showKaryawan'])->name('EvaluasiPascaIdp.showKaryawan');
+    });
 });
 Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
     // SUPERVISOR
@@ -306,6 +325,11 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
     Route::prefix('mentor/panduan/idp')->name('karyawan.Panduan.')->group(function () {
         Route::get('/', [PanduanController::class, 'autoShowPanduanMentor'])->name('autoShowPanduanMentor');
     });
+     Route::prefix('mentor/bank/evaluasi')->name('mentor.EvaluasiIdp.')->group(function () {
+        Route::get('/idp', [EvaluasiPascaIdpController::class, 'indexMentor'])->name('EvaluasiPascaIdp.indexMentor');
+        Route::get('/idp/create', [EvaluasiPascaIdpController::class, 'createMentor'])->name('EvaluasiPascaIdp.createMentor');
+        Route::post('/idp/store', [EvaluasiPascaIdpController::class, 'storeMentor'])->name('EvaluasiPascaIdp.storeMentor');
+    });
 });
 // KARYAWAN
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
@@ -332,6 +356,11 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
     // PANDUAN IDP KARYWAN
     Route::prefix('karyawan/panduan/idp')->name('karyawan.Panduan.')->group(function () {
         Route::get('/panduan/karyawan', [PanduanController::class, 'autoShowPanduanKaryawan'])->name('autoShowPanduanKaryawan');
+    });
+    Route::prefix('karyawan/bank/evaluasi')->name('karyawan.EvaluasiIdp.')->group(function () {
+        Route::get('/idp', [EvaluasiPascaIdpController::class, 'indexKaryawan'])->name('EvaluasiPascaIdp.indexKaryawan');
+        Route::get('/idp/create', [EvaluasiPascaIdpController::class, 'create'])->name('EvaluasiPascaIdp.create');
+        Route::post('/idp/store', [EvaluasiPascaIdpController::class, 'store'])->name('EvaluasiPascaIdp.store');
     });
 });
 // PROFILE

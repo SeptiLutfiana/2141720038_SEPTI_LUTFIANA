@@ -99,4 +99,12 @@ class IDP extends Model
     {
         return $this->belongsTo(IDP::class, 'id_idp_template_asal');
     }
+    public function evaluasiIdp()
+    {
+        return $this->hasMany(\App\Models\EvaluasiIdp::class, 'id_idp', 'id_idp');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
+    }
 }

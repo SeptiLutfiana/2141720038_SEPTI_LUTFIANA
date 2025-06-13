@@ -2,9 +2,8 @@
 
 @section('title', 'Halaman Bank IDP')
 @push('style')
-    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('library/datatables/media/css/select.bootstrap4.min.css') }}">
-    @livewireStyles()
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap4.min.css">
 @endpush
 
 @section('main')
@@ -38,7 +37,8 @@
                             <div class="card-header">
                                 <h4>Data Individual Development Plan</h4>
                                 <div class="card-header-action">
-                                    <a href="{{ route('adminsdm.BehaviorIDP.ListIDP.cetakPdf') }}" class="btn btn-icon btn-danger icon-left" target="_blank"
+                                    <a href="{{ route('adminsdm.BehaviorIDP.ListIDP.cetakPdf') }}"
+                                        class="btn btn-icon btn-danger icon-left" target="_blank"
                                         rel="noopener noreferrer"><i class="fas fa-print"></i>
                                         Print PDF</a>
                                     <a href="{{ route('adminsdm.BehaviorIDP.create') }}"
@@ -111,7 +111,6 @@
     </div>
 @endsection
 @push('scripts')
-    @livewireScripts()
     <script>
         Livewire.on('idpDeleted', message => {
             Swal.fire({
