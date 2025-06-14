@@ -1,39 +1,40 @@
 <div>
-    <div class="form-group mb-2" style="max-width: 350px;"> <input wire:model.debounce.300ms="search" type="text"
-            class="form-control" placeholder="Cari nama pengguna...">
-    </div>
 
-    <table class="table table-striped">
+    <table class="table">
         <thead>
-            <tr>
+            <tr class="text-center">
                 <th>No</th>
-                <th>Nama Pengisi</th>
-                <th>Tanggal Evaluasi</th>
-                <th>Jenis Evaluasi</th>
+                <th>Nama Karyawan</th>
+                <th>Judul IDP</th>
+                <th>Status</th>
                 <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($evaluasiPasca as $item)
-                <tr>
-                    <td>{{ $loop->iteration + ($evaluasiPasca->currentPage() - 1) * $evaluasiPasca->perPage() }}</td>
-                    <td>{{ $item->user->name ?? '-' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($item->tanggal_evaluasi)->format('d M Y') }}</td>
-                    <td>{{ ucfirst($item->jenis_evaluasi) }}</td>
+            @foreach ($idps as $index => $idp)
+                <tr class="text-center">
+                    <td>{{ $idps->firstItem() + $index }}</td>
+                    <td>{{ $idp->user->name }}</td>
+                    <td>{{ $idp->proyeksi_karir }}</td>
                     <td>
-                        <button wire:click="deleteId({{ $item->id_evaluasi_idp }})" class="btn btn-danger btn-sm"
-                            onclick="return confirm('Yakin ingin menghapus data ini?')">
-                            Hapus
-                        </button>
+                        <span class="badge badge-warning">Belum Dievaluasi</span>
                     </td>
+                    <td>
+                        <a href="{{ route('supervisor.EvaluasiIdp.createSpv', [
+                            'id_idp' => $idp->id_idp,
+                            'id_user' => Auth::id(),
+                            'jenis' => 'pasca',
+                        ]) }}"
+                            class="btn btn-primary btn-sm">
+                            <i class="fas fa-pen mr-1"></i> Kerjakan
+                        </a>
+                    </td>
+
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="5" class="text-center text-muted">Belum ada data evaluasi pasca IDP.</td>
-                </tr>
-            @endforelse
+            @endforeach
         </tbody>
     </table>
 
-    {{ $evaluasiPasca->links() }}
+    {{ $idps->links() }}
+
 </div>

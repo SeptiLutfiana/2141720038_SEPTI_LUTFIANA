@@ -218,7 +218,7 @@
                 <div class="card-header">
                     <h4>Grafik Nilai Karyawan (Hard vs Soft)</h4>
                 </div>
-                <div style="position: relative; height: 600px;">
+                <div style="position: relative; height: 500px;">
                     <canvas id="chartKaryawan"></canvas>
                 </div>
             </div>

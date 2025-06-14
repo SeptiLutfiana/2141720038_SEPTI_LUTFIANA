@@ -305,6 +305,11 @@ Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
     Route::prefix('supervisor/panduan/idp')->name('supervisor.Panduan.')->group(function () {
         Route::get('/', [PanduanController::class, 'autoShowPanduanSupervisor'])->name('autoShowPanduanSupervisor');
     });
+    Route::prefix('supervisor/evaluasi')->name('supervisor.EvaluasiIdp.')->group(function () {
+        Route::get('/idp', [EvaluasiPascaIdpController::class, 'indexSpv'])->name('indexSpv');
+        Route::get('/idp/create', [EvaluasiPascaIdpController::class, 'createSpv'])->name('createSpv');
+        Route::post('/idp/store', [EvaluasiPascaIdpController::class, 'storeSpv'])->name('storeSpv');
+    });
 });
 // MENTOR
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {

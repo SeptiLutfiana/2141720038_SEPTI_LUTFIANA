@@ -5,41 +5,39 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\EvaluasiIdp;
+use Illuminate\Support\Facades\Auth;
+use App\Models\IDP;
 class EvaluasiPascaIdpSupervisorTable extends Component
 {
 
-    use WithPagination;
+     use WithPagination;
 
-    public $search = '';
-    protected string $paginationTheme = 'bootstrap';
-
-    public function updatingSearch()
-    {
-        $this->resetPage();
-    }
-
-    public function deleteId($id)
-    {
-        if ($evaluasi = EvaluasiIdp::find($id)) {
-            $evaluasi->delete();
-            session()->flash('msg-success', 'Evaluasi berhasil dihapus');
-        } else {
-            session()->flash('msg-error', 'Evaluasi tidak ditemukan');
-        }
-    }
+    public $jenisEvaluasi = 'pasca';
 
     public function render()
     {
-        $query = EvaluasiIdp::with('user')
-            ->where('jenis_evaluasi', 'pasca');
+        $supervisor = Auth::user(); // user login = mentor
 
-        if ($this->search) {
-            $query->whereHas('user', function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%');
-            });
-        }
+        $idps = IDP::whereHas('rekomendasis', function ($q) {
+            $q->whereIn('hasil_rekomendasi', ['Disarankan', 'Disarankan dengan Pengembangan']);
+        })
+            // Karyawan yang dimentori oleh user ini (mentor)
+            ->whereHas('user', function ($q) use ($supervisor) {
+                $q->where('id_supervisor', $supervisor->id); // pastikan ada kolom id_mentor di tabel users
+            })
+            // Belum dievaluasi oleh mentor
+            ->whereDoesntHave('evaluasiIdp', function ($q) use ($supervisor) {
+                $q->where('jenis_evaluasi', 'pasca')
+                    ->where('id_user', $supervisor->id)
+                    ->whereHas('jawaban.bankEvaluasi', function ($sub) {
+                        $sub->where('untuk_role', 'supervisor');
+                    });
+            })
+            ->with('user') // agar bisa tampil nama karyawannya
+            ->paginate(10);
 
-        $evaluasiPasca = $query->latest()->paginate(5);
-        return view('livewire.evaluasi-pasca-idp-supervisor-table');
+        return view('livewire.evaluasi-pasca-idp-supervisor-table', [
+            'idps' => $idps
+        ]);
     }
 }

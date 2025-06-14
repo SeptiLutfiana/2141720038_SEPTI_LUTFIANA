@@ -1,7 +1,7 @@
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand text-center py-3">
-             @php
+            @php
                 $dashboardRoute = match (Auth::user()->id_role) {
                     1 => route('adminsdm.dashboard'),
                     2 => route('supervisor.spv-dashboard'),
@@ -191,6 +191,16 @@
                         </li>
                         <li class="{{ Request::is('supervisor/panduan/idp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('supervisor/panduan/idp') }}">Panduan</a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- Menu Evaluasi (Dipisah) -->
+                <li class="nav-item dropdown {{ $type_menu === 'evaluasi' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown"><i class="fas fa-poll"></i>
+                        <span>Evaluasi</span></a>
+                    <ul class="dropdown-menu">
+                        <li class="{{ Request::is('supervisor/evaluasi/idp') ? 'active' : '' }}">
+                            <a href="{{ url('supervisor/evaluasi/idp') }}">Evaluasi Pasca IDP</a>
                         </li>
                     </ul>
                 </li>

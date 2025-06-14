@@ -12,7 +12,7 @@
                         <a href="{{ route('mentor.dashboard-mentor') }}">Dashboard</a>
                     </div>
                     <div class="breadcrumb-item active">
-                        <a href="{{ route('mentor.EvaluasiIdp.EvaluasiPascaIdp.indexMentor') }}">Data Evaluasi</a>
+                        <a href="{{ route('supervisor.EvaluasiIdp.indexSpv') }}">Data Evaluasi</a>
                     </div>
                     <div class="breadcrumb-item">Kerjakan Evaluasi IDP</div>
                 </div>
@@ -20,10 +20,10 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h4>Evaluasi Pasca IDP oleh Mentor</h4>
+                    <h4>Evaluasi Pasca IDP oleh Supervisor</h4>
                 </div>
 
-                <form action="{{ route('mentor.EvaluasiIdp.EvaluasiPascaIdp.storeMentor') }}" method="POST">
+                <form action="{{ route('supervisor.EvaluasiIdp.storeSpv') }}" method="POST">
                     @csrf
                     <div class="card-body">
 

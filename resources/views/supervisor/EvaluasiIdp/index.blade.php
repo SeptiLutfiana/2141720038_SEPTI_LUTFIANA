@@ -12,7 +12,7 @@
             <div class="section-header">
                 <h1>Data Evaluasi IDP</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('mentor.dashboard-mentor') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('supervisor.IDP.indexSupervisor') }}">Dashboard</a></div>
                     <div class="breadcrumb-item">Evaluasi IDP</div>
                 </div>
             </div>
@@ -38,7 +38,7 @@
                                 <h4>Evaluasi IDP</h4>
                             </div>
                             <div class="card-body">
-                                <livewire:evaluasi-pasca-idp-mentor-table />
+                                <livewire:evaluasi-pasca-idp-supervisor-table />
                             </div>
                         </div>
                     </div>

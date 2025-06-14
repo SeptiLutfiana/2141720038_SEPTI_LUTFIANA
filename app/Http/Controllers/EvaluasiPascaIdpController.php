@@ -168,11 +168,11 @@ class EvaluasiPascaIdpController extends Controller
             ->when($tipePertanyaan, function ($query, $tipePertanyaan) {
                 return $query->where('tipe_pertanyaan', $tipePertanyaan);
             })
-            ->orderBy('pertanyaan')
+            ->orderBy('created_at', 'desc')
             ->paginate(5)
             ->withQueryString();
 
-        return view('adminsdm.BankEvaluasi.EvaluasiPascaIdp.index', [
+        return view('supervisor.EvaluasiIdp.index', [
             'type_menu' => 'evaluasi',
             'evaluasiPasca' => $evaluasiPasca,
             'search' => $search,
@@ -261,7 +261,7 @@ class EvaluasiPascaIdpController extends Controller
         $id_idp = $request->query('id_idp');
         $id_user = $request->query('id_user');
         $jenisEvaluasi = $request->query('jenis', 'pasca');
-        $sebagaiRole = Auth::user()->roles->pluck('nama_role')->first();
+        $sebagaiRole = 'Mentor';
         $pertanyaans = BankEvaluasi::where('jenis_evaluasi', $jenisEvaluasi)
             ->where('untuk_role', 'mentor')
             ->get();
@@ -282,13 +282,12 @@ class EvaluasiPascaIdpController extends Controller
             'id_user' => 'required|exists:users,id',
             'jenis_evaluasi' => 'required|in:onboarding,pasca',
         ]);
-        $sebagaiRole = Auth::user()->roles->pluck('nama_role')->first();
         $evaluasi = EvaluasiIdp::create([
             'id_idp' => $request->id_idp,
-            'id_user' => $request->id_user,
+            'id_user' => Auth::id(), // ← PASTIKAN ini dipakai
             'jenis_evaluasi' => $request->jenis_evaluasi,
             'tanggal_evaluasi' => now(),
-            'sebagai_role' => $sebagaiRole,
+            'sebagai_role' => 'Mentor',
         ]);
 
         if ($request->has('jawaban_likert')) {
@@ -314,5 +313,63 @@ class EvaluasiPascaIdpController extends Controller
         }
 
         return redirect()->route('mentor.EvaluasiIdp.EvaluasiPascaIdp.indexMentor')->with('msg-success', 'Evaluasi berhasil dikirim');
+    }
+    public function createSpv(Request $request)
+    {
+        $id_idp = $request->query('id_idp');
+        $id_user = $request->query('id_user');
+        $jenisEvaluasi = $request->query('jenis', 'pasca');
+        $sebagaiRole = 'Supervisor';
+        $pertanyaans = BankEvaluasi::where('jenis_evaluasi', $jenisEvaluasi)
+            ->where('untuk_role', 'supervisor')
+            ->get();
+
+        return view('supervisor.EvaluasiIdp.create', [
+            'id_idp' => $id_idp,
+            'id_user' => $id_user,
+            'jenisEvaluasi' => $jenisEvaluasi,
+            'pertanyaans' => $pertanyaans,
+            'sebagai_role' => $sebagaiRole,
+            'type_menu' => 'evaluasi',
+        ]);
+    }
+    public function storeSpv(Request $request)
+    {
+        $request->validate([
+            'id_idp' => 'required|exists:idps,id_idp',
+            'id_user' => 'required|exists:users,id',
+            'jenis_evaluasi' => 'required|in:onboarding,pasca',
+        ]);
+        $evaluasi = EvaluasiIdp::create([
+            'id_idp' => $request->id_idp,
+            'id_user' => Auth::id(), // ← PASTIKAN ini dipakai
+            'jenis_evaluasi' => $request->jenis_evaluasi,
+            'tanggal_evaluasi' => now(),
+            'sebagai_role' => 'Supervisor',
+        ]);
+
+        if ($request->has('jawaban_likert')) {
+            foreach ($request->jawaban_likert as $id_bank => $nilai) {
+                EvaluasiIdpJawaban::create([
+                    'id_evaluasi_idp' => $evaluasi->id_evaluasi_idp,
+                    'id_bank_evaluasi' => $id_bank,
+                    'jawaban_likert' => $nilai,
+                    'jawaban_esai' => null,
+                ]);
+            }
+        }
+
+        if ($request->has('jawaban_esai')) {
+            foreach ($request->jawaban_esai as $id_bank => $teks) {
+                EvaluasiIdpJawaban::create([
+                    'id_evaluasi_idp' => $evaluasi->id_evaluasi_idp,
+                    'id_bank_evaluasi' => $id_bank,
+                    'jawaban_likert' => null,
+                    'jawaban_esai' => $teks,
+                ]);
+            }
+        }
+
+        return redirect()->route('supervisor.EvaluasiIdp.indexSpv')->with('msg-success', 'Evaluasi berhasil dikirim');
     }
 }
