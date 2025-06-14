@@ -7,16 +7,16 @@
                 <th>Mentor</th>
                 <th>Supervisor</th>
                 <th>Persetujuan Mentor</th>
-                <th>Status Pengajuan IDP</th>
-                <th>Hasil Rekomendasi</th>
-                <th>Progres IDP</th>
+                {{-- <th>Status Pengajuan IDP</th> --}}
+                <th>Rekomendasi</th>
+                <th>Progres</th>
                 <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
             @if ($idps->count())
                 @forelse($idps as $i => $item)
-                    <tr>
+                    <tr class="text-center">
                         <td>{{ $i + 1 }}</td>
                         <td>{{ $item->proyeksi_karir }}</td>
                         <td>{{ $item->mentor->name }}</td>
@@ -44,7 +44,7 @@
                                 {{ $status }}
                             </span>
                         </td>
-                        <td class="text-center">
+                        {{-- <td class="text-center">
                             @php
                                 $status = $item->status_pengajuan_idp;
                                 $bgColor = '';
@@ -69,7 +69,7 @@
                                 style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 4px; border-radius: 9999px;">
                                 {{ $status }}
                             </span>
-                        </td>
+                        </td> --}}
                         @php
                             $hasil = $item->rekomendasis->first()->hasil_rekomendasi ?? null;
                             $bgColor = '#fef3c7'; // default: kuning muda (Menunggu Penilaian)
@@ -91,7 +91,7 @@
 
                         <td class="text-center">
                             <span
-                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 4px; border-radius: 9999px">
+                                style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 2px; border-radius: 9999px">
                                 {{ $hasil }}
                             </span>
                         </td>

@@ -194,7 +194,7 @@
             <div class="card">
                 <div class="card-header d-flex align-items-center">
                     <i class="fas fa-chart-line text-primary mr-2"></i>
-                    <h4 class="mb-0 font-weight-bold">Status Perencanaan IDP</h4>
+                    <h4 class="mb-0 font-weight-bold">Riwayat Perencanaan IDP</h4>
                 </div>
                 <hr class="m-0">
                 <div class="card-body">

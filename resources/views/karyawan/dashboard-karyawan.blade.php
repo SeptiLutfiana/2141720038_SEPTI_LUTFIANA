@@ -17,52 +17,105 @@
             <div class="section-body">
             </div>
             @include('components.alert') {{-- Tampilkan notifikasi jika ada --}}
+            <div class="alert alert-light border border-info shadow-sm d-flex align-items-center" role="alert">
+                <i class="fas fa-smile-beam text-info fa-lg mr-3"></i>
+                <div>
+                    <h5 class="mb-1 font-weight-bold">Hai, {{ Auth::user()->name }} 👋</h5>
+                    <small>Selamat datang kembali.</small>
+                </div>
+            </div>
+
             {{-- Progres Behavior IDP --}}
+            <div class="row">
+                {{-- KIRI: Informasi Bank IDP --}}
+                <div class="col-md-8 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <i class="fas fa-chart-line text-primary mr-2"></i>
+                            <h4 class="mb-0">Progres Behavior IDP</h4>
+                        </div>
+                        <hr class="m-0">
+                        <div class="card-body">
+                            <div class="row">
+                                @php
+                                    $dataProgres = [
+                                        [
+                                            'title' => 'Individual Development Plan',
+                                            'count' => $jumlahIDPGiven,
+                                            'icon' => 'fa-user',
+                                            'bg' => 'bg-primary',
+                                            'border' => 'border-primary',
+                                        ],
+                                        [
+                                            'title' => 'IDP Menunggu Persetujuan Supervisor',
+                                            'count' => $jumlahRekomendasiBelumMuncul,
+                                            'icon' => 'fa-hourglass-half',
+                                            'bg' => 'bg-warning',
+                                            'border' => 'border-warning',
+                                        ],
+                                    ];
+                                @endphp
+                                @foreach ($dataProgres as $item)
+                                    <div class="col-12 mb-3">
+                                        <div class="card card-statistic-1 {{ $item['border'] }}">
+                                            <div class="card-icon {{ $item['bg'] }}">
+                                                <i class="fas {{ $item['icon'] }}"></i>
+                                            </div>
+                                            <div class="card-wrap">
+                                                <div class="card-header">
+                                                    <h4>{{ $item['title'] }}</h4>
+                                                </div>
+                                                <div class="card-body">
+                                                    {{ $item['count'] }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <i class="fas fa-book text-primary mr-2"></i>
+                            <h4 class="mb-0 font-weight-bold">Total Evaluasi Pasca IDP</h4>
+                        </div>
+                        <hr class="m-0">
+                        <div class="card-body">
+
+                            <div class="card card-statistic-1 border-info text-center py-4">
+                                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                                    <div class="card-icon bg-info mb-3"
+                                        style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                                        <i class="fas fa-chart-bar text-white fa-lg"></i>
+                                    </div>
+                                    <div class="card-wrap">
+                                        <div class="card-header">
+                                            <h4>Total Evaluasi Belum Dikerjakan</h4>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            {{ $totalBelumEvaluasiPasca }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-header d-flex align-items-center">
-                    <i class="fas fa-chart-line text-primary mr-2"></i>
-                    <h4 class="mb-0">Progres Behavior IDP</h4>
+                    <i class="fas fa-clipboard-list text-primary mr-2"></i>
+                    <h4 class="mb-0">Status Perencanaan IDP</h4>
                 </div>
                 <hr class="m-0">
                 <div class="card-body">
                     <div class="row">
                         @php
                             $dataProgres = [
-                                [
-                                    'title' => 'Individual Development Plan',
-                                    'count' => $jumlahIDPGiven,
-                                    'icon' => 'fa-user',
-                                    'bg' => 'bg-primary',
-                                    'border' => 'border-primary',
-                                ],
-                                [
-                                    'title' => 'IDP Menunggu Persetujuan Supervisor',
-                                    'count' => $jumlahRekomendasiBelumMuncul,
-                                    'icon' => 'fa-hourglass-half',
-                                    'bg' => 'bg-warning',
-                                    'border' => 'border-warning',
-                                ],
-                                [
-                                    'title' => 'IDP Disarankan',
-                                    'count' => $jumlahDisarankan,
-                                    'icon' => 'fa-check',
-                                    'bg' => 'bg-success',
-                                    'border' => 'border-success',
-                                ],
-                                [
-                                    'title' => 'IDP Disarankan Dengan Pengembangan',
-                                    'count' => $jumlahDisarankanDenganPengembangan,
-                                    'icon' => 'fa-tools',
-                                    'bg' => 'bg-secondary',
-                                    'border' => 'border-secondary',
-                                ],
-                                [
-                                    'title' => 'IDP Tidak Disarankan',
-                                    'count' => $jumlahTidakDisarankan,
-                                    'icon' => 'fa-ban',
-                                    'bg' => 'bg-dark',
-                                    'border' => 'border-dark',
-                                ],
                                 [
                                     'title' => 'Persetujuan Mentor',
                                     'count' => $jumlahMenungguPersetujuan,
@@ -84,13 +137,59 @@
                                     'bg' => 'bg-danger',
                                     'border' => 'border-danger',
                                 ],
-                                // [
-                                //     'title' => 'IDP Menunggu Persetujuan Mentor',
-                                //     'count' => $jumlahIdpMenungguPersetujuan,
-                                //     'icon' => 'fa-user-clock',
-                                //     'bg' => 'bg-indigo',
-                                //     'border' => 'border-indigo',
-                                // ],
+                            ];
+                        @endphp
+                        @foreach ($dataProgres as $item)
+                            <div class="col-lg-4 col-md-6 col-sm-6 col-12 mb-3">
+                                <div class="card card-statistic-1 {{ $item['border'] }}">
+                                    <div class="card-icon {{ $item['bg'] }}">
+                                        <i class="fas {{ $item['icon'] }}"></i>
+                                    </div>
+                                    <div class="card-wrap">
+                                        <div class="card-header">
+                                            <h4>{{ $item['title'] }}</h4>
+                                        </div>
+                                        <div class="card-body">
+                                            {{ $item['count'] }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex align-items-center">
+                    <i class="fas fa-history text-primary mr-2"></i>
+                    <h4 class="mb-0">Riwayat Perencanaan IDP</h4>
+                </div>
+                <hr class="m-0">
+                <div class="card-body">
+                    <div class="row">
+                        @php
+                            $dataProgres = [
+                                [
+                                    'title' => 'Disarankan',
+                                    'count' => $jumlahDisarankan,
+                                    'icon' => 'fa-check',
+                                    'bg' => 'bg-success',
+                                    'border' => 'border-success',
+                                ],
+                                [
+                                    'title' => 'Disarankan Dengan Pengembangan',
+                                    'count' => $jumlahDisarankanDenganPengembangan,
+                                    'icon' => 'fa-tools',
+                                    'bg' => 'bg-secondary',
+                                    'border' => 'border-secondary',
+                                ],
+                                [
+                                    'title' => 'Tidak Disarankan',
+                                    'count' => $jumlahTidakDisarankan,
+                                    'icon' => 'fa-ban',
+                                    'bg' => 'bg-dark',
+                                    'border' => 'border-dark',
+                                ],
                             ];
                         @endphp
                         @foreach ($dataProgres as $item)
@@ -115,7 +214,8 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    <h4>Grafik Nilai Karyawan (Hard vs Soft)</h4>
+                    <i class="fas fa-chart-bar text-primary mr-2"></i>
+                    <h4>Grafik Nilai Perencanaan Individual Development Plan (Hard vs Soft)</h4>
                 </div>
                 <div class="card-body">
                     <canvas id="chartKaryawan" height="100"></canvas>
@@ -123,6 +223,7 @@
             </div>
             <div class="card">
                 <div class="card-header">
+                    <i class="fas fa-award text-primary mr-2"></i>
                     <h4>Top 5 Perencanaan IDP (Hasil Rekomendasi: Disarankan)</h4>
                 </div>
                 <div class="card-body">
@@ -177,7 +278,8 @@
                                         <td>{{ $rek->hasil_rekomendasi }}</td>
                                         <td>
                                             <div style="font-size: 10px;" class="text-muted mb-1">
-                                                {{ $jumlahSelesai }}/{{ $totalKompetensi }} | {{ $persen }}%
+                                                {{ $jumlahSelesai }}/{{ $totalKompetensi }} |
+                                                {{ $persen }}%
                                             </div>
                                             <div class="progress" style="height: 6px; border-radius: 999px;">
                                                 <div class="progress-bar {{ $warna }}" role="progressbar"
@@ -224,7 +326,7 @@
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Plot Nilai Kompetensi Hard vs Soft Karyawan'
+                        text: 'Nilai Kompetensi Hard vs Soft Karyawan'
                     },
                     tooltip: {
                         callbacks: {

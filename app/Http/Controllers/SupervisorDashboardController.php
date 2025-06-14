@@ -128,6 +128,15 @@ class SupervisorDashboardController extends Controller
                 $LGTotals[] = (int) $data->total;
             }
         }
+        $totalBelumEvaluasiPasca = Idp::where('id_mentor', Auth::id())
+            ->whereHas('rekomendasis', function ($query) {
+                $query->whereIn('hasil_rekomendasi', ['Disarankan', 'Disarankan dengan Pengembangan']);
+            })
+            ->whereDoesntHave('evaluasiIdp', function ($query) {
+                $query->where('jenis_evaluasi', 'pasca')
+                    ->where('sebagai_role', 'mentor');
+            })
+            ->count();
         return view('supervisor.spv-dashboard', [
             'type_menu' => 'dashboard',
             'jumlahIDPGiven' => $jumlahIDPGiven,
@@ -140,11 +149,11 @@ class SupervisorDashboardController extends Controller
             'topKaryawan' => $topKaryawan,
             'jumlahIDPRevisi' => $jumlahIDPRevisi,
             'jumlahIdpTidakDisetujui' => $jumlahIdpTidakDisetujui,
-            // 'jumlahIdpMenungguPersetujuan' =>$jumlahIdpMenungguPersetujuan,
             'jenjangLabels' => $jenjangLabels,
             'jenjangTotals' => $jenjangTotals,
             'LGLabels' => $LGLabels,
             'LGTotals' => $LGTotals,
+            'totalBelumEvaluasiPasca' => $totalBelumEvaluasiPasca,
         ]);
     }
     public function indexSupervisor(Request $request)

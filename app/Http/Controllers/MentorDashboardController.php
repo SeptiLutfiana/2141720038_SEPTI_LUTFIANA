@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\IdpRekomendasi;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class MentorDashboardController extends Controller
 {
@@ -125,6 +126,17 @@ class MentorDashboardController extends Controller
                 $LGTotals[] = (int) $data->total;
             }
         }
+
+        $totalBelumEvaluasiPasca = Idp::where('id_mentor', Auth::id())
+            ->whereHas('rekomendasis', function ($query) {
+                $query->whereIn('hasil_rekomendasi', ['Disarankan', 'Disarankan dengan Pengembangan']);
+            })
+            ->whereDoesntHave('evaluasiIdp', function ($query) {
+                $query->where('jenis_evaluasi', 'pasca')
+                    ->where('sebagai_role', 'mentor');
+            })
+            ->count();
+
         return view('mentor.dashboard-mentor', [
             'type_menu' => 'dashboard',
             'jumlahIDPGiven' => $jumlahIDPGiven,
@@ -137,11 +149,11 @@ class MentorDashboardController extends Controller
             'topKaryawan' => $topKaryawan,
             'jumlahIDPRevisi' => $jumlahIDPRevisi,
             'jumlahIdpTidakDisetujui' => $jumlahIdpTidakDisetujui,
-            // 'jumlahIdpMenungguPersetujuan' =>$jumlahIdpMenungguPersetujuan,
             'jenjangLabels' => $jenjangLabels,
             'jenjangTotals' => $jenjangTotals,
             'LGLabels' => $LGLabels,
             'LGTotals' => $LGTotals,
+            'totalBelumEvaluasiPasca' => $totalBelumEvaluasiPasca,
         ]);
     }
     public function indexMentor(Request $request)

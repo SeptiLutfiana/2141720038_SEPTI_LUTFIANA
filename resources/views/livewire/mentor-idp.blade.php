@@ -8,7 +8,7 @@
                 <th>Persetujuan Mentor</th>
                 <th>Persetujuan IDP</th>
                 <th>Supervisor</th>
-                <th>Hasil Rekomendasi</th>
+                {{-- <th>Hasil Rekomendasi</th> --}}
                 <th>Progres IDP</th>
                 <th>Aksi</th>
             </tr>
@@ -71,7 +71,7 @@
                         </td>
 
                         <td>{{ $item->supervisor->name }}</td>
-                        @php
+                        {{-- @php
                             $hasil = $item->rekomendasis->first()->hasil_rekomendasi ?? null;
                             $bgColor = '#fef3c7'; // default: kuning muda (Menunggu Penilaian)
                             $textColor = '#92400e'; // default: coklat gelap
@@ -95,7 +95,7 @@
                                 style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 4px; border-radius: 9999px">
                                 {{ $hasil }}
                             </span>
-                        </td>
+                        </td> --}}
                         <td>
                             @php
                                 $idpKompetensis = $item->idpKompetensis;

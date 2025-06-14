@@ -187,6 +187,7 @@ class EvaluasiPascaIdpController extends Controller
         $id_idp = $request->query('id_idp');
         $id_user = $request->query('id_user');
         $jenisEvaluasi = $request->query('jenis', 'pasca');
+        $sebagaiRole = Auth::user()->roles->pluck('nama_role')->first();
 
         // Ambil pertanyaan untuk role karyawan
         $pertanyaans = BankEvaluasi::where('jenis_evaluasi', $jenisEvaluasi)
@@ -198,6 +199,7 @@ class EvaluasiPascaIdpController extends Controller
             'id_user' => $id_user,
             'jenisEvaluasi' => $jenisEvaluasi,
             'pertanyaans' => $pertanyaans,
+            'sebagai_role' => $sebagaiRole,
             'type_menu' => 'evaluasi',
         ]);
     }
@@ -209,12 +211,15 @@ class EvaluasiPascaIdpController extends Controller
             'id_user' => 'required|exists:users,id',
             'jenis_evaluasi' => 'required|in:onboarding,pasca',
         ]);
+        $sebagaiRole = Auth::user()->roles->pluck('nama_role')->first(); // atau sesuaikan jika struktur berbeda
 
         $evaluasi = EvaluasiIdp::create([
             'id_idp' => $request->id_idp,
             'id_user' => $request->id_user,
             'jenis_evaluasi' => $request->jenis_evaluasi,
             'tanggal_evaluasi' => now(),
+            'sebagai_role' => $sebagaiRole, // Disimpan di sini
+
         ]);
 
         if ($request->has('jawaban_likert')) {
@@ -256,8 +261,7 @@ class EvaluasiPascaIdpController extends Controller
         $id_idp = $request->query('id_idp');
         $id_user = $request->query('id_user');
         $jenisEvaluasi = $request->query('jenis', 'pasca');
-
-        // Ambil pertanyaan untuk role karyawan
+        $sebagaiRole = Auth::user()->roles->pluck('nama_role')->first();
         $pertanyaans = BankEvaluasi::where('jenis_evaluasi', $jenisEvaluasi)
             ->where('untuk_role', 'mentor')
             ->get();
@@ -267,6 +271,7 @@ class EvaluasiPascaIdpController extends Controller
             'id_user' => $id_user,
             'jenisEvaluasi' => $jenisEvaluasi,
             'pertanyaans' => $pertanyaans,
+            'sebagai_role' => $sebagaiRole,
             'type_menu' => 'evaluasi',
         ]);
     }
@@ -277,12 +282,13 @@ class EvaluasiPascaIdpController extends Controller
             'id_user' => 'required|exists:users,id',
             'jenis_evaluasi' => 'required|in:onboarding,pasca',
         ]);
-
+        $sebagaiRole = Auth::user()->roles->pluck('nama_role')->first();
         $evaluasi = EvaluasiIdp::create([
             'id_idp' => $request->id_idp,
             'id_user' => $request->id_user,
             'jenis_evaluasi' => $request->jenis_evaluasi,
             'tanggal_evaluasi' => now(),
+            'sebagai_role' => $sebagaiRole,
         ]);
 
         if ($request->has('jawaban_likert')) {

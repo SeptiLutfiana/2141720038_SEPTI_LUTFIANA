@@ -1,13 +1,31 @@
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand text-center py-3">
-            <a href="{{ route('logout') }}">
+             @php
+                $dashboardRoute = match (Auth::user()->id_role) {
+                    1 => route('adminsdm.dashboard'),
+                    2 => route('supervisor.spv-dashboard'),
+                    3 => route('mentor.dashboard-mentor'),
+                    4 => route('karyawan.dashboard-karyawan'),
+                    default => '#',
+                };
+            @endphp
+            <a href="{{ $dashboardRoute }}">
                 <img src="{{ asset('img/Logo-MenaraPEFI.png') }}" alt="MENARA PEFI" style="max-height: 40px; width: auto;">
             </a>
         </div>
 
         <div class="sidebar-brand sidebar-brand-sm">
-            <a href="{{ route('logout') }}">MP</a>
+            @php
+                $dashboardRoute = match (Auth::user()->id_role) {
+                    1 => route('adminsdm.dashboard'),
+                    2 => route('supervisor.spv-dashboard'),
+                    3 => route('mentor.dashboard-mentor'),
+                    4 => route('karyawan.dashboard-karyawan'),
+                    default => '#',
+                };
+            @endphp
+            <a href="{{ $dashboardRoute }}">MP</a>
         </div>
         <ul class="sidebar-menu">
             <li class="menu-header">MENU UTAMA</li>

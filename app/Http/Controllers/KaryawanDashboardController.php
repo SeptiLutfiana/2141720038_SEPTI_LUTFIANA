@@ -104,6 +104,16 @@ class KaryawanDashboardController extends Controller
             ->orderByDesc('nilai_akhir_hard')
             ->take(5)
             ->get();
+        $totalBelumEvaluasiPasca = Idp::where('id_user', Auth::user()->id)
+            ->whereHas('rekomendasis', function ($query) {
+                $query->whereIn('hasil_rekomendasi', ['Disarankan', 'Disarankan dengan Pengembangan']);
+            })
+            ->whereDoesntHave('evaluasiIdp', function ($query) {
+                $query->where('jenis_evaluasi', 'pasca')
+                    ->where('sebagai_role', 'karyawan');
+            })
+            ->count();
+
         return view('karyawan.dashboard-karyawan', [
             'type_menu' => 'dashboard',
             'jumlahIDPGiven' => $jumlahIDPGiven,
@@ -116,7 +126,7 @@ class KaryawanDashboardController extends Controller
             'topKaryawan' => $topKaryawan,
             'jumlahIDPRevisi' => $jumlahIDPRevisi,
             'jumlahIdpTidakDisetujui' => $jumlahIdpTidakDisetujui,
-            // 'jumlahIdpMenungguPersetujuan' =>$jumlahIdpMenungguPersetujuan,
+            'totalBelumEvaluasiPasca' => $totalBelumEvaluasiPasca
         ]);
     }
     public function indexKaryawan(Request $request)
