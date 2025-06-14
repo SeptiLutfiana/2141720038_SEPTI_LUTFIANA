@@ -837,6 +837,7 @@ select.form-control:not([size]):not([multiple]) {
     color: #628836;
     padding-right: 10px;
     margin-bottom: 0;
+    font-weight: bold; /* tambahkan baris ini */
 }
 .card .card-header h4 + .card-header-action,
 .card .card-header h4 + .card-header-form {
@@ -4334,3 +4335,44 @@ body:not(.sidebar-mini)
 .border-indigo {
     border-color: #6610f2 !important;
 }
+input.form-control,
+select.form-control,
+textarea.form-control {
+    border-color: #e4e6fc !important;
+    background-color: #fdfdff !important;
+    height: 42px;
+    font-size: 14px;
+    padding: 10px 15px;
+    color: #34395e;
+}
+
+input[type="date"].form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+select.form-control {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%2334395e' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 8px 10px;
+    padding-right: 2rem;
+}
+
+input.form-control:focus,
+select.form-control:focus,
+textarea.form-control:focus {
+    border-color: #95a0f4 !important;
+    outline: none;
+    box-shadow: none;
+}
+input.form-control[readonly],
+textarea.form-control[readonly],
+select.form-control[readonly] {
+    background-color: #f4f5f7 !important;
+    border-color: #d3d6e0 !important;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+

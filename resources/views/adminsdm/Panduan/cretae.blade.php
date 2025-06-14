@@ -115,7 +115,8 @@
     </div>
 @endsection
 
-@push('script')
+@push('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Summernote JS -->
     <script src="{{ asset('library/summernote/dist/summernote-bs4.min.js') }}"></script>
 

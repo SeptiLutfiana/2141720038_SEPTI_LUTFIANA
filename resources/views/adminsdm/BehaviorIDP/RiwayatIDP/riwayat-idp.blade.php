@@ -4,6 +4,12 @@
 @push('style')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap4.min.css">
+    <style>
+        body {
+            zoom: 90%;
+            /* ubah ke 85% jika masih terasa besar */
+        }
+    </style>
 @endpush
 
 @section('main')

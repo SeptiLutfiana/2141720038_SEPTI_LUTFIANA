@@ -81,13 +81,13 @@
 
     <!-- Livewire Scripts -->
     @livewireScripts
-    <script>
+    {{-- <script>
         // Cegah Alpine.js dimuat 2x oleh Livewire
         window.Alpine = window.Alpine || {};
         window.deferLoadingAlpine = function(callback) {
             window.addEventListener('alpine:initializing', callback);
         };
-    </script>
+    </script> --}}
 
     <!-- Page Specific Scripts -->
     @stack('scripts')

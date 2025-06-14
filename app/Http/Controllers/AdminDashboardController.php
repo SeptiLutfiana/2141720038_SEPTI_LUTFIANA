@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EvaluasiIdp;
 use App\Models\User;
 use App\Models\IDP;
 use App\Models\Jenjang;
@@ -96,6 +97,7 @@ class AdminDashboardController extends Controller
             ->orderByDesc('nilai_akhir_hard')
             ->take(5)
             ->get();
+        $totalEvaluasiPasca = EvaluasiIdp::count();
         return view('adminsdm.dashboard', [
             'type_menu' => 'dashboard',
             'jumlahKaryawan' => $jumlahKaryawan,
@@ -116,6 +118,7 @@ class AdminDashboardController extends Controller
             'totalPanduan' => $totalPanduan,
             'dataPoints' => $rekomendasiData,
             'topKaryawan' => $topKaryawan,
+            'totalEvaluasiPasca' => $totalEvaluasiPasca,
         ]);
     }
     public function indexRiwayatIdp(Request $request)
@@ -247,7 +250,7 @@ class AdminDashboardController extends Controller
                     ->orWhereHas('supervisor', function ($q2) use ($search) {
                         $q2->where('name', 'like', "%$search%");
                     })
-                     ->orWhereHas('mentor', function ($q2) use ($search) {
+                    ->orWhereHas('mentor', function ($q2) use ($search) {
                         $q2->where('name', 'like', "%$search%");
                     })
                     ->orWhereHas('rekomendasis', function ($q2) use ($search) {

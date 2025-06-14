@@ -122,7 +122,7 @@
     </div>
 @endsection
 
-@push('script')
+@push('scripts')
     <!-- Summernote JS -->
     <script src="{{ asset('library/summernote/dist/summernote-bs4.min.js') }}"></script>
 

@@ -11,49 +11,65 @@ class BankEvaluasiTable extends Component
     use WithPagination;
 
     public $search = '';
-    protected string $paginationTheme = 'bootstrap';
-    protected $updatesQueryString = ['search'];
-    public $jenisEvaluasi;
-    public $tipePertanyaan;
-    public $untukRole;
+    public $jenisEvaluasi = '';
+    public $tipePertanyaan = '';
+    public $untukRole = '';
 
-    public function mount($search = '', $jenisEvaluasi = null, $tipePertanyaan = null, $untukRole=null)
+    protected string $paginationTheme = 'bootstrap';
+
+    // Query string binding agar tetap saat reload page
+    protected $updatesQueryString = ['search', 'jenisEvaluasi', 'tipePertanyaan', 'untukRole'];
+
+    public function mount($search = '', $jenisEvaluasi = '', $tipePertanyaan = '', $untukRole = '')
     {
-        // Mengambil search query dari URL
-        $this->search = request()->query('search');
-        $this->jenisEvaluasi = $jenisEvaluasi;
-        $this->tipePertanyaan =$tipePertanyaan;
-        $this->untukRole = $untukRole;
+        $this->search = request()->query('search', $search);
+        $this->jenisEvaluasi = request()->query('jenisEvaluasi', $jenisEvaluasi);
+        $this->tipePertanyaan = request()->query('tipePertanyaan', $tipePertanyaan);
+        $this->untukRole = request()->query('untukRole', $untukRole);
     }
+
+    // Reset pagination ke halaman 1 saat filter berubah
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+    public function updatingJenisEvaluasi()
+    {
+        $this->resetPage();
+    }
+    public function updatingTipePertanyaan()
+    {
+        $this->resetPage();
+    }
+    public function updatingUntukRole()
+    {
+        $this->resetPage();
+    }
+
     public function deleteId($id)
     {
-        if ($bankEvaluasi = BankEvaluasi::find($id)) {
-            $bankEvaluasi->delete();
+        $item = BankEvaluasi::find($id);
+
+        if ($item) {
+            $item->delete();
             session()->flash('msg-success', 'Pertanyaan berhasil dihapus');
         } else {
             session()->flash('msg-error', 'Pertanyaan tidak ditemukan');
         }
     }
+
     public function render()
     {
-        $query = BankEvaluasi::query();
+        $data = BankEvaluasi::query()
+            ->when($this->search, fn($q) => $q->where('pertanyaan', 'like', "%{$this->search}%"))
+            ->when($this->jenisEvaluasi, fn($q) => $q->where('jenis_evaluasi', $this->jenisEvaluasi))
+            ->when($this->tipePertanyaan, fn($q) => $q->where('tipe_pertanyaan', $this->tipePertanyaan))
+            ->when($this->untukRole, fn($q) => $q->where('untuk_role', $this->untukRole))
+            ->latest()
+            ->paginate(5);
 
-        if ($this->search) {
-            $query->where('pertanyaan', 'like', '%' . $this->search . '%');
-        }
-
-        if ($this->jenisEvaluasi) {
-            $query->where('jenis_evaluasi', $this->jenisEvaluasi);
-        }
-         if ($this->tipePertanyaan) {
-            $query->where('tipe_pertanyaan', $this->tipePertanyaan);
-        }
-         if ($this->untukRole) {
-            $query->where('untuk_role', $this->untukRole);
-        }
-
-        $bankEvaluasi = $query->latest()->paginate(5);
-
-        return view('livewire.bank-evaluasi-table', compact('bankEvaluasi'));
+        return view('livewire.bank-evaluasi-table', [
+            'bankEvaluasi' => $data,
+        ]);
     }
 }

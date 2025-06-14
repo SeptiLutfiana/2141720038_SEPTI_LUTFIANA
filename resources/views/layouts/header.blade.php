@@ -1,18 +1,21 @@
 <div class="navbar-bg"></div>
-<nav class="navbar navbar-expand-lg main-navbar">
+<nav class="navbar navbar-expand-lg main-navbar d-flex justify-between align-items-center px-4 py-2">
     <form class="form-inline mr-auto">
         <ul class="navbar-nav mr-3">
             <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg"><i class="fas fa-bars"></i></a></li>
-            <li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i
-                        class="fas fa-search"></i></a></li>
+            {{-- <li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i
+                        class="fas fa-search"></i></a></li> --}}
         </ul>
     </form>
-    <ul class="navbar-nav navbar-right">
-        <li class="dropdown dropdown-list-toggle">
-            <a href="#" data-toggle="dropdown" class="nav-link notification-toggle nav-link-lg">
-                <i class="far fa-bell"></i>
+    <ul class="navbar-nav navbar-right d-flex align-items-center gap-3">
+        <li class="dropdown dropdown-list-toggle position-relative mr-3">
+            <a href="#" data-toggle="dropdown" class="nav-link nav-link-lg position-relative">
+                <i class="far fa-bell fa-lg"></i>
                 @if (auth()->user()->unreadNotifications->count() > 0)
-                    <span class="badge badge-danger">{{ auth()->user()->unreadNotifications->count() }}</span>
+                    <span class="badge badge-danger position-absolute"
+                        style="top: -6px; right: -6px; font-size: 0.65rem; padding: 4px 6px; border-radius: 999px;">
+                        {{ auth()->user()->unreadNotifications->count() }}
+                    </span>
                 @endif
             </a>
 
@@ -39,7 +42,7 @@
                         };
                     @endphp
 
-                    <div class="dropdown-list-content dropdown-list-icons">
+                    <div class="dropdown-list-content dropdown-list-icons" style="max-height: 400px; overflow-y: auto;">
                         @if (auth()->user()->unreadNotifications->count() > 0)
                             @foreach (auth()->user()->unreadNotifications as $notification)
                                 @php
@@ -89,11 +92,14 @@
             </div>
         </li>
 
-        <li class="dropdown"><a href="#" data-toggle="dropdown"
-                class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-                <img alt="image" src="{{ asset('img/avatar/avatar-1.png') }}" class="rounded-circle mr-1">
-                <div class="d-sm-none d-lg-inline-block">
-                    Hi, {{ Auth::user()->name }} (
+        <li class="dropdown d-flex align-items-center">
+            <a href="#" data-toggle="dropdown"
+                class="nav-link dropdown-toggle nav-link-lg nav-link-user d-flex align-items-center">
+                <img alt="image" src="{{ asset('img/avatar/avatar-1.png') }}" class="rounded-circle"
+                    style="width: 35px; height: 35px;">
+                <span class="ml-2 text-white font-weight-bold d-none d-lg-inline">
+                    Hi, {{ Auth::user()->name }}
+                    (
                     @php
                         $role = session('active_role');
                     @endphp
@@ -109,7 +115,7 @@
                         Unknown
                     @endif
                     )
-                </div>
+                </span>
             </a>
             <div class="dropdown-menu dropdown-menu-right" style="min-width: 250px;">
                 <div class="dropdown-title">

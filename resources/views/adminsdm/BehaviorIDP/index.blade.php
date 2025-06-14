@@ -13,8 +13,8 @@
                 <h1>Behavior Individual Development Plan</h1>
 
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Data IDP</a></div>
+                    <div class="breadcrumb-item active" style="font-weight: bold; color: #628836;"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item"><a>Data IDP</a></div>
                 </div>
             </div>
             <div class="section-body">

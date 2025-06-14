@@ -1,12 +1,13 @@
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
-        <div class="sidebar-brand">
-            <a href="index.html">
-                <img src="{{ asset('img/Logo-MenaraPEFI.png') }}" alt="MENARA PEFI" style="height:40px;">
+        <div class="sidebar-brand text-center py-3">
+            <a href="{{ route('logout') }}">
+                <img src="{{ asset('img/Logo-MenaraPEFI.png') }}" alt="MENARA PEFI" style="max-height: 40px; width: auto;">
             </a>
         </div>
+
         <div class="sidebar-brand sidebar-brand-sm">
-            <a href="index.html">MP</a>
+            <a href="{{ route('logout') }}">MP</a>
         </div>
         <ul class="sidebar-menu">
             <li class="menu-header">MENU UTAMA</li>

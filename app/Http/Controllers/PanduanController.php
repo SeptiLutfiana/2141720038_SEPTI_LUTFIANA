@@ -12,7 +12,7 @@ class PanduanController extends Controller
     public function index(Request $request)
     {
         $search = $request->query('search');
-
+        $datas = Panduan::with('roles')->get();
         $panduan = Panduan::when($search, function ($query, $search) {
             return $query->where('judul', 'like', "%$search%");
         })
@@ -24,6 +24,7 @@ class PanduanController extends Controller
             'type_menu' => 'idps',
             'panduan' => $panduan,
             'search' => $search,
+            'datas'=> $datas,
         ]);
     }
     public function create()
@@ -32,8 +33,9 @@ class PanduanController extends Controller
         $role = Role::all(); // <-- Pastikan ini ada
         return view('adminsdm.Panduan.cretae', [
             'type_menu' => 'idps',
-            'jenjang' => $panduan,
+            'panduan' => $panduan,
             'role' => $role,
+
         ]);
     }
     public function store(Request $request)
