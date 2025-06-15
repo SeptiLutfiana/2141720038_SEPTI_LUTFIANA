@@ -6,6 +6,7 @@ use App\Models\Panduan;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PanduanController extends Controller
 {
@@ -24,7 +25,7 @@ class PanduanController extends Controller
             'type_menu' => 'idps',
             'panduan' => $panduan,
             'search' => $search,
-            'datas'=> $datas,
+            'datas' => $datas,
         ]);
     }
     public function create()
@@ -187,5 +188,16 @@ class PanduanController extends Controller
             'panduan' => $panduan,
             'type_menu' => 'supervisor',
         ]);
+    }
+    public function uploadFile(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:pdf,doc,docx,xls,xlsx|max:5120',
+        ]);
+
+        $path = $request->file('file')->store('implementasi', 'public');
+        $url = Storage::url($path); // Hasil: /storage/uploads/files/nama_file.pdf
+
+        return $url;
     }
 }

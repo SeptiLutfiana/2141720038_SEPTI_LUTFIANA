@@ -33,12 +33,32 @@
                                         value="{{ $panduan->roles->pluck('nama_role')->implode(', ') ?: '-' }}">
                                 </div>
                                 <div class="form-group col-12">
-                                    <label>Isi Panduan IDP</label>
-                                    <div class="border p-3" style="background-color: #f9f9f9;">
-                                        {!! $panduan->isi !!}
-                                    </div>
-                                </div>
+                                    <label class="font-weight-bold">Isi Panduan IDP</label>
 
+                                    @php
+                                        use Illuminate\Support\Str;
+                                        $isi = $panduan->isi;
+                                        $isFile = Str::contains($isi, ['.pdf', '.doc', '.docx', '.xls', '.xlsx']);
+                                        $fileName = $isFile ? basename($isi) : null;
+                                    @endphp
+
+                                    @if ($isFile)
+                                        <div class="p-4 rounded border border-danger bg-light">
+                                            <p class="text-dark mb-2">
+                                                <i class="fas fa-file-pdf text-danger"></i>
+                                                <strong> Panduan tersedia dalam bentuk file dokumen (PDF/DOC).</strong><br>
+                                                Silakan unduh melalui tautan berikut:
+                                            </p>
+                                            <div class="border p-3 rounded bg-white">
+                                                {!! $panduan->isi !!}
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="alert alert-light border shadow-sm" style="background-color: #fcfcfc;">
+                                            {!! $isi !!}
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                             <div class="card-footer text-right">
                                 <a class="btn btn-primary float-right"

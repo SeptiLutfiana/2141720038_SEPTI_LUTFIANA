@@ -272,6 +272,8 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::delete('/{panduan}', [PanduanController::class, 'destroy'])->name('destroy');
         Route::get('/{id}/edit', [PanduanController::class, 'edit'])->name('edit');
         Route::put('/{id}/update', [PanduanController::class, 'update'])->name('update');
+        Route::post('/upload-file', [PanduanController::class, 'uploadFile'])->name('upload-file');
+
     });
     Route::prefix('admin/datamaster/bank/evaluasi')->name('adminsdm.BankEvaluasi.')->group(function () {
         Route::get('/', [BankEvaluasiController::class, 'index'])->name('index');

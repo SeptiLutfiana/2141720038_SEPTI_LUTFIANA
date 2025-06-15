@@ -4,7 +4,7 @@
 
 @push('style')
     <!-- Summernote CSS -->
-    <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
     <style>
         .note-editor {
             border: 1px solid #ced4da;
@@ -93,7 +93,11 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
+                            <div class="form-group">
+                                <label>Upload PDF atau Dokumen</label>
+                                <input type="file" id="upload-file-btn" class="form-control-file"
+                                    accept=".pdf,.doc,.docx,.xls,.xlsx">
+                            </div>
                             <div class="form-group">
                                 <label for="isi">Isi Panduan</label>
                                 <textarea name="isi" id="isi" class="form-control summernote @error('isi') is-invalid @enderror"
@@ -102,6 +106,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
                         </div>
 
                         <div class="card-footer text-right">
@@ -116,9 +121,8 @@
 @endsection
 
 @push('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Summernote JS -->
-    <script src="{{ asset('library/summernote/dist/summernote-bs4.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
 
     <script>
         console.log("=== SUMMERNOTE INITIALIZATION ===");
@@ -163,6 +167,29 @@
                 if (confirm('Yakin ingin mereset form?')) {
                     $('form')[0].reset();
                     $('.summernote').summernote('code', '');
+                }
+            });
+        });
+        $('#upload-file-btn').on('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            $.ajax({
+                url: '{{ route('adminsdm.Panduan.upload-file') }}',
+                method: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(url) {
+                    const linkHtml = `<a href="${url}" target="_blank">${file.name}</a>`;
+                    $('.summernote').summernote('pasteHTML', linkHtml);
+                },
+                error: function(xhr) {
+                    alert('Gagal upload file: ' + xhr.responseText);
                 }
             });
         });

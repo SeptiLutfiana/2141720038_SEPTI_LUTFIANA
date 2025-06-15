@@ -25,7 +25,7 @@
                             class="btn btn-warning btn-sm mb-1"><i class="fas fa-edit"></i></a>
                         <a href="{{ route('adminsdm.Panduan.show', $item->id_panduan) }}"
                             class="btn btn-primary btn-sm mb-1"> <i class="fas fa-info-circle"></i></a>
-                        <form action="{{ route('adminsdm.Panduan.destroy', $item->id_panduan) }}" method="POST"
+                        <form action="{{ route('adminsdm.Panduan.destroy', $item->id_panduan) }}" method="POST" class="d-inline delete-form"
                             style="display: inline;">
                             @csrf
                             @method('DELETE')

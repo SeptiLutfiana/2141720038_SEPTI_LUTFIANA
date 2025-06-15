@@ -21,11 +21,34 @@
                 <div class="row mt-sm-4">
                     <div class="col-12 col-md-12">
                         <div class="card">
+                            <div class="card-header">
+                                <h4>Detail Panduan IDP Mentor</h4>
+                            </div>
                             <div class="card-body">
                                 <div class="form-group col-12">
+                                    @php
+                                        use Illuminate\Support\Str;
+                                        $isi = $panduan->isi ?? '';
+                                        $isFile =
+                                            Str::contains($isi, ['.pdf', '.doc', '.docx', '.xls', '.xlsx']) &&
+                                            Str::contains($isi, 'href=');
+                                    @endphp
+
                                     <div class="border p-3" style="background-color: #f9f9f9;">
                                         @if (!empty($panduan) && !empty($panduan->isi))
-                                            {!! $panduan->isi !!}
+                                            @if ($isFile)
+                                                <p class="mb-2 text-dark">
+                                                    <i class="fas fa-file-pdf text-danger"></i>
+                                                    <strong>Panduan tersedia dalam bentuk file dokumen
+                                                        (PDF/DOC).</strong><br>
+                                                    Silakan unduh melalui tautan berikut:
+                                                </p>
+                                                <div class="border rounded p-2 bg-white text-danger">
+                                                    {!! $panduan->isi !!}
+                                                </div>
+                                            @else
+                                                {!! $panduan->isi !!}
+                                            @endif
                                         @else
                                             <div class="text-center text-muted" style="padding: 40px 0;">
                                                 <em>Panduan belum tersedia untuk role Anda.</em>

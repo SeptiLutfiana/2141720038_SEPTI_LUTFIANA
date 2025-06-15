@@ -67,5 +67,17 @@
                 showConfirmButton: false
             });
         });
+        document.addEventListener('DOMContentLoaded', function () {
+        const deleteForms = document.querySelectorAll('.delete-form');
+
+        deleteForms.forEach(form => {
+            form.addEventListener('submit', function (e) {
+                const confirmed = confirm('Yakin ingin menghapus data panduan ini?');
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
     </script>
 @endpush

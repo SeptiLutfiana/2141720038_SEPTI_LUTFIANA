@@ -99,8 +99,11 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
-
+                            <div class="form-group">
+                                <label>Upload PDF atau Dokumen</label>
+                                <input type="file" id="upload-file-btn" class="form-control-file"
+                                    accept=".pdf,.doc,.docx,.xls,.xlsx">
+                            </div>
                             <div class="form-group">
                                 <label for="isi">Isi Panduan</label>
                                 <textarea name="isi" id="isi" class="form-control summernote @error('isi') is-invalid @enderror"
@@ -171,6 +174,29 @@
                     $('#judul').val('{{ $panduan->judul }}');
                     $('#id_role').val('{{ $panduan->id_role }}');
                     $('.summernote').summernote('code', '{!! addslashes($panduan->isi) !!}');
+                }
+            });
+        });
+        $('#upload-file-btn').on('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            $.ajax({
+                url: '{{ route('adminsdm.Panduan.upload-file') }}',
+                method: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(url) {
+                    const linkHtml = `<a href="${url}" target="_blank">${file.name}</a>`;
+                    $('.summernote').summernote('pasteHTML', linkHtml);
+                },
+                error: function(xhr) {
+                    alert('Gagal upload file: ' + xhr.responseText);
                 }
             });
         });
