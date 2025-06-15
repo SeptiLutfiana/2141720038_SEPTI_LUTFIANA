@@ -25,6 +25,57 @@
                     <small>Selamat datang kembali sebagi Mentor Perencanaan IDP di Perhutani Forestry Institute.</small>
                 </div>
             </div>
+            <div class="card">
+                <div class="card-header text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fas fa-clipboard-check mr-2"></i>Evaluasi IDP Onboarding</h4>
+                    <a href="{{ route('mentor.EvaluasiIdp.EvaluasiOnBording.indexMentor') }}"
+                        class="btn btn-light btn-sm text-primary">
+                        Lihat Semua
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    @if ($idpsBelumDievaluasi->isEmpty())
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-check-circle fa-2x mb-2"></i><br>
+                            Semua IDP telah dievaluasi onboarding.
+                        </div>
+                    @else
+                        <div class="list-group list-group-flush">
+                            @foreach ($idpsBelumDievaluasi as $idp)
+                                @php
+                                    $sisaHari = \Carbon\Carbon::now()->diffInDays($idp->waktu_selesai, false);
+                                    $warna = $sisaHari <= 7 ? 'danger' : ($sisaHari <= 14 ? 'warning' : 'success');
+                                @endphp
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="w-100">
+                                        <div class="d-flex justify-content-between">
+                                            <h6 class="mb-1">{{ $idp->user->name }}</h6>
+                                            <span class="badge border border-{{ $warna }}">
+                                                Sisa {{ intval($sisaHari) }} hari
+                                            </span>
+                                        </div>
+                                        <small class="text-muted">
+                                            Proyeksi Karir: <strong>{{ $idp->proyeksi_karir }}</strong> |
+                                            Tanggal selesai:
+                                            {{ \Carbon\Carbon::parse($idp->waktu_selesai)->format('d M Y') }}
+                                        </small>
+                                    </div>
+                                    <div class="ml-3">
+                                        <a href="{{ route('mentor.EvaluasiIdp.EvaluasiOnBording.create', [
+                                            'id_idp' => $idp->id_idp,
+                                            'id_user' => Auth::id(),
+                                            'jenis' => 'onboarding',
+                                        ]) }}"
+                                            class="btn btn-sm btn-outline-success">
+                                            Evaluasi
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
             <div class="row">
                 {{-- Chart IDP per Jenjang --}}
                 <div class="col-md-6 mb-4">

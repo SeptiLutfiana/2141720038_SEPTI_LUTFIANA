@@ -11,6 +11,7 @@ use App\Http\Controllers\AngkatanPspController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BankEvaluasiController;
 use App\Http\Controllers\DivisiController;
+use App\Http\Controllers\EvaluasiOnBordingMentorController;
 use App\Http\Controllers\EvaluasiPascaIdpController;
 use App\Http\Controllers\IdpController;
 use App\Http\Controllers\JabatanController;
@@ -335,6 +336,12 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::get('/idp/create', [EvaluasiPascaIdpController::class, 'createMentor'])->name('EvaluasiPascaIdp.createMentor');
         Route::post('/idp/store', [EvaluasiPascaIdpController::class, 'storeMentor'])->name('EvaluasiPascaIdp.storeMentor');
     });
+    Route::prefix('mentor/evaluasi/onboarding')->name('mentor.EvaluasiIdp.EvaluasiOnBording.')->group(function () {
+    Route::get('/idp', [EvaluasiOnBordingMentorController::class, 'indexMentor'])->name('indexMentor');
+    Route::get('/create', [EvaluasiOnBordingMentorController::class, 'create'])->name('create');
+    Route::post('/store', [EvaluasiOnBordingMentorController::class, 'store'])->name('store');
+});
+
 });
 // KARYAWAN
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {

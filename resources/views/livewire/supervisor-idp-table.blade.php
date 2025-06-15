@@ -4,8 +4,8 @@
             <tr class="text-center">
                 <th>No</th>
                 <th>Nama Karyawan</th>
-                <th>NPK Karyawan</th>
-                <th>Jenjang Karyawan</th>
+                {{-- <th>NPK Karyawan</th>
+                <th>Jenjang Karyawan</th> --}}
                 <th>Learning Group</th>
                 <th>Proyeksi Karir</th>
                 <th>Nama Mentor</th>
@@ -20,8 +20,8 @@
                     <tr class="text-center">
                         <td class="text-center" style="width: 30px;">{{ $i + 1 }}</td>
                         <td>{{ $item->karyawan->name ?? 'Menunggu Applay IDP' }}</td>
-                        <td>{{ $item->karyawan->npk ?? 'Menunggu Applay IDP' }}</td>
-                        <td>{{ $item->jenjang->nama_jenjang }}</td>
+                        {{-- <td>{{ $item->karyawan->npk ?? 'Menunggu Applay IDP' }}</td>
+                        <td>{{ $item->jenjang->nama_jenjang }}</td> --}}
                         <td>{{ $item->learningGroup->nama_LG }}</td>
                         <td>{{ $item->proyeksi_karir }}</td>
                         <td>{{ $item->mentor->name ?? 'Menunggu Persetujuan Mentor' }}</td>

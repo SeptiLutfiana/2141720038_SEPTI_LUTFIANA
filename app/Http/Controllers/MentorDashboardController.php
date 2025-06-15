@@ -136,6 +136,21 @@ class MentorDashboardController extends Controller
                     ->where('sebagai_role', 'mentor');
             })
             ->count();
+        $mentor = Auth::user();
+
+        $idpsBelumDievaluasi = IDP::whereDate('waktu_mulai', '<=', now())
+            ->whereDate('waktu_selesai', '>=', now())
+            ->whereDoesntHave('rekomendasis') // ✅ Tambahkan ini
+            ->whereHas('user', function ($q) use ($mentor) {
+                $q->where('id_mentor', $mentor->id);
+            })
+            ->whereDoesntHave('evaluasiIdp', function ($q) use ($mentor) {
+                $q->where('jenis_evaluasi', 'onboarding')
+                    ->where('id_user', $mentor->id);
+            })
+            ->with('user')
+            ->limit(5) // Biar tidak terlalu panjang di dashboard
+            ->get();
 
         return view('mentor.dashboard-mentor', [
             'type_menu' => 'dashboard',
@@ -154,6 +169,7 @@ class MentorDashboardController extends Controller
             'LGLabels' => $LGLabels,
             'LGTotals' => $LGTotals,
             'totalBelumEvaluasiPasca' => $totalBelumEvaluasiPasca,
+            'idpsBelumDievaluasi' => $idpsBelumDievaluasi,
         ]);
     }
     public function indexMentor(Request $request)

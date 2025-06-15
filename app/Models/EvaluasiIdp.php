@@ -23,6 +23,7 @@ class EvaluasiIdp extends Model
         'jenis_evaluasi',
         'tanggal_evaluasi',
         'sebagai_role',
+        'catatan',
     ];
     public function idps()
     {

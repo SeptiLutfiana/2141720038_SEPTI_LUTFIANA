@@ -230,8 +230,8 @@
                     <a href="#" class="nav-link has-dropdown"><i class="fas fa-poll"></i>
                         <span>Evaluasi</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('evaluasi-onboarding') ? 'active' : '' }}">
-                            <a href="{{ url('evaluasi-onboarding') }}">Evaluasi On Boarding</a>
+                        <li class="{{ Request::is('mentor/evaluasi/onboarding/idp') ? 'active' : '' }}">
+                            <a href="{{ url('mentor/evaluasi/onboarding/idp') }}">Evaluasi Onboarding</a>
                         </li>
                         <li class="{{ Request::is('mentor/bank/evaluasi/idp') ? 'active' : '' }}">
                             <a href="{{ url('mentor/bank/evaluasi/idp') }}">Evaluasi Pasca IDP</a>
