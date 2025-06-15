@@ -35,7 +35,7 @@
     <!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/components.css') }}">
-
+    @livewireStyles
     <!-- Vite Assets (Alpine + Tailwind + JS) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 

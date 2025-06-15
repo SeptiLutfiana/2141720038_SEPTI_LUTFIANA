@@ -6,7 +6,8 @@ use App\Models\BankEvaluasi;
 use App\Models\EvaluasiIdp;
 use App\Models\EvaluasiIdpJawaban;
 use Illuminate\Http\Request;
-
+use App\Models\IDP;
+use Illuminate\Support\Facades\Auth;
 class EvaluasiOnBordingMentorController extends Controller
 {
     public function indexMentor()
@@ -46,5 +47,31 @@ class EvaluasiOnBordingMentorController extends Controller
         ]);
 
         return redirect()->route('mentor.EvaluasiIdp.EvaluasiOnBording.indexMentor')->with('msg-success', 'Evaluasi onboarding berhasil disimpan.');
+    }
+    public function indexKaryawan()
+    {
+        return view('karyawan.EvaluasiIdp.EvaluasiOnboarding.index', [
+            'type_menu' => 'evaluasi',
+        ]);
+    }
+    public function detail($id_idp)
+    {
+        $idp = IDP::with([
+            'user',
+            'mentor',
+            'evaluasiIdp' => function ($q) {
+                $q->where('jenis_evaluasi', 'onboarding')->orderByDesc('tanggal_evaluasi');
+            }
+        ])->findOrFail($id_idp);
+
+        // Pastikan yang login adalah pemilik IDP
+        if ($idp->id_user !== Auth::id()) {
+            abort(403);
+        }
+
+        return view('karyawan.EvaluasiIdp.EvaluasiOnboarding.detail', [
+            'type_menu' => 'evaluasi',
+            'idp' =>$idp,
+        ]);
     }
 }

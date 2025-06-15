@@ -331,17 +331,16 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
     Route::prefix('mentor/panduan/idp')->name('karyawan.Panduan.')->group(function () {
         Route::get('/', [PanduanController::class, 'autoShowPanduanMentor'])->name('autoShowPanduanMentor');
     });
-     Route::prefix('mentor/bank/evaluasi')->name('mentor.EvaluasiIdp.')->group(function () {
+    Route::prefix('mentor/bank/evaluasi')->name('mentor.EvaluasiIdp.')->group(function () {
         Route::get('/idp', [EvaluasiPascaIdpController::class, 'indexMentor'])->name('EvaluasiPascaIdp.indexMentor');
         Route::get('/idp/create', [EvaluasiPascaIdpController::class, 'createMentor'])->name('EvaluasiPascaIdp.createMentor');
         Route::post('/idp/store', [EvaluasiPascaIdpController::class, 'storeMentor'])->name('EvaluasiPascaIdp.storeMentor');
     });
     Route::prefix('mentor/evaluasi/onboarding')->name('mentor.EvaluasiIdp.EvaluasiOnBording.')->group(function () {
-    Route::get('/idp', [EvaluasiOnBordingMentorController::class, 'indexMentor'])->name('indexMentor');
-    Route::get('/create', [EvaluasiOnBordingMentorController::class, 'create'])->name('create');
-    Route::post('/store', [EvaluasiOnBordingMentorController::class, 'store'])->name('store');
-});
-
+        Route::get('/idp', [EvaluasiOnBordingMentorController::class, 'indexMentor'])->name('indexMentor');
+        Route::get('/create', [EvaluasiOnBordingMentorController::class, 'create'])->name('create');
+        Route::post('/store', [EvaluasiOnBordingMentorController::class, 'store'])->name('store');
+    });
 });
 // KARYAWAN
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
@@ -373,6 +372,10 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::get('/idp', [EvaluasiPascaIdpController::class, 'indexKaryawan'])->name('EvaluasiPascaIdp.indexKaryawan');
         Route::get('/idp/create', [EvaluasiPascaIdpController::class, 'create'])->name('EvaluasiPascaIdp.create');
         Route::post('/idp/store', [EvaluasiPascaIdpController::class, 'store'])->name('EvaluasiPascaIdp.store');
+    });
+    Route::prefix('karyawan/evaluasi/onboarding')->name('karyawan.EvaluasiIdp.EvaluasiOnboarding.')->group(function () {
+        Route::get('/idp', [EvaluasiOnBordingMentorController::class, 'indexKaryawan'])->name('indexKaryawan');
+        Route::get('/detail/{id_idp}', [EvaluasiOnBordingMentorController::class, 'detail'])->name('detail');
     });
 });
 // PROFILE

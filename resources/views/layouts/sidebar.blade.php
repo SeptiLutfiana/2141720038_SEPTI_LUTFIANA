@@ -270,8 +270,8 @@
                         <span>Evaluasi</span></a>
                     <ul class="dropdown-menu">
                         <li
-                            class="{{ Request::is('admin/datamaster/bank/evaluasi/pasca/idp/create') ? 'active' : '' }}">
-                            <a href="{{ url('karyawan/bank/evaluasi/idp/create') }}">Evaluasi On Boarding</a>
+                            class="{{ Request::is('karyawan/evaluasi/onboarding/idp') ? 'active' : '' }}">
+                            <a href="{{ url('karyawan/evaluasi/onboarding/idp') }}">Evaluasi On Boarding</a>
                         </li>
                         <li class="{{ Request::is('karyawan/bank/evaluasi/idp') ? 'active' : '' }}">
                             <a href="{{ url('karyawan/bank/evaluasi/idp') }}">Evaluasi Pasca IDP</a>
