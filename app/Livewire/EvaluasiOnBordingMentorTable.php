@@ -20,11 +20,10 @@ class EvaluasiOnBordingMentorTable extends Component
         // Ambil semua IDP aktif milik karyawan yang dimentori oleh user login
         $all = IDP::whereDate('waktu_mulai', '<=', now())
             ->whereDate('waktu_selesai', '>=', now())
-            ->whereDoesntHave('rekomendasis') // ✅ Tambahkan ini
             ->whereHas('user', function ($q) use ($mentor) {
                 $q->where('id_mentor', $mentor->id);
             })
-            ->with(['user', 'evaluasiIdp' => function ($q) use ($mentor) {
+            ->with(['user', 'rekomendasis', 'evaluasiIdp' => function ($q) use ($mentor) {
                 $q->where('jenis_evaluasi', 'onboarding')
                     ->where('id_user', $mentor->id);
             }])
@@ -32,11 +31,25 @@ class EvaluasiOnBordingMentorTable extends Component
 
         // Filter: hanya tampilkan jika belum pernah dievaluasi atau sudah lebih dari 14 hari
         $filtered = $all->filter(function ($idp) use ($mentor) {
+            $now = Carbon::now();
+            $isHMinus1 = Carbon::parse($idp->waktu_selesai)->isSameDay($now->copy()->addDay());
             $lastEval = $idp->evaluasiIdp->sortByDesc('tanggal_evaluasi')->first();
 
+            // 1. Jika belum pernah dievaluasi
             if (!$lastEval) return true;
 
-            return Carbon::parse($lastEval->tanggal_evaluasi)->diffInDays(now()) >= 14;
+            // 2. Jika sudah lebih dari 14 hari dari evaluasi terakhir
+            if (Carbon::parse($lastEval->tanggal_evaluasi)->diffInDays($now) >= 14) return true;
+
+            // 3. Jika hari ini adalah H-1 dan belum ada rekomendasi
+            if ($isHMinus1 && $idp->rekomendasis->isEmpty()) {
+                // Jangan tampilkan kalau evaluasi onboarding hari ini sudah dilakukan
+                if ($lastEval && Carbon::parse($lastEval->tanggal_evaluasi)->isSameDay($now)) {
+                    return false;
+                }
+                return true;
+            }
+            return false;
         });
 
         // Manual pagination

@@ -113,7 +113,13 @@ class KaryawanDashboardController extends Controller
                     ->where('sebagai_role', 'karyawan');
             })
             ->count();
-
+        $user = Auth::user();
+        $idpUser = \App\Models\IDP::where('id_user', $user->id)->pluck('id_idp');
+        $evaluasiOnboarding = \App\Models\EvaluasiIdp::whereIn('id_idp', $idpUser)
+            ->where('jenis_evaluasi', 'onboarding')
+            ->where('dibaca', false)
+            ->latest()
+            ->first();
         return view('karyawan.dashboard-karyawan', [
             'type_menu' => 'dashboard',
             'jumlahIDPGiven' => $jumlahIDPGiven,
@@ -126,7 +132,8 @@ class KaryawanDashboardController extends Controller
             'topKaryawan' => $topKaryawan,
             'jumlahIDPRevisi' => $jumlahIDPRevisi,
             'jumlahIdpTidakDisetujui' => $jumlahIdpTidakDisetujui,
-            'totalBelumEvaluasiPasca' => $totalBelumEvaluasiPasca
+            'totalBelumEvaluasiPasca' => $totalBelumEvaluasiPasca,
+            'evaluasiOnboarding' => $evaluasiOnboarding,
         ]);
     }
     public function indexKaryawan(Request $request)

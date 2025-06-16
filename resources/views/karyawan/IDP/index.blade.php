@@ -39,10 +39,7 @@
                             <div class="card-header">
                                 <h4>Data Individual Development Plan</h4>
                                 <div class="card-header-action">
-                                    <a href="#" class="btn btn-icon btn-danger icon-left" target="_blank">
-                                        <i class="fas fa-print"></i> Print PDF
-                                    </a>
-                                    <a href="#" class="btn btn-icon btn-primary icon-left">
+                                    <a href="{{ route('karyawan.IDP.create') }}" class="btn btn-icon btn-primary icon-left">
                                         <i class="fas fa-plus"></i> Tambah
                                     </a>
                                 </div>

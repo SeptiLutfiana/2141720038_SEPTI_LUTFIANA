@@ -8,6 +8,7 @@ use App\Models\EvaluasiIdpJawaban;
 use Illuminate\Http\Request;
 use App\Models\IDP;
 use Illuminate\Support\Facades\Auth;
+
 class EvaluasiOnBordingMentorController extends Controller
 {
     public function indexMentor()
@@ -68,10 +69,19 @@ class EvaluasiOnBordingMentorController extends Controller
         if ($idp->id_user !== Auth::id()) {
             abort(403);
         }
+        // Ambil evaluasi onboarding pertama (terbaru)
+        $evaluasi = $idp->evaluasiIdp->first();
+
+        // Tandai evaluasi sebagai dibaca jika belum
+        if ($evaluasi && !$evaluasi->dibaca) {
+            $evaluasi->dibaca = true;
+            $evaluasi->save();
+        }
 
         return view('karyawan.EvaluasiIdp.EvaluasiOnboarding.detail', [
             'type_menu' => 'evaluasi',
-            'idp' =>$idp,
+            'idp' => $idp,
+            'evaluasi' => $evaluasi,
         ]);
     }
 }

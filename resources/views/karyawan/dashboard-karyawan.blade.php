@@ -17,13 +17,26 @@
             <div class="section-body">
             </div>
             @include('components.alert') {{-- Tampilkan notifikasi jika ada --}}
-            <div class="alert alert-light border border-info shadow-sm d-flex align-items-center" role="alert">
-                <i class="fas fa-smile-beam text-info fa-lg mr-3"></i>
-                <div>
+            <div class="alert border border-warning shadow-sm d-flex align-items-center" role="alert">
+                <i class="fas fa-smile-beam text-warning fa-lg mr-3"></i>
+                <div class="text-dark">
                     <h5 class="mb-1 font-weight-bold">Hai, {{ Auth::user()->name }} 👋</h5>
-                    <small>Selamat datang kembali.</small>
+                    <small>Selamat datang kembali di Dashboard Karyawan</small>
                 </div>
             </div>
+            @if ($evaluasiOnboarding)
+                <div class="alert alert-light border border-info shadow-sm d-flex align-items-center">
+                    <i class="fas fa-info-circle fa-lg text-info mr-3"></i>
+                    <div>
+                        <strong>Evaluasi Onboarding Tersedia!</strong><br>
+                        Evaluasi IDP Anda telah dikirim oleh mentor.<br>
+                        <a href="{{ route('karyawan.EvaluasiIdp.EvaluasiOnboarding.detail', $evaluasiOnboarding->id_idp) }}"
+                            class="btn btn-sm btn-outline-primary mt-2">
+                            Lihat Evaluasi
+                        </a>
+                    </div>
+                </div>
+            @endif
 
             {{-- Progres Behavior IDP --}}
             <div class="row">

@@ -4380,3 +4380,8 @@ input[type="file"].form-control-file {
     border-radius: 0.25rem;
     padding: 0.375rem 0.75rem;
 }
+label {
+    font-size: 18px; /* Ubah sesuai keinginan: 16px, 17px, dsb. */
+    font-weight: 600;
+    color: #333;
+}
