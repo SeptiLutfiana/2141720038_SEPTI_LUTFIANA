@@ -1,34 +1,58 @@
 <?php
 
 namespace App\Console\Commands;
+
 use App\Models\IdpRekomendasi;
 use App\Models\IDP;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
+use Illuminate\Console\Scheduling\Schedule;
 
 class AutoRekomendasiIdp extends Command
 {
-   protected $signature = 'idp:autorekom';
-    protected $description = 'Beri rekomendasi otomatis Tidak Disarankan untuk IDP yang melewati batas waktu';
+    protected $signature = 'idp:check-rekomendasi';
+    protected $description = 'Buat rekomendasi otomatis untuk IDP yang melewati batas waktu dan belum disetujui mentor';
 
     public function handle()
     {
-        $expiredIdps = IDP::whereDate('waktu_selesai', '<', now())
+        $$now = now();
+
+        $idps = IDP::with('idpKompetensis.pengerjaans')
+            ->where('waktu_selesai', '<', $now)
             ->doesntHave('rekomendasis')
             ->get();
 
-        $total = 0;
+        $count = 0;
 
-        foreach ($expiredIdps as $idp) {
-            IdpRekomendasi::create([
-                'id_idp' => $idp->id,
-                'hasil_rekomendasi' => 'Tidak Disarankan',
-                'deskripsi_rekomendasi' => 'IDP telah melewati batas waktu dan tidak memenuhi target, sehingga tidak direkomendasikan.',
-                'nilai_akhir_soft' => null,
-                'nilai_akhir_hard' => null,
-            ]);
-            $total++;
+        foreach ($idps as $idp) {
+            // Cek apakah semua kompetensi sudah dikerjakan
+            $belumDikerjakan = $idp->idpKompetensis->filter(function ($komp) {
+                return $komp->pengerjaans->isEmpty();
+            });
+
+            // Kasus 1: Semua dikerjakan, disetujui mentor, tapi belum direkomendasi → lewati
+            if (
+                $belumDikerjakan->isEmpty() &&
+                $idp->status_pengerjaan === 'Disetujui Mentor'
+            ) {
+                continue; // skip, biarkan supervisor yang menilai
+            }
+
+            // Kasus 2: Masih ada yang belum dikerjakan, waktu habis → rekomendasi otomatis
+            if ($belumDikerjakan->isNotEmpty()) {
+                IdpRekomendasi::create([
+                    'id_idp' => $idp->id_idp,
+                    'hasil_rekomendasi' => 'Tidak Disarankan',
+                    'deskripsi_rekomendasi' => 'IDP tidak disarankan karena tidak semua kompetensi dikerjakan hingga batas waktu.',
+                    'nilai_akhir_soft' => null,
+                    'nilai_akhir_hard' => null,
+                ]);
+                $count++;
+            }
         }
-
-        $this->info("Selesai: $total IDP diberi rekomendasi otomatis.");
+    }
+    public function schedule(Schedule $schedule): void
+    {
+        $schedule->daily(); // <-- ini yang membuatnya otomatis dijalankan harian
     }
 }
