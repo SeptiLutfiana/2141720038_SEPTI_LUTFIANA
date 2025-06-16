@@ -26,28 +26,45 @@ use App\Models\Divisi;
 use App\Models\Kompetensi;
 use App\Models\MetodeBelajar;
 use FFI\Exception;
+use App\Models\EvaluasiIdp;
 
 class KaryawanDashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $idpIds = IDP::where('id_user', Auth::id())
-            ->where('is_template', false) // pastikan bukan bank IDP
+        $user = Auth::user();
+        $karyawanId = $user->id;
+
+        // Ambil tahun dari query atau default ke tahun sekarang
+        $tahunDipilih = $request->input('tahun', now()->year);
+
+        // List tahun dari IDP karyawan (buat dropdown filter)
+        $listTahun = IDP::where('id_user', $karyawanId)
+            ->selectRaw('YEAR(waktu_mulai) as tahun')
+            ->distinct()
+            ->pluck('tahun')
+            ->sortDesc();
+
+        $idpIds = IDP::where('id_user', $karyawanId)
+            ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->pluck('id_idp');
-        $jumlahIDPGiven = IDP::where('is_template', false)
-            ->where('id_user', Auth::id()) // hanya milik user yang sedang login
+
+        $jumlahIDPGiven = IDP::where('id_user', $karyawanId)
+            ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->count();
-        $jumlahRekomendasiBelumMuncul = IDP::where('is_template', false) // hanya IDP biasa, bukan bank
-            ->where('id_user', Auth::id()) // hanya milik karyawan yang login
+
+        $jumlahRekomendasiBelumMuncul = IDP::where('id_user', $karyawanId)
+            ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->where(function ($query) {
-                $query->doesntHave('rekomendasis') // tidak ada rekomendasi sama sekali
+                $query->doesntHave('rekomendasis')
                     ->orWhereHas('rekomendasis', function ($q) {
-                        $q->whereNull('hasil_rekomendasi') // ada rekomendasi tapi belum ada hasilnya
-                            ->orWhere('hasil_rekomendasi', '');
+                        $q->whereNull('hasil_rekomendasi')->orWhere('hasil_rekomendasi', '');
                     });
-            })
-            ->count();
-        // Hitung berdasarkan hasil rekomendasi
+            })->count();
+
         $jumlahDisarankan = IdpRekomendasi::whereIn('id_idp', $idpIds)
             ->where('hasil_rekomendasi', 'Disarankan')
             ->count();
@@ -59,31 +76,37 @@ class KaryawanDashboardController extends Controller
         $jumlahTidakDisarankan = IdpRekomendasi::whereIn('id_idp', $idpIds)
             ->where('hasil_rekomendasi', 'Tidak Disarankan')
             ->count();
-        $karyawanId = Auth::id(); // ID user login (karyawan)
 
         $jumlahMenungguPersetujuan = IDP::where('id_user', $karyawanId)
             ->where('status_approval_mentor', 'Menunggu Persetujuan')
             ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->count();
-        $user = Auth::user();
+
         $jumlahIDPRevisi = IDP::where('id_user', $karyawanId)
             ->where('status_pengajuan_idp', 'Revisi')
             ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->count();
+
         $jumlahIdpTidakDisetujui = IDP::where('id_user', $karyawanId)
             ->where('status_pengajuan_idp', 'Tidak Disetujui')
             ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->count();
+
         $jumlahIdpMenungguPersetujuan = IDP::where('id_user', $karyawanId)
             ->where('status_pengajuan_idp', 'Menunggu Persetujuan')
             ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->count();
-        $user = Auth::user();
-        $rekomendasiData = IdpRekomendasi::with('idp.karyawan.roles')
+
+        $rekomendasiData = IdpRekomendasi::whereIn('id_idp', $idpIds)
+            ->with('idp.karyawan.roles')
             ->get()
             ->filter(function ($item) use ($user) {
                 return $item->idp
-                    && $item->idp->id_user == $user->id // hanya idp milik user login
+                    && $item->idp->id_user == $user->id
                     && $item->idp->karyawan
                     && $item->idp->karyawan->roles->contains('id_role', 4);
             })
@@ -93,18 +116,18 @@ class KaryawanDashboardController extends Controller
                     'y' => $item->nilai_akhir_soft,
                     'label' => ($item->idp->karyawan->name ?? 'Tidak Diketahui') . ' - ' . ($item->idp->proyeksi_karir ?? '-'),
                 ];
-            })
-            ->values();
-        $topKaryawan = IdpRekomendasi::with(['idp.karyawan'])
+            })->values();
+
+        $topKaryawan = IdpRekomendasi::with('idp.karyawan')
             ->where('hasil_rekomendasi', 'Disarankan')
-            ->whereHas('idp', function ($query) use ($user) {
-                $query->where('id_user', $user->id);
-            })
+            ->whereIn('id_idp', $idpIds)
             ->orderByDesc('nilai_akhir_soft')
             ->orderByDesc('nilai_akhir_hard')
             ->take(5)
             ->get();
-        $totalBelumEvaluasiPasca = Idp::where('id_user', Auth::user()->id)
+
+        $totalBelumEvaluasiPasca = IDP::where('id_user', $user->id)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->whereHas('rekomendasis', function ($query) {
                 $query->whereIn('hasil_rekomendasi', ['Disarankan', 'Disarankan dengan Pengembangan']);
             })
@@ -113,26 +136,29 @@ class KaryawanDashboardController extends Controller
                     ->where('sebagai_role', 'karyawan');
             })
             ->count();
-        $user = Auth::user();
-        $idpUser = \App\Models\IDP::where('id_user', $user->id)->pluck('id_idp');
-        $evaluasiOnboarding = \App\Models\EvaluasiIdp::whereIn('id_idp', $idpUser)
+
+        $evaluasiOnboarding = EvaluasiIdp::whereIn('id_idp', $idpIds)
             ->where('jenis_evaluasi', 'onboarding')
             ->where('dibaca', false)
             ->latest()
             ->first();
+
         return view('karyawan.dashboard-karyawan', [
             'type_menu' => 'dashboard',
+            'tahunDipilih' => $tahunDipilih,
+            'listTahun' => $listTahun,
             'jumlahIDPGiven' => $jumlahIDPGiven,
             'jumlahRekomendasiBelumMuncul' => $jumlahRekomendasiBelumMuncul,
             'jumlahDisarankan' => $jumlahDisarankan,
             'jumlahDisarankanDenganPengembangan' => $jumlahDisarankanDenganPengembangan,
             'jumlahTidakDisarankan' => $jumlahTidakDisarankan,
             'jumlahMenungguPersetujuan' => $jumlahMenungguPersetujuan,
-            'dataPoints' => $rekomendasiData,
-            'topKaryawan' => $topKaryawan,
             'jumlahIDPRevisi' => $jumlahIDPRevisi,
             'jumlahIdpTidakDisetujui' => $jumlahIdpTidakDisetujui,
+            'jumlahIdpMenungguPersetujuan' => $jumlahIdpMenungguPersetujuan,
             'totalBelumEvaluasiPasca' => $totalBelumEvaluasiPasca,
+            'dataPoints' => $rekomendasiData,
+            'topKaryawan' => $topKaryawan,
             'evaluasiOnboarding' => $evaluasiOnboarding,
         ]);
     }

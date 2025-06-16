@@ -25,6 +25,18 @@
                     <small>Selamat datang kembali sebagi Mentor Perencanaan IDP di Perhutani Forestry Institute.</small>
                 </div>
             </div>
+            <form method="GET" action="{{ route('mentor.dashboard-mentor') }}" class="form-inline mb-4">
+                <label for="filterTahun" class="mr-2 font-weight-bold">Tahun Periode:</label>
+                <select name="tahun" id="filterTahun" class="form-control mr-2" style="width: 100px;"
+                    onchange="this.form.submit()">
+                    @foreach ($listTahun as $th)
+                        <option value="{{ $th }}" {{ request('tahun', $tahunDipilih) == $th ? 'selected' : '' }}>
+                            {{ $th }}
+                        </option>
+                    @endforeach
+                </select>
+                <noscript><button type="submit" class="btn btn-primary">Terapkan</button></noscript>
+            </form>
             <div class="card">
                 <div class="card-header text-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0"><i class="fas fa-clipboard-check mr-2"></i>Evaluasi IDP Onboarding</h4>

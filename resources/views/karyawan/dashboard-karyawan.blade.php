@@ -24,6 +24,18 @@
                     <small>Selamat datang kembali di Dashboard Karyawan</small>
                 </div>
             </div>
+            <form method="GET" action="{{ route('karyawan.dashboard-karyawan') }}" class="form-inline mb-4">
+                <label for="filterTahun" class="mr-2 font-weight-bold">Tahun Periode:</label>
+                <select name="tahun" id="filterTahun" class="form-control mr-2" style="width: 100px;"
+                    onchange="this.form.submit()">
+                    @foreach ($listTahun as $th)
+                        <option value="{{ $th }}" {{ request('tahun', $tahunDipilih) == $th ? 'selected' : '' }}>
+                            {{ $th }}
+                        </option>
+                    @endforeach
+                </select>
+                <noscript><button type="submit" class="btn btn-primary">Terapkan</button></noscript>
+            </form>
             @if ($evaluasiOnboarding)
                 <div class="alert alert-light border border-info shadow-sm d-flex align-items-center">
                     <i class="fas fa-info-circle fa-lg text-info mr-3"></i>

@@ -16,71 +16,99 @@ use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $jumlahKaryawan = User::whereHas('userRoles.role', function ($query) {
-            $query->where('nama_role', 'karyawan');
-        })->count();
+        // Ambil daftar tahun dari data IDP
+        $listTahun = IDP::selectRaw('YEAR(waktu_mulai) as tahun')
+            ->distinct()
+            ->pluck('tahun')
+            ->sortDesc();
 
-        $jumlahSpv = User::whereHas('userRoles.role', function ($query) {
-            $query->where('nama_role', 'supervisor');
-        })->count();
-        $jumlahMentor = User::whereHas('userRoles.role', function ($query) {
-            $query->where('nama_role', 'mentor');
-        })->count();
-        $jumlahIDPGiven = IDP::where('is_template', false)->count(); // IDP by karyawan
-        $jumlahIDPBank = IDP::where('is_template', true)->count();   // IDP bank/template
-        $jumlahDisarankan = IdpRekomendasi::where('hasil_rekomendasi', 'Disarankan')->count();
-        $jumlahDisarankanDenganPengembangan = IdpRekomendasi::where('hasil_rekomendasi', 'Disarankan dengan Pengembangan')->count();
-        $jumlahTidakDisarankan = IdpRekomendasi::where('hasil_rekomendasi', 'Tidak Disarankan')->count();
-        $jumlahRekomendasiBelumMuncul = IDP::where('is_template', false) // hanya IDP biasa, bukan bank
+        // Ambil tahun dari request atau default ke tahun sekarang
+        $tahunDipilih = $request->input('tahun', now()->year);
+
+        // Filter data berdasarkan tahun
+        $jumlahIDPGiven = IDP::where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
+            ->count();
+
+        $jumlahIDPBank = IDP::where('is_template', true)
+            ->whereYear('waktu_mulai', $tahunDipilih)
+            ->count();
+
+        $jumlahRekomendasiBelumMuncul = IDP::where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->where(function ($query) {
-                $query->doesntHave('rekomendasis') // tidak ada rekomendasi sama sekali
+                $query->doesntHave('rekomendasis')
                     ->orWhereHas('rekomendasis', function ($q) {
-                        $q->whereNull('hasil_rekomendasi') // ada rekomendasi tapi belum ada hasilnya
+                        $q->whereNull('hasil_rekomendasi')
                             ->orWhere('hasil_rekomendasi', '');
                     });
-            })
-            ->count();
-        $jumlahRekomendasiMenunggu = IdpRekomendasi::whereNull('hasil_rekomendasi')->count();
+            })->count();
+
         $jumlahApplyBankIdp = IDP::where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->whereNotNull('id_idp_template_asal')
             ->count();
-        $jenjangData = IDP::select('id_jenjang', DB::raw('count(*) as total'))
+
+        $jumlahDisarankan = IdpRekomendasi::whereHas('idp', function ($q) use ($tahunDipilih) {
+            $q->whereYear('waktu_mulai', $tahunDipilih);
+        })->where('hasil_rekomendasi', 'Disarankan')->count();
+
+        $jumlahDisarankanDenganPengembangan = IdpRekomendasi::whereHas('idp', function ($q) use ($tahunDipilih) {
+            $q->whereYear('waktu_mulai', $tahunDipilih);
+        })->where('hasil_rekomendasi', 'Disarankan dengan Pengembangan')->count();
+
+        $jumlahTidakDisarankan = IdpRekomendasi::whereHas('idp', function ($q) use ($tahunDipilih) {
+            $q->whereYear('waktu_mulai', $tahunDipilih);
+        })->where('hasil_rekomendasi', 'Tidak Disarankan')->count();
+
+        $jumlahRekomendasiMenunggu = IdpRekomendasi::whereNull('hasil_rekomendasi')
+            ->whereHas('idp', function ($q) use ($tahunDipilih) {
+                $q->whereYear('waktu_mulai', $tahunDipilih);
+            })->count();
+
+        // Tetap menampilkan data user tanpa filter tahun
+        $jumlahKaryawan = User::whereHas('userRoles.role', fn($q) => $q->where('nama_role', 'karyawan'))->count();
+        $jumlahSpv = User::whereHas('userRoles.role', fn($q) => $q->where('nama_role', 'supervisor'))->count();
+        $jumlahMentor = User::whereHas('userRoles.role', fn($q) => $q->where('nama_role', 'mentor'))->count();
+
+        // Jenjang chart
+        $jenjangData = IDP::whereYear('waktu_mulai', $tahunDipilih)
+            ->select('id_jenjang', DB::raw('count(*) as total'))
             ->groupBy('id_jenjang')
             ->with('jenjang')
             ->get();
 
-        // Buat array kosong jika tidak ada data
         $jenjangLabels = [];
         $jenjangTotals = [];
-
-        if ($jenjangData->isNotEmpty()) {
-            foreach ($jenjangData as $data) {
-                $jenjangLabels[] = $data->jenjang ? $data->jenjang->nama_jenjang : 'Tidak diketahui';
-                $jenjangTotals[] = (int) $data->total;
-            }
+        foreach ($jenjangData as $data) {
+            $jenjangLabels[] = $data->jenjang ? $data->jenjang->nama_jenjang : 'Tidak diketahui';
+            $jenjangTotals[] = (int) $data->total;
         }
-        $LGData = IDP::select('id_LG', DB::raw('count(*) as total'))
+
+        // Learning Group chart
+        $LGData = IDP::whereYear('waktu_mulai', $tahunDipilih)
+            ->select('id_LG', DB::raw('count(*) as total'))
             ->groupBy('id_LG')
             ->with('learningGroup')
             ->get();
 
-        // Buat array kosong jika tidak ada data
         $LGLabels = [];
         $LGTotals = [];
-
-        if ($LGData->isNotEmpty()) {
-            foreach ($LGData as $data) {
-                $LGLabels[] = $data->learningGroup ? $data->learningGroup->nama_LG : 'Tidak diketahui';
-                $LGTotals[] = (int) $data->total;
-            }
+        foreach ($LGData as $data) {
+            $LGLabels[] = $data->learningGroup ? $data->learningGroup->nama_LG : 'Tidak diketahui';
+            $LGTotals[] = (int) $data->total;
         }
+
         $totalPanduan = Panduan::count();
-        $rekomendasiData = IdpRekomendasi::with('idp.karyawan.roles')
+
+        $rekomendasiData = IdpRekomendasi::whereHas('idp', function ($q) use ($tahunDipilih) {
+            $q->whereYear('waktu_mulai', $tahunDipilih);
+        })
+            ->with('idp.karyawan.roles')
             ->get()
             ->filter(function ($item) {
-                // Hanya ambil yang punya IDP, karyawan, dan role karyawan (id_role = 4)
                 return $item->idp && $item->idp->karyawan && $item->idp->karyawan->roles->contains('id_role', 4);
             })
             ->map(function ($item) {
@@ -89,15 +117,22 @@ class AdminDashboardController extends Controller
                     'y' => $item->nilai_akhir_soft,
                     'label' => ($item->idp->karyawan->name ?? 'Tidak Diketahui') . ' - ' . ($item->idp->proyeksi_karir ?? '-'),
                 ];
-            })
-            ->values(); // reset index array
+            })->values();
+
         $topKaryawan = IdpRekomendasi::with(['idp.karyawan'])
             ->where('hasil_rekomendasi', 'Disarankan')
+            ->whereHas('idp', function ($q) use ($tahunDipilih) {
+                $q->whereYear('waktu_mulai', $tahunDipilih);
+            })
             ->orderByDesc('nilai_akhir_soft')
             ->orderByDesc('nilai_akhir_hard')
             ->take(5)
             ->get();
-        $totalEvaluasiPasca = EvaluasiIdp::count();
+
+        $totalEvaluasiPasca = EvaluasiIdp::where('jenis_evaluasi', 'pasca')
+            ->whereYear('created_at', $tahunDipilih)
+            ->count();
+
         return view('adminsdm.dashboard', [
             'type_menu' => 'dashboard',
             'jumlahKaryawan' => $jumlahKaryawan,
@@ -119,8 +154,11 @@ class AdminDashboardController extends Controller
             'dataPoints' => $rekomendasiData,
             'topKaryawan' => $topKaryawan,
             'totalEvaluasiPasca' => $totalEvaluasiPasca,
+            'listTahun' => $listTahun,
+            'tahunDipilih' => $tahunDipilih,
         ]);
     }
+
     public function indexRiwayatIdp(Request $request)
     {
         $search = $request->query('search');

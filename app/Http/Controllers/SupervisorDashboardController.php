@@ -19,63 +19,83 @@ use App\Models\IdpRekomendasi;
 
 class SupervisorDashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $idpIds = IDP::where('id_supervisor', Auth::id())
-            ->where('is_template', false) // pastikan bukan bank IDP
+        $user = Auth::user();
+        $spvId = $user->id;
+
+        // Ambil tahun dari query atau default ke tahun sekarang
+        $tahunDipilih = $request->input('tahun', now()->year);
+
+        // Ambil daftar tahun unik dari waktu_mulai IDP untuk dropdown filter
+        $listTahun = IDP::where('id_supervisor', $spvId)
+            ->where('is_template', false)
+            ->selectRaw('YEAR(waktu_mulai) as tahun')
+            ->distinct()
+            ->pluck('tahun')
+            ->sortDesc();
+
+        $idpIds = IDP::where('id_supervisor', $spvId)
+            ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->pluck('id_idp');
-        $jumlahIDPGiven = IDP::where('is_template', false)
-            ->where('id_supervisor', Auth::id()) // hanya milik user yang sedang login
+
+        $jumlahIDPGiven = IDP::where('id_supervisor', $spvId)
+            ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->count();
-        $jumlahRekomendasiBelumMuncul = IDP::where('is_template', false) // hanya IDP biasa, bukan bank
-            ->where('id_supervisor', Auth::id()) // hanya milik karyawan yang login
+
+        $jumlahRekomendasiBelumMuncul = IDP::where('id_supervisor', $spvId)
+            ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->where(function ($query) {
-                $query->doesntHave('rekomendasis') // tidak ada rekomendasi sama sekali
+                $query->doesntHave('rekomendasis')
                     ->orWhereHas('rekomendasis', function ($q) {
-                        $q->whereNull('hasil_rekomendasi') // ada rekomendasi tapi belum ada hasilnya
-                            ->orWhere('hasil_rekomendasi', '');
+                        $q->whereNull('hasil_rekomendasi')->orWhere('hasil_rekomendasi', '');
                     });
-            })
-            ->count();
-        // Hitung berdasarkan hasil rekomendasi
+            })->count();
+
         $jumlahDisarankan = IdpRekomendasi::whereIn('id_idp', $idpIds)
-            ->where('hasil_rekomendasi', 'Disarankan')
-            ->count();
+            ->where('hasil_rekomendasi', 'Disarankan')->count();
 
         $jumlahDisarankanDenganPengembangan = IdpRekomendasi::whereIn('id_idp', $idpIds)
-            ->where('hasil_rekomendasi', 'Disarankan dengan Pengembangan')
-            ->count();
+            ->where('hasil_rekomendasi', 'Disarankan dengan Pengembangan')->count();
 
         $jumlahTidakDisarankan = IdpRekomendasi::whereIn('id_idp', $idpIds)
-            ->where('hasil_rekomendasi', 'Tidak Disarankan')
-            ->count();
-        $karyawanId = Auth::id(); // ID user login (karyawan)
+            ->where('hasil_rekomendasi', 'Tidak Disarankan')->count();
 
-        $jumlahMenungguPersetujuan = IDP::where('id_supervisor', $karyawanId)
+        $jumlahMenungguPersetujuan = IDP::where('id_supervisor', $spvId)
             ->where('status_approval_mentor', 'Menunggu Persetujuan')
             ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->count();
-        $user = Auth::user();
-        $jumlahIDPRevisi = IDP::where('id_supervisor', $karyawanId)
+
+        $jumlahIDPRevisi = IDP::where('id_supervisor', $spvId)
             ->where('status_pengajuan_idp', 'Revisi')
             ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->count();
-        $jumlahIdpTidakDisetujui = IDP::where('id_supervisor', $karyawanId)
+
+        $jumlahIdpTidakDisetujui = IDP::where('id_supervisor', $spvId)
             ->where('status_pengajuan_idp', 'Tidak Disetujui')
             ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->count();
-        $jumlahIdpMenungguPersetujuan = IDP::where('id_supervisor', $karyawanId)
+
+        $jumlahIdpMenungguPersetujuan = IDP::where('id_supervisor', $spvId)
             ->where('status_pengajuan_idp', 'Menunggu Persetujuan')
             ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->count();
-        $user = Auth::user();
-        $rekomendasiData = IdpRekomendasi::with('idp.karyawan.roles')
+
+        $rekomendasiData = IdpRekomendasi::whereIn('id_idp', $idpIds)
+            ->with('idp.karyawan.roles')
             ->get()
-            ->filter(function ($item) use ($user) {
-                return $item->idp
-                    && $item->idp->id_supervisor == $user->id // hanya idp milik user login
-                    && $item->idp->karyawan
-                    && $item->idp->karyawan->roles->contains('id_role', 4);
+            ->filter(function ($item) use ($spvId) {
+                return $item->idp &&
+                    $item->idp->id_supervisor == $spvId &&
+                    $item->idp->karyawan &&
+                    $item->idp->karyawan->roles->contains('id_role', 4);
             })
             ->map(function ($item) {
                 return [
@@ -83,72 +103,72 @@ class SupervisorDashboardController extends Controller
                     'y' => $item->nilai_akhir_soft,
                     'label' => ($item->idp->karyawan->name ?? 'Tidak Diketahui') . ' - ' . ($item->idp->proyeksi_karir ?? '-'),
                 ];
-            })
-            ->values();
-        $topKaryawan = IdpRekomendasi::with(['idp.karyawan'])
+            })->values();
+
+        $topKaryawan = IdpRekomendasi::with('idp.karyawan')
             ->where('hasil_rekomendasi', 'Disarankan')
-            ->whereHas('idp', function ($query) use ($user) {
-                $query->where('id_supervisor', $user->id);
-            })
+            ->whereIn('id_idp', $idpIds)
             ->orderByDesc('nilai_akhir_soft')
             ->orderByDesc('nilai_akhir_hard')
             ->take(5)
             ->get();
+
         $jenjangData = IDP::select('id_jenjang', DB::raw('count(*) as total'))
-            ->where('id_supervisor', $user->id)
-            ->where('is_template', 0) // Tambahkan ini
+            ->where('id_supervisor', $spvId)
+            ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->groupBy('id_jenjang')
             ->with('jenjang')
             ->get();
 
-        // Buat array kosong jika tidak ada data
         $jenjangLabels = [];
         $jenjangTotals = [];
-
-        if ($jenjangData->isNotEmpty()) {
-            foreach ($jenjangData as $data) {
-                $jenjangLabels[] = $data->jenjang ? $data->jenjang->nama_jenjang : 'Tidak diketahui';
-                $jenjangTotals[] = (int) $data->total;
-            }
+        foreach ($jenjangData as $data) {
+            $jenjangLabels[] = $data->jenjang ? $data->jenjang->nama_jenjang : 'Tidak diketahui';
+            $jenjangTotals[] = (int) $data->total;
         }
+
         $LGData = IDP::select('id_LG', DB::raw('count(*) as total'))
-            ->where('id_supervisor', $user->id)
-            ->where('is_template', 0) // Tambahkan ini
+            ->where('id_supervisor', $spvId)
+            ->where('is_template', false)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->groupBy('id_LG')
             ->with('learningGroup')
             ->get();
 
-        // Buat array kosong jika tidak ada data
         $LGLabels = [];
         $LGTotals = [];
-
-        if ($LGData->isNotEmpty()) {
-            foreach ($LGData as $data) {
-                $LGLabels[] = $data->learningGroup ? $data->learningGroup->nama_LG : 'Tidak diketahui';
-                $LGTotals[] = (int) $data->total;
-            }
+        foreach ($LGData as $data) {
+            $LGLabels[] = $data->learningGroup ? $data->learningGroup->nama_LG : 'Tidak diketahui';
+            $LGTotals[] = (int) $data->total;
         }
-        $totalBelumEvaluasiPasca = Idp::where('id_mentor', Auth::id())
+
+        $totalBelumEvaluasiPasca = IDP::where('id_supervisor', $spvId)
+            ->whereYear('waktu_mulai', $tahunDipilih)
             ->whereHas('rekomendasis', function ($query) {
                 $query->whereIn('hasil_rekomendasi', ['Disarankan', 'Disarankan dengan Pengembangan']);
             })
             ->whereDoesntHave('evaluasiIdp', function ($query) {
                 $query->where('jenis_evaluasi', 'pasca')
-                    ->where('sebagai_role', 'mentor');
+                    ->where('sebagai_role', 'supervisor');
             })
             ->count();
+
         return view('supervisor.spv-dashboard', [
             'type_menu' => 'dashboard',
+            'tahunDipilih' => $tahunDipilih,
+            'listTahun' => $listTahun,
             'jumlahIDPGiven' => $jumlahIDPGiven,
             'jumlahRekomendasiBelumMuncul' => $jumlahRekomendasiBelumMuncul,
             'jumlahDisarankan' => $jumlahDisarankan,
             'jumlahDisarankanDenganPengembangan' => $jumlahDisarankanDenganPengembangan,
             'jumlahTidakDisarankan' => $jumlahTidakDisarankan,
             'jumlahMenungguPersetujuan' => $jumlahMenungguPersetujuan,
-            'dataPoints' => $rekomendasiData,
-            'topKaryawan' => $topKaryawan,
             'jumlahIDPRevisi' => $jumlahIDPRevisi,
             'jumlahIdpTidakDisetujui' => $jumlahIdpTidakDisetujui,
+            'jumlahIdpMenungguPersetujuan' => $jumlahIdpMenungguPersetujuan,
+            'dataPoints' => $rekomendasiData,
+            'topKaryawan' => $topKaryawan,
             'jenjangLabels' => $jenjangLabels,
             'jenjangTotals' => $jenjangTotals,
             'LGLabels' => $LGLabels,
@@ -156,6 +176,7 @@ class SupervisorDashboardController extends Controller
             'totalBelumEvaluasiPasca' => $totalBelumEvaluasiPasca,
         ]);
     }
+
     public function indexSupervisor(Request $request)
     {
         $user = Auth::user(); // Ambil user yang sedang login

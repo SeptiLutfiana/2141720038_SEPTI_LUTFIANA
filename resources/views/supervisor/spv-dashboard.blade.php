@@ -24,6 +24,18 @@
                     <small>Selamat datang kembali sebagi Supervisor Perencanaan IDP di Perhutani Forestry Institute.</small>
                 </div>
             </div>
+            <form method="GET" action="{{ route('supervisor.spv-dashboard') }}" class="form-inline mb-4">
+                <label for="filterTahun" class="mr-2 font-weight-bold">Tahun Periode:</label>
+                <select name="tahun" id="filterTahun" class="form-control mr-2" style="width: 100px;"
+                    onchange="this.form.submit()">
+                    @foreach ($listTahun as $th)
+                        <option value="{{ $th }}" {{ request('tahun', $tahunDipilih) == $th ? 'selected' : '' }}>
+                            {{ $th }}
+                        </option>
+                    @endforeach
+                </select>
+                <noscript><button type="submit" class="btn btn-primary">Terapkan</button></noscript>
+            </form>
             <div class="row">
                 {{-- KIRI: Informasi Bank IDP --}}
                 <div class="col-md-8 mb-4">
