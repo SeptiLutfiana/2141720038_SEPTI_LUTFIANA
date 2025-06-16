@@ -37,7 +37,7 @@
                 @endforeach
             @else
                 <tr>
-                    <td colspan="5" class="text-center text-muted">Belum ada data bank evaluasi yang tersedia.</td>
+                    <td colspan="6" class="text-center text-muted">Belum ada data bank evaluasi yang tersedia.</td>
                 </tr>
             @endif
         </tbody>

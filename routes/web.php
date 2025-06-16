@@ -273,7 +273,6 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::get('/{id}/edit', [PanduanController::class, 'edit'])->name('edit');
         Route::put('/{id}/update', [PanduanController::class, 'update'])->name('update');
         Route::post('/upload-file', [PanduanController::class, 'uploadFile'])->name('upload-file');
-
     });
     Route::prefix('admin/datamaster/bank/evaluasi')->name('adminsdm.BankEvaluasi.')->group(function () {
         Route::get('/', [BankEvaluasiController::class, 'index'])->name('index');
@@ -291,6 +290,8 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::get('/idp/create', [EvaluasiPascaIdpController::class, 'create'])->name('EvaluasiPascaIdp.create');
         Route::post('/idp/store', [EvaluasiPascaIdpController::class, 'store'])->name('EvaluasiPascaIdp.store');
         Route::get('/{id}/detail/jawaban', [EvaluasiPascaIdpController::class, 'showKaryawan'])->name('EvaluasiPascaIdp.showKaryawan');
+        Route::get('/evaluasi/export-excel', [EvaluasiPascaIdpController::class, 'exportExcel'])->name('EvaluasiPascaIdp.exportExcel');
+        Route::get('/evaluasi/export-csv', [EvaluasiPascaIdpController::class, 'exportCSV'])->name('EvaluasiPascaIdp.exportCSV');
     });
 });
 Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {

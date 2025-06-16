@@ -1,8 +1,4 @@
 <div>
-    <div class="form-group mb-2" style="max-width: 350px;"> <input wire:model.debounce.300ms="search" type="text"
-            class="form-control" placeholder="Cari nama pengguna...">
-    </div>
-
     <table class="table table-striped">
         <thead>
             <tr class="text-center">
@@ -16,7 +12,7 @@
         </thead>
         <tbody>
             @forelse($evaluasiPasca as $item)
-                <tr>
+                <tr class="text-center">
                     <td>{{ $loop->iteration + ($evaluasiPasca->currentPage() - 1) * $evaluasiPasca->perPage() }}</td>
                     <td>{{ $item->user->name ?? '-' }}</td>
                     <td>{{ $item->idps->proyeksi_karir ?? '-' }}</td>
@@ -33,7 +29,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center text-muted">Belum ada data evaluasi pasca IDP.</td>
+                    <td colspan="6" class="text-center text-muted">Belum ada data evaluasi pasca IDP.</td>
                 </tr>
             @endforelse
         </tbody>

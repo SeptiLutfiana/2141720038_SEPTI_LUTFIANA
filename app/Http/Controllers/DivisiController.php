@@ -23,13 +23,13 @@ class DivisiController extends Controller
                 ->orWhere('keterangan', 'like', "%$search%");
         })
             ->orderBy('nama_divisi')
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString(); // agar ?search=... tetap terbawa saat paging
 
         return view('adminsdm.data-master.karyawan.divisi.index', [
-            'type_menu' => 'data-master',
             'divisi' => $divisi,
             'search' => $search,
+            'type_menu' => 'data-master',
         ]);
     }
     public function create()

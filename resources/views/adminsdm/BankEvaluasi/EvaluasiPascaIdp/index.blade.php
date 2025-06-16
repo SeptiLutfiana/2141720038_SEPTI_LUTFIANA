@@ -37,35 +37,57 @@
                             <div class="card-header">
                                 <h4>Evaluasi IDP</h4>
                                 <div class="card-header-action">
-                                    <div class="dropdown mr-2">
+                                    <div class="dropdown mr-1">
                                         <button type="button" class="btn btn-danger rounded-pill dropdown-toggle"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="fas fa-file-export"></i> Ekspor
                                         </button>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="{{ route('adminsdm.BankEvaluasi.printPdf') }}"
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            {{-- <a class="dropdown-item" href="{{ route('adminsdm.BankEvaluasi.printPdf') }}"
                                                 target="_blank">
                                                 <i class="fas fa-file-pdf text-danger"></i> PDF
-                                            </a>
+                                            </a> --}}
                                             <a class="dropdown-item"
-                                                href="{{ route('adminsdm.BankEvaluasi.exportExcel') }}">
+                                                href="{{ route('adminsdm.BankEvaluasi.EvaluasiPascaIdp.exportExcel') }}">
                                                 <i class="fas fa-file-excel text-success"></i> Excel
                                             </a>
-                                            <a class="dropdown-item" href="{{ route('adminsdm.BankEvaluasi.exportCSV') }}">
+                                            <a class="dropdown-item" href="{{ route('adminsdm.BankEvaluasi.EvaluasiPascaIdp.exportCSV') }}">
                                                 <i class="fas fa-file-csv text-warning"></i> CSV
                                             </a>
-                                            <a class="dropdown-item" href="{{ route('adminsdm.BankEvaluasi.exportDocx') }}">
+                                            {{-- <a class="dropdown-item" href="{{ route('adminsdm.BankEvaluasi.exportDocx') }}">
                                                 <i class="fas fa-file-word text-primary"></i> Word (DOCX)
-                                            </a>
+                                            </a> --}}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-body">
-
+                                <form method="GET" action="{{ route('adminsdm.BankEvaluasi.EvaluasiPascaIdp.index') }}"
+                                    class="mb-3">
+                                    <div class="form-row">
+                                        <div class="col-md-3">
+                                            <label>Cari Karyawan</label>
+                                            <input type="text" name="search" class="form-control"
+                                                placeholder="Cari nama pengisi evaluasi..." value="{{ request('search') }}"
+                                                oninput="this.form.submit()">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Pilih Tahun</label>
+                                            <select name="tahun" class="form-control" onchange="this.form.submit()">
+                                                <option value="">-- Semua Tahun --</option>
+                                                @foreach ($listTahun as $tahun)
+                                                    <option value="{{ $tahun }}"
+                                                        {{ request('tahun') == $tahun ? 'selected' : '' }}>
+                                                        {{ $tahun }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
                                 @livewire('evaluasi-pasca-idp-table', [
                                     'search' => request('search'),
-                                    'jenisEvaluasi' => request('jenis_evaluasi'),
+                                    'tahun' => request('tahun'),
                                 ])
                             </div>
                         </div>

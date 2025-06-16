@@ -8,7 +8,10 @@ use App\Models\EvaluasiIdpJawaban;
 use Illuminate\Http\Request;
 use App\Models\IDP;
 use App\Models\User;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\EvaluasiIdpExport;
+
 
 class EvaluasiPascaIdpController extends Controller
 {
@@ -16,20 +19,27 @@ class EvaluasiPascaIdpController extends Controller
     public function index(Request $request)
     {
         $search = $request->query('search');
+        $tahun = $request->query('tahun');
         $jenisEvaluasi = $request->query('jenis_evaluasi');
         $tipePertanyaan = $request->query('tipe_pertanyaan');
+        $listTahun = EvaluasiIdp::whereNotNull('tanggal_evaluasi')
+            ->selectRaw('YEAR(tanggal_evaluasi) as tahun')
+            ->distinct()
+            ->orderByDesc('tahun')
+            ->pluck('tahun');
 
         $evaluasiPasca = EvaluasiIdp::when($search, function ($query, $search) {
-            return $query->where('pertanyaan', 'like', "%$search%")
-                ->orWhere('jenis_evaluasi', 'like', "%$search%")
-                ->orWhere('tipe_pertanyaan', 'like', "%$search%")
-                ->orWhere('untuk_role', 'like', "%$search%");
+            return $query->where('sebagai_role', 'like', "%$search%")
+                ->orWhere('jenis_evaluasi', 'like', "%$search%");
         })
             ->when($jenisEvaluasi, function ($query, $jenisEvaluasi) {
                 return $query->where('jenis_evaluasi', $jenisEvaluasi);
             })
             ->when($tipePertanyaan, function ($query, $tipePertanyaan) {
                 return $query->where('tipe_pertanyaan', $tipePertanyaan);
+            })
+            ->when($tahun, function ($query, $tahun) {
+                return $query->whereYear('tanggal_evaluasi', $tahun);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(5)
@@ -41,7 +51,8 @@ class EvaluasiPascaIdpController extends Controller
             'search' => $search,
             'jenisEvaluasi' => $jenisEvaluasi,
             'tiperPertanyaan' => $tipePertanyaan,
-
+            'tahun' => $tahun,
+            'listTahun' => $listTahun,
         ]);
     }
     public function indexKaryawan(Request $request)
@@ -371,5 +382,15 @@ class EvaluasiPascaIdpController extends Controller
         }
 
         return redirect()->route('supervisor.EvaluasiIdp.indexSpv')->with('msg-success', 'Evaluasi berhasil dikirim');
+    }
+    public function exportExcel(Request $request)
+    {
+        $tahun = $request->query('tahun'); // tangkap filter tahun jika ada
+        return Excel::download(new EvaluasiIdpExport($tahun), 'jawaban-evaluasi-pasca-idp.xlsx');
+    }
+    public function exportCSV(Request $request)
+    {
+        $tahun = $request->query('tahun');
+        return Excel::download(new EvaluasiIdpExport($tahun), 'jawaban-evaluasi-pasca-idp.csv');
     }
 }

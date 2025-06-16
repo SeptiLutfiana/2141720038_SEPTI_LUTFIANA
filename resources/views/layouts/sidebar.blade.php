@@ -82,10 +82,10 @@
                         <li class="{{ Request::is('admin/datamaster/karyawan') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/karyawan') }}">Data Karyawan</a>
                         </li>
-                        <li class="{{ Request::is('/admin/datamaster/divisi') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/divisi') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('/admin/datamaster/divisi') }}">Data Divisi</a>
                         </li>
-                        <li class="{{ Request::is('/admin/datamaster/jabatan') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/jabatan') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('/admin/datamaster/jabatan') }}">Data Jabatan</a>
                         </li>
                         <li class="{{ Request::is('admin/datamaster/angkatanpsp') ? 'active' : '' }}">

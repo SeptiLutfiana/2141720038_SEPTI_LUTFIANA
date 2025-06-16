@@ -12,10 +12,13 @@ class EvaluasiPascaIdpTable extends Component
 
     public $search = '';
     protected string $paginationTheme = 'bootstrap';
+    public $tahun;
+    protected $updatesQueryString = ['search','tahun'];
 
-    public function updatingSearch()
+    public function mount()
     {
-        $this->resetPage();
+        $this->search = request()->query('search');
+        $this->tahun = request()->query('tahun');
     }
 
     public function deleteId($id)
@@ -30,7 +33,7 @@ class EvaluasiPascaIdpTable extends Component
 
     public function render()
     {
-        $query = EvaluasiIdp::with('user')
+        $query = EvaluasiIdp::with('user', 'idps')
             ->where('jenis_evaluasi', 'pasca');
 
         if ($this->search) {
@@ -39,8 +42,13 @@ class EvaluasiPascaIdpTable extends Component
             });
         }
 
+        if ($this->tahun) {
+            $query->whereYear('tanggal_evaluasi', $this->tahun);
+        }
         $evaluasiPasca = $query->latest()->paginate(5);
 
-        return view('livewire.evaluasi-pasca-idp-table', compact('evaluasiPasca'));
+        return view('livewire.evaluasi-pasca-idp-table', [
+            'evaluasiPasca' => $evaluasiPasca,
+        ]);
     }
 }
