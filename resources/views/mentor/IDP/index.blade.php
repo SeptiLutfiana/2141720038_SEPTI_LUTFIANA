@@ -38,11 +38,6 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4>Data Individual Development Plan</h4>
-                                <div class="card-header-action">
-                                    <a href="#" class="btn btn-icon btn-danger icon-left" target="_blank">
-                                        <i class="fas fa-print"></i> Print PDF
-                                    </a>
-                                </div>
                             </div>
                             <div class="card-body">
                                 <form method="GET" action="{{ route('mentor.IDP.indexMentor') }}" class="mb-3">

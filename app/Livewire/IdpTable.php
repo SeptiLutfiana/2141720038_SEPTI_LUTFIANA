@@ -62,7 +62,7 @@ class IdpTable extends Component
             ->when($this->tahun, function ($query) {
                 return $query->whereYear('waktu_mulai', $this->tahun);
             })
-            ->orderBy('proyeksi_karir')
+            ->orderBy('waktu_mulai', 'desc')
             ->paginate(5)
             ->withQueryString();
 

@@ -261,7 +261,7 @@ class MentorDashboardController extends Controller
             'idps' => $idps,
             'pengerjaans' => $pengerjaans,
             'highlightPengerjaan' => $highlightPengerjaan,
-            'type_menu' => 'karyawan',
+            'type_menu' => 'mentor',
         ]);
     }
     public function updatePenilaian(Request $request, $id)

@@ -18,7 +18,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($idps as $index => $idp)
+            @forelse ($idps as $index => $idp)
                 <tr class="text-center">
                     <td>{{ $idps->firstItem() + $index }}</td>
                     <td>{{ $idp->proyeksi_karir }}</td>
@@ -30,8 +30,13 @@
                         </a>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="4" class="text-center text-muted">Tidak ada data IDP pada tahun ini.</td>
+                </tr>
+            @endforelse
         </tbody>
+
     </table>
 
     {{ $idps->links() }}

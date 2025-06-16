@@ -97,10 +97,10 @@
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
 
-                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="accordion-icon me-2 bi bi-chevron-right"></span>
 
                                             <span class="kompetensi-nama">
-                                                {{ $kom->kompetensi->nama_kompetensi }}
+                                                {{ $kom->kompetensi->nama_kompetensi }} - (Kompetensi {{ $kom->peran }})
 
                                                 @if ($statuses->isNotEmpty())
                                                     @php
@@ -142,11 +142,11 @@
                                                         <tr class="text-center">
                                                             <th width="2%">No</th>
                                                             <th width="5%">File</th>
-                                                            <th width="40%">Keterangan</th>
+                                                            {{-- <th width="30%">Keterangan</th> --}}
                                                             <th width="10%">Tanggal Upload</th>
                                                             <th width="15%">Status</th>
-                                                            <th width="15%">Saran</th>
-                                                            <th width="8%">Aksi</th>
+                                                            {{-- <th width="15%">Saran</th> --}}
+                                                            <th width="10%">Aksi</th>
 
                                                         </tr>
                                                     </thead>
@@ -199,7 +199,7 @@
                                                                         </a>
                                                                     @endif
                                                                 </td>
-                                                                <td>{{ $peng->keterangan_hasil ?? '-' }}</td>
+                                                                {{-- <td>{{ $peng->keterangan_hasil ?? '-' }}</td> --}}
                                                                 <td class="text-center">
                                                                     {{ $peng->created_at->format('d-m-Y') }}</td>
                                                                 @php
@@ -233,18 +233,19 @@
 
                                                                 <td class="text-center">
                                                                     <span
-                                                                        style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 4px 10px; border-radius: 9999px;">
+                                                                        style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 2px 10px; border-radius: 9999px;">
                                                                         {{ $peng->status_pengerjaan }}
                                                                     </span>
                                                                 </td>
-                                                                <td>{{ $peng->saran }}</td>
+                                                                {{-- <td>{{ $peng->saran }}</td> --}}
                                                                 <td class="text-center">
                                                                     <button type="button" class="btn btn-primary btn-nilai"
                                                                         data-toggle="modal" data-target="#nilaiModal"
                                                                         data-id="{{ $peng->id_idpKomPeng }}"
                                                                         data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
                                                                         data-status="{{ $peng->status_pengerjaan }}"
-                                                                        data-saran="{{ $peng->saran }}">
+                                                                        data-saran="{{ $peng->saran }}"
+                                                                        data-keterangan="{{ $peng->keterangan_hasil }}">
                                                                         <i class="bi bi-pencil-square"></i> Nilai
                                                                     </button>
                                                                 </td>
@@ -258,7 +259,7 @@
                                 @endforeach
                             </div>
                             <div class="form-group col-md-12">
-                                <label> Hard Kompetensi</label>
+                                <label style="font-size: 18px; font-weight: 600;"> Hard Kompetensi</label>
                                 @foreach ($idps->idpKompetensis->where('kompetensi.jenis_kompetensi', 'Hard Kompetensi') as $kom)
                                     <div class="accordion border-bottom mb-2 pb-2">
                                         @php
@@ -269,7 +270,7 @@
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
 
-                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="accordion-icon me-2 bi bi-chevron-right"></span>
 
                                             <span class="kompetensi-nama">
                                                 {{ $kom->kompetensi->nama_kompetensi }}
@@ -314,11 +315,11 @@
                                                     <tr class="text-center">
                                                         <th width="2%">No</th>
                                                         <th width="5%">File</th>
-                                                        <th width="40%">Keterangan</th>
+                                                        {{-- <th width="30%">Keterangan</th> --}}
                                                         <th width="10%">Tanggal Upload</th>
                                                         <th width="15%">Status</th>
-                                                        <th width="15%">Saran</th>
-                                                        <th width="8%">Aksi</th>
+                                                        {{-- <th width="15%">Saran</th> --}}
+                                                        <th width="10%">Aksi</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -370,7 +371,7 @@
                                                                     </a>
                                                                 @endif
                                                             </td>
-                                                            <td>{{ $peng->keterangan_hasil ?? '-' }}</td>
+                                                            {{-- <td>{{ $peng->keterangan_hasil ?? '-' }}</td> --}}
                                                             <td class="text-center">
                                                                 {{ $peng->created_at->format('d-m-Y') }}</td>
                                                             @php
@@ -403,18 +404,19 @@
 
                                                             <td class="text-center">
                                                                 <span
-                                                                    style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 4px 10px; border-radius: 9999px;">
+                                                                    style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 2px 6px; border-radius: 9999px;">
                                                                     {{ $peng->status_pengerjaan }}
                                                                 </span>
                                                             </td>
-                                                            <td>{{ $peng->saran }}</td>
+                                                            {{-- <td>{{ $peng->saran }}</td> --}}
                                                             <td class="text-center">
                                                                 <button type="button" class="btn btn-primary btn-nilai"
                                                                     data-toggle="modal" data-target="#nilaiModal"
                                                                     data-id="{{ $peng->id_idpKomPeng }}"
                                                                     data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
                                                                     data-status="{{ $peng->status_pengerjaan }}"
-                                                                    data-saran="{{ $peng->saran }}">
+                                                                    data-saran="{{ $peng->saran }}"
+                                                                    data-keterangan="{{ $peng->keterangan_hasil }}">
                                                                     <i class="bi bi-pencil-square"></i> Nilai
                                                                 </button>
 
@@ -452,6 +454,10 @@
                         </button>
                     </div>
                     <div class="modal-body">
+                        <div class="form-group">
+                            <label for="keterangan">Keterangan Hasil</label>
+                            <p id="keterangan-hasil" class="form-control bg-light" style="min-height: 4rem;"></p>
+                        </div>
                         <div class="mb-3 text-center">
                             <label class="d-block">Pilih Status:</label>
                             @php
@@ -493,12 +499,15 @@
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
             const icon = button.querySelector('.accordion-icon');
+
             if (content.style.display === "none" || content.style.display === "") {
                 content.style.display = "block";
-                icon.innerHTML = "˅";
+                icon.classList.remove('bi-chevron-right');
+                icon.classList.add('bi-chevron-down');
             } else {
                 content.style.display = "none";
-                icon.innerHTML = "›";
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-right');
             }
         }
         document.addEventListener('DOMContentLoaded', function() {
@@ -506,7 +515,7 @@
             const form = document.getElementById('nilaiForm');
             const modalTitle = nilaiModal.querySelector('.modal-title');
             const saranInput = document.getElementById('saran');
-
+            const keteranganOutput = document.getElementById('keterangan-hasil');
             const statusRadios = nilaiModal.querySelectorAll('input[name="status_pengerjaan"]');
 
             // Ketika modal dibuka lewat tombol "Nilai"
@@ -517,10 +526,12 @@
                     const kompetensi = button.getAttribute('data-kompetensi');
                     const status = button.getAttribute('data-status');
                     const saran = button.getAttribute('data-saran');
+                    const keterangan = button.getAttribute('data-keterangan');
 
                     // Update judul modal
                     modalTitle.textContent = 'Persetujuan Implementasi IDP oleh Mentor: ' +
                         kompetensi;
+                    keteranganOutput.textContent = keterangan || '-';
 
                     // Update action form sesuai ID
                     form.action = '/mentor/behavior/idp/penilaian/idp/' + id;

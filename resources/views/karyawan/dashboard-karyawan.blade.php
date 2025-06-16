@@ -230,8 +230,8 @@
                     <i class="fas fa-chart-bar text-primary mr-2"></i>
                     <h4>Grafik Nilai Perencanaan Individual Development Plan (Hard vs Soft)</h4>
                 </div>
-                <div class="card-body">
-                    <canvas id="chartKaryawan" height="100"></canvas>
+                <div style="position: relative; height: 500px;">
+                    <canvas id="chartKaryawan"></canvas>
                 </div>
             </div>
             <div class="card">

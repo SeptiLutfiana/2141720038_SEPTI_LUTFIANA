@@ -154,12 +154,12 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="text-center">Belum ada data.</td>
+                        <td colspan="8" class="text-center">Belum ada data.</td>
                     </tr>
                 @endforelse
             @else
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-3">
+                    <td colspan="8" class="text-center text-muted py-3">
                         Data Tidak Ditemukan
                     </td>
                 </tr>

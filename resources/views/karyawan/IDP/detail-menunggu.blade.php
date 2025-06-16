@@ -74,7 +74,7 @@
                             </div>
                             <div class="form-group col-md-12">
                                 <label>Saran Pengajuan IDP</label>
-                                <textarea readonly class="form-control" style="height:6rem;">{{ $idps->saran_idp}}</textarea>
+                                <textarea readonly class="form-control" style="height:6rem;">{{ $idps->saran_idp }}</textarea>
                             </div>
                             <div class="form-group col-md-12">
                                 <label>Daftar Kompetensi</label> <br>
@@ -84,8 +84,9 @@
                                         <button class="accordion-button text-start w-100 d-flex align-items-center"
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
-                                            <span class="accordion-icon me-2">›</span>
-                                            <span class="kompetensi-nama">{{ $kom->kompetensi->nama_kompetensi }}</span>
+                                            <span class="accordion-icon me-2 bi bi-chevron-right"></span>
+                                            <span class="kompetensi-nama">{{ $kom->kompetensi->nama_kompetensi }} -
+                                                (Kompetensi {{ $kom->peran }})</span>
                                         </button>
 
                                         <div class="accordion-content ps-4 mt-2" style="display: none;">
@@ -108,7 +109,7 @@
                                         <button class="accordion-button text-start w-100 d-flex align-items-center"
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
-                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="accordion-icon me-2 bi bi-chevron-right"></span>
                                             <span class="kompetensi-nama">{{ $kom->kompetensi->nama_kompetensi }}</span>
                                         </button>
 
@@ -132,21 +133,22 @@
                     </div>
                 </div>
             </div>
-    </div>
-    </div>
-    </section>
+        </section>
     </div>
 
     <script>
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
             const icon = button.querySelector('.accordion-icon');
+
             if (content.style.display === "none" || content.style.display === "") {
                 content.style.display = "block";
-                icon.innerHTML = "˅";
+                icon.classList.remove('bi-chevron-right');
+                icon.classList.add('bi-chevron-down');
             } else {
                 content.style.display = "none";
-                icon.innerHTML = "›";
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-right');
             }
         }
     </script>

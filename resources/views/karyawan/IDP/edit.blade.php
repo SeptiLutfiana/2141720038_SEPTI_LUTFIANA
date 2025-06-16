@@ -131,6 +131,10 @@
                                     @enderror
                                 @endif
                             </div>
+                            <div class="form-group">
+                                <label>Saran IDP</label>
+                                <textarea name="saran_idp" id="saran_idp" class="form-control" readonly style="height:6rem;">{{ old('saran_idp', $idp->saran_idp) }}</textarea>
+                            </div>
 
                             <div class="form-row">
                                 <div class="form-group col-md-6">
@@ -165,7 +169,8 @@
                                     <input type="hidden" name="kompetensi[{{ $kom->id_idpKom }}][peran]"
                                         value="{{ $kom->peran ?? 'umum' }}">
                                     @foreach ($kom->metodeBelajars as $metode)
-                                        <input type="hidden" name="kompetensi[{{ $kom->id_idpKom }}][id_metode_belajar][]"
+                                        <input type="hidden"
+                                            name="kompetensi[{{ $kom->id_idpKom }}][id_metode_belajar][]"
                                             value="{{ $metode->id_metodeBelajar }}">
                                     @endforeach
                                 @endforeach

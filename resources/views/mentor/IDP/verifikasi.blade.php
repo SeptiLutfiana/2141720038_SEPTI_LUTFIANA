@@ -117,12 +117,13 @@
                                     <label> Soft Kompetensi</label>
                                     @foreach ($idps->idpKompetensis->where('kompetensi.jenis_kompetensi', 'Soft Kompetensi') as $kom)
                                         <div class="accordion border-bottom mb-2 pb-2">
-                                            <button class="accordion-button text-start w-100 d-flex align-items-center"
+                                            <button type="button"
+                                                class="accordion-button text-start w-100 d-flex align-items-center"
                                                 onclick="toggleAccordion(this)"
                                                 style="border: none; background: none; padding: 0;">
-                                                <span class="accordion-icon me-2">›</span>
-                                                <span
-                                                    class="kompetensi-nama">{{ $kom->kompetensi->nama_kompetensi }}</span>
+                                                <span class="accordion-icon me-2 bi bi-chevron-right"></span>
+                                                <span class="kompetensi-nama">{{ $kom->kompetensi->nama_kompetensi }} -
+                                                    (Kompetensi {{ $kom->peran }})</span>
                                             </button>
 
                                             <div class="accordion-content ps-4 mt-2" style="display: none;">
@@ -143,10 +144,11 @@
                                     <label> Hard Kompetensi</label>
                                     @foreach ($idps->idpKompetensis->where('kompetensi.jenis_kompetensi', 'Hard Kompetensi') as $kom)
                                         <div class="accordion border-bottom mb-2 pb-2">
-                                            <button class="accordion-button text-start w-100 d-flex align-items-center"
+                                            <button type="button"
+                                                class="accordion-button text-start w-100 d-flex align-items-center"
                                                 onclick="toggleAccordion(this)"
                                                 style="border: none; background: none; padding: 0;">
-                                                <span class="accordion-icon me-2">›</span>
+                                                <span class="accordion-icon me-2 bi bi-chevron-right"></span>
                                                 <span
                                                     class="kompetensi-nama">{{ $kom->kompetensi->nama_kompetensi }}</span>
                                             </button>
@@ -181,12 +183,15 @@
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
             const icon = button.querySelector('.accordion-icon');
+
             if (content.style.display === "none" || content.style.display === "") {
                 content.style.display = "block";
-                icon.innerHTML = "˅";
+                icon.classList.remove('bi-chevron-right');
+                icon.classList.add('bi-chevron-down');
             } else {
                 content.style.display = "none";
-                icon.innerHTML = "›";
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-right');
             }
         }
     </script>

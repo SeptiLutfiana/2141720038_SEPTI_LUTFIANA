@@ -100,10 +100,10 @@
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
 
-                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="accordion-icon me-2 bi bi-chevron-right"></span>
 
                                             <span class="kompetensi-nama">
-                                                {{ $kom->kompetensi->nama_kompetensi }}
+                                                {{ $kom->kompetensi->nama_kompetensi }} - (Kompetensi {{ $kom->peran }})
 
                                                 @if ($statuses->isNotEmpty())
                                                     @php
@@ -326,7 +326,7 @@
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
 
-                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="accordion-icon me-2 bi bi-chevron-right"></span>
 
                                             <span class="kompetensi-nama">
                                                 {{ $kom->kompetensi->nama_kompetensi }}
@@ -605,15 +605,17 @@
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
             const icon = button.querySelector('.accordion-icon');
+
             if (content.style.display === "none" || content.style.display === "") {
                 content.style.display = "block";
-                icon.innerHTML = "˅";
+                icon.classList.remove('bi-chevron-right');
+                icon.classList.add('bi-chevron-down');
             } else {
                 content.style.display = "none";
-                icon.innerHTML = "›";
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-right');
             }
         }
-
         function displaySelectedFile(input, displayId, errorId) {
             const displayElement = document.getElementById(displayId);
             const errorElement = document.getElementById(errorId);

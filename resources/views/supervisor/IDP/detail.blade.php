@@ -134,12 +134,11 @@
                                                     <tr class="text-center">
                                                         <th width="2%">No</th>
                                                         <th width="5%">File</th>
-                                                        <th width="30%">Keterangan</th>
+                                                        <th width="28%">Keterangan</th>
                                                         <th width="10%">Tanggal Upload</th>
-                                                        <th width="15%">Status Persetujuan Mentor</th>
                                                         <th width="15%">Rating Kompetensi</th>
                                                         <th width="15%">Saran Supervisor</th>
-                                                        <th width="8%">Aksi</th>
+                                                        <th width="15%">Aksi</th>
 
                                                     </tr>
                                                 </thead>
@@ -195,40 +194,6 @@
                                                             <td>{{ $peng->keterangan_hasil ?? '-' }}</td>
                                                             <td class="text-center">
                                                                 {{ $peng->created_at->format('d-m-Y') }}</td>
-                                                            @php
-                                                                $statusColors = [
-                                                                    'Menunggu Persetujuan' => [
-                                                                        'bg' => '#d1fae5',
-                                                                        'text' => '#065f46',
-                                                                    ], // hijau muda & hijau tua
-                                                                    'Disetujui Mentor' => [
-                                                                        'bg' => '#bfdbfe',
-                                                                        'text' => '#1e3a8a',
-                                                                    ], // biru muda & biru tua
-                                                                    'Ditolak Mentor' => [
-                                                                        'bg' => '#fecaca',
-                                                                        'text' => '#991b1b',
-                                                                    ], // merah muda & merah tua
-                                                                    'Revisi Mentor' => [
-                                                                        'bg' => '#fef3c7',
-                                                                        'text' => '#92400e',
-                                                                    ], // kuning muda & kuning tua
-                                                                ];
-
-                                                                $bgColor =
-                                                                    $statusColors[$peng->status_pengerjaan]['bg'] ??
-                                                                    '#e5e7eb'; // default abu-abu
-                                                                $textColor =
-                                                                    $statusColors[$peng->status_pengerjaan]['text'] ??
-                                                                    '#374151'; // default abu-abu gelap
-                                                            @endphp
-
-                                                            <td class="text-center">
-                                                                <span
-                                                                    style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 4px 10px; border-radius: 9999px;">
-                                                                    {{ $peng->status_pengerjaan }}
-                                                                </span>
-                                                            </td>
                                                             <td class="text-center">
                                                                 {{ $peng->nilaiPengerjaanIdp->rating ?? '-' }}</td>
                                                             <td class="text-center">
@@ -302,12 +267,11 @@
                                                     <tr class="text-center">
                                                         <th width="2%">No</th>
                                                         <th width="5%">File</th>
-                                                        <th width="30%">Keterangan</th>
+                                                        <th width="28%">Keterangan</th>
                                                         <th width="10%">Tanggal Upload</th>
-                                                        <th width="15%">Status Persetujuan Mentor</th>
                                                         <th width="15%">Rating Kompetensi</th>
                                                         <th width="15%">Saran Supervisor</th>
-                                                        <th width="8%">Aksi</th>
+                                                        <th width="15%">Aksi</th>
 
                                                     </tr>
                                                 </thead>
@@ -363,40 +327,6 @@
                                                             <td>{{ $peng->keterangan_hasil ?? '-' }}</td>
                                                             <td class="text-center">
                                                                 {{ $peng->created_at->format('d-m-Y') }}</td>
-                                                            @php
-                                                                $statusColors = [
-                                                                    'Menunggu Persetujuan' => [
-                                                                        'bg' => '#d1fae5',
-                                                                        'text' => '#065f46',
-                                                                    ], // hijau muda & hijau tua
-                                                                    'Disetujui Mentor' => [
-                                                                        'bg' => '#bfdbfe',
-                                                                        'text' => '#1e3a8a',
-                                                                    ], // biru muda & biru tua
-                                                                    'Ditolak Mentor' => [
-                                                                        'bg' => '#fecaca',
-                                                                        'text' => '#991b1b',
-                                                                    ], // merah muda & merah tua
-                                                                    'Revisi Mentor' => [
-                                                                        'bg' => '#fef3c7',
-                                                                        'text' => '#92400e',
-                                                                    ], // kuning muda & kuning tua
-                                                                ];
-
-                                                                $bgColor =
-                                                                    $statusColors[$peng->status_pengerjaan]['bg'] ??
-                                                                    '#e5e7eb'; // default abu-abu
-                                                                $textColor =
-                                                                    $statusColors[$peng->status_pengerjaan]['text'] ??
-                                                                    '#374151'; // default abu-abu gelap
-                                                            @endphp
-
-                                                            <td class="text-center">
-                                                                <span
-                                                                    style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 1px 8px; border-radius: 9999px;">
-                                                                    {{ $peng->status_pengerjaan }}
-                                                                </span>
-                                                            </td>
                                                             <td class="text-center"
                                                                 id="rating-{{ $peng->id_idpKomPeng }}">
                                                                 {{ $peng->nilaiPengerjaanIdp->rating ?? 'belum dinilai' }}
@@ -449,21 +379,78 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="mb-3 text-center">
-                            <label class="d-block">Pilih Nilai Rating:</label>
-                            @php
-                                $statuses = ['1', '2', '3', '4', '5'];
-                            @endphp
-                            @foreach ($statuses as $status)
-                                <div class="form-check form-check-inline">
-                                    <input class="btn-check" type="radio" name="rating"
-                                        id="statusModal{{ $loop->index }}" value="{{ $status }}">
-                                    <label class="btn btn-outline-primary rounded-pill"
-                                        for="statusModal{{ $loop->index }}">
-                                        {{ $status }}
-                                    </label>
-                                </div>
-                            @endforeach
+                        @php
+                            $statuses = [
+                                '1' => 'Kurang',
+                                '2' => 'Perlu Peningkatan',
+                                '3' => 'Cukup',
+                                '4' => 'Baik',
+                                '5' => 'Sangat Baik',
+                            ];
+                        @endphp
+
+                        <style>
+                            .rating-container {
+                                display: flex;
+                                justify-content: center;
+                                gap: 1rem;
+                            }
+
+                            .rating-item {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                font-size: 0.85rem;
+                            }
+
+                            .rating-item label {
+                                font-weight: bold;
+                                margin-bottom: 0.25rem;
+                            }
+
+                            .rating-desc {
+                                font-size: 0.7rem;
+                                color: #6c757d;
+                                margin-top: 0.25rem;
+                            }
+
+                            .btn-check {
+                                display: none;
+                            }
+
+                            .btn-rating {
+                                border: 2px solid #83B92C;
+                                border-radius: 50%;
+                                width: 40px;
+                                height: 40px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-weight: 500;
+                                color: #83B92C;
+                                cursor: pointer;
+                                transition: all 0.2s ease-in-out;
+                            }
+
+                            .btn-check:checked+.btn-rating {
+                                background-color: #83B92C;
+                                color: white;
+                            }
+                        </style>
+
+                        <div class="text-center mb-3">
+                            <label class="fw-bold mb-2 d-block">Pilih Nilai Rating:</label>
+                            <div class="rating-container">
+                                @foreach ($statuses as $value => $label)
+                                    <div class="rating-item">
+                                        <input type="radio" class="btn-check" name="rating"
+                                            id="rating{{ $value }}" value="{{ $value }}">
+                                        <label class="btn-rating"
+                                            for="rating{{ $value }}">{{ $value }}</label>
+                                        <div class="rating-desc">{{ $label }}</div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                         <div class="invalid-feedback d-block" id="error-rating"></div>
                         <div class="form-group">
@@ -474,7 +461,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">Simpan</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
                         <button type="button" class="btn btn-warning" data-dismiss="modal">Batal</button>
                     </div>
                 </div>

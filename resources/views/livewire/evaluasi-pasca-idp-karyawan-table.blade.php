@@ -30,7 +30,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="text-center text-muted">Tidak ada IDP yang perlu dievaluasi.</td>
+                    <td colspan="4" class="text-center text-muted">Tidak ada IDP yang dievaluasi.</td>
                 </tr>
             @endforelse
         </tbody>

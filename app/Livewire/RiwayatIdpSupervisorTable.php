@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 use App\Models\IDP;
 use App\Models\User;
+
 class RiwayatIdpSupervisorTable extends Component
 {
     use WithPagination;
@@ -67,7 +68,7 @@ class RiwayatIdpSupervisorTable extends Component
             ->when($this->tahun, function ($query) {
                 return $query->whereYear('waktu_mulai', $this->tahun);
             })
-            ->orderBy('proyeksi_karir')
+            ->orderBy('waktu_mulai', 'desc')
             ->paginate(5)
             ->withQueryString();
 
