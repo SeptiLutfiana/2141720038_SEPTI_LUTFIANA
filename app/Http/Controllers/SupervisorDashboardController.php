@@ -16,6 +16,8 @@ use Illuminate\Support\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use App\Models\IdpRekomendasi;
+use App\Notifications\IDPBaruDibuatNotification;
+use Illuminate\Notifications\DatabaseNotification;
 
 class SupervisorDashboardController extends Controller
 {
@@ -255,6 +257,13 @@ class SupervisorDashboardController extends Controller
     }
     public function showSupervisor($id, Request $request)
     {
+        if ($request->has('notification_id')) {
+            $notification = DatabaseNotification::find($request->notification_id);
+
+            if ($notification && $notification->notifiable_id == Auth::id()) {
+                $notification->markAsRead();
+            }
+        }
         $idps = IDP::with([
             'karyawan',
             'mentor',
@@ -280,7 +289,7 @@ class SupervisorDashboardController extends Controller
             'idps' => $idps,
             'pengerjaans' => $pengerjaans,
             'highlightPengerjaan' => $highlightPengerjaan,
-            'type_menu' => 'karyawan',
+            'type_menu' => 'supervisor',
         ]);
     }
     private $rekomendasiService;
@@ -534,5 +543,27 @@ class SupervisorDashboardController extends Controller
         ]);
 
         return $pdf->stream('Data-IDP.pdf');
+    }
+    public function showBank($id, Request $request)
+    {
+        if ($request->has('notification_id')) {
+            $notification = DatabaseNotification::find($request->notification_id);
+
+            if ($notification && $notification->notifiable_id == Auth::id()) {
+                $notification->markAsRead();
+            }
+        }
+        // Mengambil data Divisi berdasarkan ID
+        $idps = IDP::with([
+            'karyawan',      // relasi banyak karyawan jika ada
+            'mentor',
+            'supervisor',
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.metodeBelajars' // relasi kompetensi beserta metode belajar
+        ])->findOrFail($id);
+        return view('supervisor.IDP.detail-bank', [
+            'idps'    => $idps,
+            'type_menu' => 'supervisor',
+        ]);
     }
 }

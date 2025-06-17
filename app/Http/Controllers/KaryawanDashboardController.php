@@ -27,6 +27,8 @@ use App\Models\Kompetensi;
 use App\Models\MetodeBelajar;
 use FFI\Exception;
 use App\Models\EvaluasiIdp;
+use App\Notifications\KaryawanMemilihMentor;
+use App\Notifications\IDPBaruDibuatNotification;
 
 class KaryawanDashboardController extends Controller
 {
@@ -562,7 +564,6 @@ class KaryawanDashboardController extends Controller
             'id_semester' => $user->id_semester,
 
         ]);
-
         // 2. Buat IDP baru hasil apply user
         $idp = IDP::create([
             'id_user' => $user->id,
@@ -585,7 +586,13 @@ class KaryawanDashboardController extends Controller
             'is_template' => 0,
             'id_idp_template_asal' => $templateIDP->id_idp,
         ]);
-
+        $mentor = \App\Models\User::find($request->id_mentor);
+        $mentor->notify(new KaryawanMemilihMentor([
+            'id_user' => $user->id,
+            'nama_karyawan' => $user->name,
+            'id_idp' => $idp->id_idp, // <- Tambahkan ini
+            'untuk_role' => 'mentor',
+        ]));
         // 3. Copy kompetensi + metode belajar ke IDP baru
         $templateKompetensis = $templateIDP->idpKompetensis;
 
@@ -857,7 +864,31 @@ class KaryawanDashboardController extends Controller
                 'id_semester' => $user->semester->id_semester,
                 'id_angkatanpsp' => $user->angkatanPsp->id_angkatanpsp
             ]);
+            $mentor = User::find($request->id_mentor);
+            $supervisor = User::find($request->id_supervisor);
 
+            $dataNotifikasi = [
+                'id_idp' => $idp->id_idp,
+                'nama_karyawan' => $user->name,
+            ];
+
+            // Kirim notifikasi ke mentor (jika dipilih)
+            if ($mentor) {
+                $mentor->notify(new IDPBaruDibuatNotification(array_merge($dataNotifikasi, [
+                    'peran' => 'Mentor',
+                    'untuk_role' => 'mentor',
+                    'link' => route('mentor.IDP.mentor.idp.show', $idp->id_idp),
+                ])));
+            }
+
+            // Kirim notifikasi ke supervisor
+            if ($supervisor) {
+                $supervisor->notify(new IDPBaruDibuatNotification(array_merge($dataNotifikasi, [
+                    'peran' => 'Supervisor',
+                    'untuk_role' => 'supervisor',
+                    'link' => route('supervisor.IDP.showSupervisor', $idp->id_idp),
+                ])));
+            }
             foreach ($request->kompetensi as $item) {
                 $idpKompetensiId = DB::table('idp_kompetensis')->insertGetId([
                     'id_idp' => $idp->id_idp,

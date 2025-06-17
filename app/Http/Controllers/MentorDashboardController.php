@@ -224,7 +224,7 @@ class MentorDashboardController extends Controller
             ->when($tahun, function ($query, $tahun) {
                 return $query->whereYear('waktu_mulai', $tahun);
             })
-            ->orderByDesc('created_at')
+            ->orderByDesc('created_at', 'asc')
             ->paginate(10);
 
         return view('mentor.IDP.index', [

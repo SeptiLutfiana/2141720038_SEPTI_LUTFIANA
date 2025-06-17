@@ -22,6 +22,7 @@ use App\Http\Controllers\KompetensiController;
 use App\Http\Controllers\LearninggroupController;
 use App\Http\Controllers\MentorDashboardController;
 use App\Http\Controllers\MetodeBelajarController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PanduanController;
 use App\Http\Controllers\PenempatanController;
 use App\Http\Controllers\RoleController;
@@ -293,6 +294,7 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::get('/evaluasi/export-excel', [EvaluasiPascaIdpController::class, 'exportExcel'])->name('EvaluasiPascaIdp.exportExcel');
         Route::get('/evaluasi/export-csv', [EvaluasiPascaIdpController::class, 'exportCSV'])->name('EvaluasiPascaIdp.exportCSV');
     });
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 });
 Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
     // SUPERVISOR
@@ -305,6 +307,7 @@ Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
         Route::get('/riwayat', [SupervisorDashboardController::class, 'indexRiwayatIdp'])->name('RiwayatIDP.indexRiwayatIdp');
         Route::get('/{id}/riwayat', [SupervisorDashboardController::class, 'showRiwayatIDP'])->name('RiwayatIDP.showRiwayatIdp');
         Route::get('/idp/cetak-filter', [SupervisorDashboardController::class, 'cetakFiltered'])->name('RiwayatIDP.cetakFiltered');
+        Route::get('/{id}/detail', [SupervisorDashboardController::class, 'showBank'])->name('showBank');
     });
     Route::prefix('supervisor/panduan/idp')->name('supervisor.Panduan.')->group(function () {
         Route::get('/', [PanduanController::class, 'autoShowPanduanSupervisor'])->name('autoShowPanduanSupervisor');
@@ -314,6 +317,7 @@ Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
         Route::get('/idp/create', [EvaluasiPascaIdpController::class, 'createSpv'])->name('createSpv');
         Route::post('/idp/store', [EvaluasiPascaIdpController::class, 'storeSpv'])->name('storeSpv');
     });
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 });
 // MENTOR
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
@@ -344,6 +348,7 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::get('/create', [EvaluasiOnBordingMentorController::class, 'create'])->name('create');
         Route::post('/store', [EvaluasiOnBordingMentorController::class, 'store'])->name('store');
     });
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 });
 // KARYAWAN
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
@@ -380,6 +385,7 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::get('/idp', [EvaluasiOnBordingMentorController::class, 'indexKaryawan'])->name('indexKaryawan');
         Route::get('/detail/{id_idp}', [EvaluasiOnBordingMentorController::class, 'detail'])->name('detail');
     });
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 });
 // PROFILE
 Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

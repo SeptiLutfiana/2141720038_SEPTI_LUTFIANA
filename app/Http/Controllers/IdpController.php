@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use FFI\Exception;
 use App\Notifications\GivenIDPNotification;
+use App\Notifications\IDPBaruDibuatNotification;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 
@@ -218,7 +219,8 @@ class IdpController extends Controller
 
             // --- PERUBAHAN UTAMA UNTUK BANK IDP ---
             // Hanya buat SATU IDP sebagai template
-            DB::transaction(function () use ($request, $namaJenjang, $namaLG) {
+            $idp = null;
+            DB::transaction(function () use ($request, $namaJenjang, $namaLG, $idp) {
                 $idp = IDP::create([
                     'id_user' => null,
                     'id_mentor' => null,
@@ -237,7 +239,16 @@ class IdpController extends Controller
                     'max_applies' => $request->max_applies,
 
                 ]);
-
+                $supervisor = User::find($request->id_supervisor_jenjang);
+                if ($supervisor && $idp) {
+                    $supervisor->notify(new IDPBaruDibuatNotification([
+                        'id_idp' => $idp->id_idp,
+                        'nama_karyawan' => 'Admin SDM',
+                        'peran' => 'Supervisor',
+                        'untuk_role' => 'supervisor',
+                        'link' => route('supervisor.IDP.showSupervisor', $idp->id_idp),
+                    ]));
+                }
                 foreach ($request->kompetensi as $item) {
                     if (empty($item['id_kompetensi']) || empty($item['id_metode_belajar'])) {
                         continue;
@@ -284,6 +295,31 @@ class IdpController extends Controller
             foreach ($users as $user) {
                 if (isset($createdIdps[$user->id])) {
                     $user->notify(new GivenIDPNotification($createdIdps[$user->id]->id_idp));
+                    // Notifikasi ke mentor (jika dipilih)
+                    if ($request->id_mentor) {
+                        $mentor = User::find($request->id_mentor);
+                        if ($mentor) {
+                            $mentor->notify(new IDPBaruDibuatNotification([
+                                'id_idp' => $createdIdps[$user->id]->id_idp,
+                                'nama_karyawan' => $user->name,
+                                'peran' => 'Mentor',
+                                'untuk_role' => 'mentor',
+                                'link' => route('mentor.IDP.mentor.idp.show', $createdIdps[$user->id]->id_idp),
+                            ]));
+                        }
+                    }
+
+                    // Notifikasi ke supervisor
+                    $supervisor = User::find($request->id_supervisor);
+                    if ($supervisor) {
+                        $supervisor->notify(new IDPBaruDibuatNotification([
+                            'id_idp' => $createdIdps[$user->id]->id_idp,
+                            'nama_karyawan' => $user->name,
+                            'peran' => 'Supervisor',
+                            'untuk_role' => 'supervisor',
+                            'link' => route('supervisor.IDP.showSupervisor', $createdIdps[$user->id]->id_idp),
+                        ]));
+                    }
                 }
             }
             return redirect()->route('adminsdm.BehaviorIDP.indexGiven')
@@ -305,7 +341,7 @@ class IdpController extends Controller
             'status_approval_mentor' => 'Disetujui',
             'status_pengajuan_idp' => 'Disetujui',
             'status_pengerjaan' => 'Menunggu Tindakan',
-            'is_template' => $isTemplate, // <-- PERBAIKAN PENTING: Set ini sesuai parameter $isTemplate
+            'is_template' => $isTemplate,
             'saran_idp' => $request->saran_idp,
             'deskripsi_idp' => $request->deskripsi_idp,
 

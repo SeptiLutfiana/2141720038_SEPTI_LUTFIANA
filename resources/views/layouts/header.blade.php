@@ -7,13 +7,13 @@
                         class="fas fa-search"></i></a></li> --}}
         </ul>
     </form>
-    <ul class="navbar-nav navbar-right d-flex align-items-center gap-3">
-        <li class="dropdown dropdown-list-toggle position-relative mr-3">
+    <ul class="navbar-nav navbar-right d-flex align-items-center">
+        <li class="dropdown dropdown-list-toggle position-relative">
             <a href="#" data-toggle="dropdown" class="nav-link nav-link-lg position-relative">
                 <i class="far fa-bell fa-lg"></i>
                 @if (auth()->user()->unreadNotifications->count() > 0)
                     <span class="badge badge-danger position-absolute"
-                        style="top: -6px; right: -6px; font-size: 0.65rem; padding: 4px 6px; border-radius: 999px;">
+                        style="top: -6px; right: -6px; font-size: 0.65rem; padding: 2px 4px; border-radius: 999px;">
                         {{ auth()->user()->unreadNotifications->count() }}
                     </span>
                 @endif
@@ -23,7 +23,11 @@
                 <div class="dropdown-header">
                     Notifications
                     <div class="float-right">
-                        <a href="#">Mark All As Read</a>
+                        <form action="{{ route('notifications.markAllAsRead') }}" method="POST" id="markAllForm">
+                            @csrf
+                            <button type="submit" class="btn btn-link p-0" style="font-size: 0.85rem;">Mark All As
+                                Read</button>
+                        </form>
                     </div>
                 </div>
 
@@ -40,11 +44,23 @@
                             4 => 'karyawan',
                             default => 'karyawan',
                         };
+                        $currentRoleKey = $roleMap[$activeRole] ?? 'karyawan';
+                        $filteredNotifications = auth()
+                            ->user()
+                            ->unreadNotifications->filter(function ($notif) use ($currentRoleKey) {
+                                return isset($notif->data['untuk_role']) &&
+                                    $notif->data['untuk_role'] === $currentRoleKey;
+                            });
                     @endphp
-
+                    @if ($filteredNotifications->count() > 0)
+                        <span class="badge badge-danger position-absolute"
+                            style="top: -6px; right: -6px; font-size: 0.65rem; padding: 2px 4px; border-radius: 999px;">
+                            {{ $filteredNotifications->count() }}
+                        </span>
+                    @endif
                     <div class="dropdown-list-content dropdown-list-icons" style="max-height: 400px; overflow-y: auto;">
-                        @if (auth()->user()->unreadNotifications->count() > 0)
-                            @foreach (auth()->user()->unreadNotifications as $notification)
+                        @if ($filteredNotifications->count() > 0)
+                            @foreach (auth()->user()->unreadNotifications->where('data.untuk_role', $userRole) as $notification)
                                 @php
                                     $idpId = $notification->data['id_idp'] ?? 0;
                                     $idpKomPengId = $notification->data['id_idpKomPeng'] ?? 0;
@@ -57,7 +73,7 @@
                                             $routeName = 'mentor.IDP.mentor.idp.show';
                                             break;
                                         case 'supervisor':
-                                            $nama = $notification->data['nama_karyawan'] ?? 'Karyawan';
+                                            $nama = $notification->data['nama_karyawan'] ?? 'Supervisor';
                                             $routeName = 'supervisor.IDP.showSupervisor';
                                             break;
                                         case 'karyawan':
@@ -150,16 +166,26 @@
                 <div id="switchRoleMenu" style="display: none; transition: all 0.1s ease; padding-left: 15px;">
                     <form action="{{ route('switchRole') }}" method="POST">
                         @csrf
-                        <button class="dropdown-item has-icon" type="submit" name="role" value="1">
+                        <button
+                            class="dropdown-item has-icon {{ session('active_role') == 1 ? 'bg-primary text-white font-weight-bold' : '' }}"
+                            type="submit" name="role" value="1">
                             <i class="fas fa-user-shield"></i> Admin
                         </button>
-                        <button class="dropdown-item has-icon" type="submit" name="role" value="2">
+                        <button
+                            class="dropdown-item has-icon {{ session('active_role') == 2 ? 'bg-primary text-white font-weight-bold' : '' }}"
+                            type="submit" name="role" value="2">
                             <i class="fas fa-user-tie"></i> Supervisor
                         </button>
-                        <button class="dropdown-item has-icon" type="submit" name="role" value="3">
+
+                        <button
+                            class="dropdown-item has-icon {{ session('active_role') == 3 ? 'bg-primary text-white font-weight-bold' : '' }}"
+                            type="submit" name="role" value="3">
                             <i class="fas fa-chalkboard-teacher"></i> Mentor
                         </button>
-                        <button class="dropdown-item has-icon" type="submit" name="role" value="4">
+
+                        <button
+                            class="dropdown-item has-icon {{ session('active_role') == 4 ? 'bg-primary text-white font-weight-bold' : '' }}"
+                            type="submit" name="role" value="4">
                             <i class="fas fa-users"></i> Karyawan
                         </button>
                     </form>

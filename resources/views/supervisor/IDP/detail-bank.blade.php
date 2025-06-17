@@ -8,8 +8,9 @@
             <div class="section-header">
                 <h1>Detail IDP Karyawan</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}">Data IDP</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('supervisor.spv-dashboard') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('supervisor.IDP.indexSupervisor') }}">Data
+                            IDP</a></div>
                     <div class="breadcrumb-item">Detail IDP</div>
                 </div>
             </div>
@@ -51,13 +52,11 @@
 
                             <div class="form-group col-md-6">
                                 <label>Maksimal Kuota</label>
-                                <input readonly type="text" class="form-control"
-                                    value="{{ $idps->max_applies }}">
+                                <input readonly type="text" class="form-control" value="{{ $idps->max_applies }}">
                             </div>
                             <div class="form-group col-md-6">
                                 <label>Total Karyawan Applay</label>
-                                <input readonly type="text" class="form-control"
-                                    value="{{ $idps->current_applies }}">
+                                <input readonly type="text" class="form-control" value="{{ $idps->current_applies }}">
                             </div>
                             <div class="form-group col-md-12">
                                 <label>Daftar Kompetensi</label> <br>
@@ -111,13 +110,12 @@
                         </div>
                     </div>
                     <div class="card-footer text-right">
-                        <a class="btn btn-primary" href="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}">Kembali</a>
+                        <a class="btn btn-primary"
+                            href="{{ route('supervisor.IDP.indexSupervisor') }}">Kembali</a>
                     </div>
                 </div>
             </div>
-    </div>
-    </div>
-    </section>
+        </section>
     </div>
 
     <script>

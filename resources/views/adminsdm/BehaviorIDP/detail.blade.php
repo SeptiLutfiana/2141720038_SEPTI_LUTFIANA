@@ -97,7 +97,7 @@
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
 
-                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="accordion-icon me-2 bi bi-chevron-right"></span>
 
                                             <span class="kompetensi-nama">
                                                 {{ $kom->kompetensi->nama_kompetensi }}
@@ -253,7 +253,7 @@
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
 
-                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="accordion-icon me-2 bi bi-chevron-right"></span>
 
                                             <span class="kompetensi-nama">
                                                 {{ $kom->kompetensi->nama_kompetensi }}
@@ -286,8 +286,7 @@
                                             <p><span>{{ $kom->kompetensi->keterangan }}</span></p>
                                             <p><strong>Metode Belajar:</strong>
                                                 @foreach ($kom->metodeBelajars as $metode)
-                                                    <span
-                                                        class="badge badge-info">{{ $metode->nama_metodeBelajar }}</span>
+                                                    <span class="badge badge-info">{{ $metode->nama_metodeBelajar }}</span>
                                                 @endforeach
                                             </p>
                                             <p><strong>Sasaran:</strong> <br></span>{!! nl2br(e($kom->sasaran)) !!}</p>
@@ -406,21 +405,22 @@
                     </div>
                 </div>
             </div>
-    </div>
-    </div>
-    </section>
+        </section>
     </div>
 
     <script>
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
             const icon = button.querySelector('.accordion-icon');
+
             if (content.style.display === "none" || content.style.display === "") {
                 content.style.display = "block";
-                icon.innerHTML = "˅";
+                icon.classList.remove('bi-chevron-right');
+                icon.classList.add('bi-chevron-down');
             } else {
                 content.style.display = "none";
-                icon.innerHTML = "›";
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-right');
             }
         }
     </script>

@@ -476,12 +476,15 @@
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
             const icon = button.querySelector('.accordion-icon');
+
             if (content.style.display === "none" || content.style.display === "") {
                 content.style.display = "block";
-                icon.innerHTML = "˅";
+                icon.classList.remove('bi-chevron-right');
+                icon.classList.add('bi-chevron-down');
             } else {
                 content.style.display = "none";
-                icon.innerHTML = "›";
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-right');
             }
         }
         document.addEventListener('DOMContentLoaded', function() {
