@@ -111,8 +111,10 @@
         <li class="dropdown d-flex align-items-center">
             <a href="#" data-toggle="dropdown"
                 class="nav-link dropdown-toggle nav-link-lg nav-link-user d-flex align-items-center">
-                <img alt="image" src="{{ asset('img/avatar/avatar-1.png') }}" class="rounded-circle"
-                    style="width: 35px; height: 35px;">
+                <img alt="image"
+                    src="{{ Auth::user()->foto_profile ? asset('storage/' . Auth::user()->foto_profile) : asset('img/avatar/avatar-1.png') }}"
+                    class="rounded-circle"
+                    style="width: 35px; height: 35px; object-fit: cover; object-position: center;">
                 <span class="ml-2 text-white font-weight-bold d-none d-lg-inline">
                     Hi, {{ Auth::user()->name }}
                     (
@@ -152,7 +154,7 @@
                     @endif
                     )
                 </div>
-                <a href="features-profile.html" class="dropdown-item has-icon">
+                <a href="{{ route('profile.edit') }}" class="dropdown-item has-icon">
                     <i class="far fa-user"></i> Profile
                 </a>
                 <a href="features-settings.html" class="dropdown-item has-icon">
