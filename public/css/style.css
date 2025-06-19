@@ -4390,3 +4390,16 @@ label {
     font-weight: 600;
     color: #333;
 }
+.dropdown-menu .dropdown-item {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+}
+.dropdown-menu .dropdown-item i {
+    text-align: center;
+}
+.dropdown-item i {
+    width: 18px;
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1;
+}

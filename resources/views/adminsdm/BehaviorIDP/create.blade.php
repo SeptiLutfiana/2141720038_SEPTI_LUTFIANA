@@ -147,13 +147,11 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Mentor</label>
-                                        <select name="id_mentor"
-                                            class="form-control @error('id_mentor') is-invalid @enderror">
-                                            <option value="">-- Pilih Mentor --</option>
+                                        <select name="id_mentor" id="mentor-select">
+                                            <option value="" selected disabled hidden>Pilih Mentor</option>
                                             @foreach ($mentors as $item)
-                                                <option value="{{ $item->id }}">{{ $item->name }} -
-                                                    {{ $item->divisi->nama_divisi }}
-                                                    -
+                                                <option value="{{ $item->id }}">
+                                                    {{ $item->name }} - {{ $item->divisi->nama_divisi }} -
                                                     {{ $item->penempatan->nama_penempatan }}
                                                 </option>
                                             @endforeach
@@ -161,13 +159,11 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Supervisor</label>
-                                        <select name="id_supervisor"
-                                            class="form-control @error('id_supervisor') is-invalid @enderror">
-                                            <option value="">-- Pilih Supervisor --</option>
+                                        <select name="id_supervisor" id="spv-select">
+                                            <option value="" selected disabled hidden>Pilih Supervisor</option>
                                             @foreach ($supervisors as $item)
-                                                <option value="{{ $item->id }}">{{ $item->name }} -
-                                                    {{ $item->divisi->nama_divisi }}
-                                                    -
+                                                <option value="{{ $item->id }}">
+                                                    {{ $item->name }} - {{ $item->divisi->nama_divisi }} -
                                                     {{ $item->penempatan->nama_penempatan }}
                                                 </option>
                                             @endforeach
@@ -849,6 +845,12 @@
                         });
                     }
                 });
+            });
+            new TomSelect("#mentor-select", {
+                allowEmptyOption: true
+            });
+            new TomSelect("#spv-select", {
+                allowEmptyOption: true
             });
         </script>
     @endpush

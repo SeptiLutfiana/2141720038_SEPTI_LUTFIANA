@@ -18,13 +18,23 @@
                     <td>{{ $item->idps->proyeksi_karir ?? '-' }}</td>
                     <td>{{ \Carbon\Carbon::parse($item->tanggal_evaluasi)->format('d M Y') }}</td>
                     <td>{{ ucfirst($item->jenis_evaluasi) }}</td>
-                    <td>
-                        <a href="{{ route('adminsdm.BankEvaluasi.EvaluasiPascaIdp.showKaryawan', $item->id_evaluasi_idp) }}"
-                            class="btn btn-primary btn-sm mb-1"><i class="fas fa-info-circle"></i> Detail</a>
-                        <button wire:click="deleteId({{ $item->id_evaluasi_idp }})" class="btn btn-danger btn-sm mb-1"
-                            onclick="return confirm('Yakin ingin menghapus data ini?')">
-                            <i class="fas fa-trash"></i> Hapus
-                        </button>
+                    <td class="text-left" style="width: 100px;">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                                Aksi
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right p-1" style="min-width: 130px; width: 130px;">
+                                <a class="dropdown-item d-flex align-items-center py-1"
+                                    href="{{ route('adminsdm.BankEvaluasi.EvaluasiPascaIdp.showKaryawan', $item->id_evaluasi_idp) }}">
+                                    <i class="fas fa-info-circle text-success mr-2" style="width: 18px;"></i> Detail
+                                </a>
+                                <a href="#" class="dropdown-item text-danger d-flex align-items-center py-1"
+                                    onclick="event.preventDefault(); if(confirm('Yakin ingin menghapus data ini?')) @this.deleteId({{ $item->id_evaluasi_idp }})">
+                                    <i class="fas fa-trash-alt mr-2" style="width: 18px;"></i> Hapus
+                                </a>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             @empty
