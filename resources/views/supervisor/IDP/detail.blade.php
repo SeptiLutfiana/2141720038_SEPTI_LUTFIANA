@@ -104,7 +104,7 @@
                                         <button class="accordion-button text-start w-100 d-flex align-items-center"
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
-                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="accordion-icon me-2 bi bi-chevron-right"></span>
                                             <span class="kompetensi-nama">
                                                 {{ $kom->kompetensi->nama_kompetensi }}
 
@@ -235,7 +235,7 @@
                                         <button class="accordion-button text-start w-100 d-flex align-items-center"
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
-                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="accordion-icon me-2 bi bi-chevron-right"></span>
                                             <span class="kompetensi-nama">
                                                 {{ $kom->kompetensi->nama_kompetensi }}
 
