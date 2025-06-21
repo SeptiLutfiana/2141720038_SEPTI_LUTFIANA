@@ -15,7 +15,7 @@ class HardKompetensiTable extends Component
     public $jenjang;
     public $jabatan;
     protected string $paginationTheme = 'bootstrap';
-    protected $updatesQueryString = ['search'];
+    protected $updatesQueryString = ['search', 'jabatan', 'jenjang'];
 
     public function mount()
     {
@@ -45,12 +45,12 @@ class HardKompetensiTable extends Component
             ->when($this->jabatan, function ($query) {
                 return $query->where('id_jabatan', $this->jabatan);
             })
-            ->orderBy('nama_kompetensi')
+            ->orderBy('created_at')
             ->paginate(5)
             ->withQueryString();
 
         return view('livewire.hard-kompetensi-table', [
-            'kompetensi' => $kompetensi, // <-- WAJIB dikirim ke view!
+            'kompetensi' => $kompetensi,
         ]);
     }
 

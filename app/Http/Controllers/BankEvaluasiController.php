@@ -17,18 +17,16 @@ class BankEvaluasiController extends Controller
     public function index(Request $request)
     {
         $search = $request->query('search');
-        $jenisEvaluasi = $request->query('jenis_evaluasi');
         $tipePertanyaan = $request->query('tipe_pertanyaan');
         $untukRole = $request->query('untuk_role');
 
-        $bankEvaluasi = BankEvaluasi::when($search, function ($query, $search) {
-            return $query->where('pertanyaan', 'like', "%$search%")
-                ->orWhere('jenis_evaluasi', 'like', "%$search%")
-                ->orWhere('tipe_pertanyaan', 'like', "%$search%")
-                ->orWhere('untuk_role', 'like', "%$search%");
-        })
-            ->when($jenisEvaluasi, function ($query, $jenisEvaluasi) {
-                return $query->where('jenis_evaluasi', $jenisEvaluasi);
+        $bankEvaluasi = BankEvaluasi::where('jenis_evaluasi', 'pasca') // hanya tampilkan pasca
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('pertanyaan', 'like', "%$search%")
+                        ->orWhere('tipe_pertanyaan', 'like', "%$search%")
+                        ->orWhere('untuk_role', 'like', "%$search%");
+                });
             })
             ->when($tipePertanyaan, function ($query, $tipePertanyaan) {
                 return $query->where('tipe_pertanyaan', $tipePertanyaan);
@@ -36,8 +34,7 @@ class BankEvaluasiController extends Controller
             ->when($untukRole, function ($query, $untukRole) {
                 return $query->where('untuk_role', $untukRole);
             })
-
-            ->orderBy('pertanyaan')
+            ->orderBy('pertanyaan', 'desc')
             ->paginate(5)
             ->withQueryString();
 
@@ -45,7 +42,6 @@ class BankEvaluasiController extends Controller
             'type_menu' => 'evaluasi',
             'evaluasi' => $bankEvaluasi,
             'search' => $search,
-            'jenisEvaluasi' => $jenisEvaluasi,
             'tiperPertanyaan' => $tipePertanyaan,
             'untuk_role' => $untukRole,
         ]);

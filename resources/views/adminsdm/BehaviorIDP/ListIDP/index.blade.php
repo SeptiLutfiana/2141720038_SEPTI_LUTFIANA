@@ -4,6 +4,33 @@
 @push('style')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap4.min.css">
+    <style>
+        .form-control,
+        .ts-control {
+            height: 45px !important;
+            padding: 0.75rem 0.75rem !important;
+            font-size: 14px;
+            line-height: 1.5;
+            background-color: #fff;
+        }
+
+        .ts-wrapper.single .ts-control {
+            background-image: none;
+        }
+
+        .ts-control:focus,
+        .form-control:focus {
+            border-color: #86b7fe;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+
+        /* Biar teks placeholder sama */
+        .form-control::placeholder {
+            color: #6c757d;
+            opacity: 1;
+        }
+    </style>
 @endpush
 
 @section('main')
@@ -51,14 +78,15 @@
                                     class="mb-3">
                                     <div class="form-row">
                                         <div class="col-md-3">
-                                            <label>Cari Karyawan</label>
+                                            <label>Cari Proyeksi Karir IDP</label>
                                             <input type="text" name="search" class="form-control"
-                                                placeholder="Cari nama karyawan..." value="{{ request('search') }}"
+                                                placeholder="Cari nama Proyeksi Karir..." value="{{ request('search') }}"
                                                 oninput="this.form.submit()">
                                         </div>
                                         <div class="col-md-3">
                                             <label>Pilih Jenjang</label>
-                                            <select name="id_jenjang" class="form-control" onchange="this.form.submit()">
+                                            <select name="id_jenjang" class="tom-select w-100"
+                                                onchange="this.form.submit()">
                                                 <option value="">-- Semua Jenjang --</option>
                                                 @foreach ($listJenjang as $j)
                                                     <option value="{{ $j->id_jenjang }}"
@@ -70,7 +98,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label>Pilih Learning Group</label>
-                                            <select name="id_LG" class="form-control" onchange="this.form.submit()">
+                                            <select name="id_LG" class="tom-select" onchange="this.form.submit()">
                                                 <option value="">-- Pilih Learning Group --</option>
                                                 @foreach ($listLG as $lg)
                                                     <option value="{{ $lg->id_LG }}"
@@ -82,7 +110,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label>Pilih Tahun</label>
-                                            <select name="tahun" class="form-control" onchange="this.form.submit()">
+                                            <select name="tahun" class="tom-select" onchange="this.form.submit()">
                                                 <option value="">-- Semua Tahun --</option>
                                                 @foreach ($listTahun as $tahun)
                                                     <option value="{{ $tahun }}"
@@ -92,6 +120,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
+
                                     </div>
                                 </form>
                                 <div class="table-responsive">
@@ -111,6 +140,8 @@
     </div>
 @endsection
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
     <script>
         Livewire.on('idpDeleted', message => {
             Swal.fire({
@@ -120,6 +151,24 @@
                 timer: 3000,
                 showConfirmButton: false
             });
+        });
+
+        function initTomSelect() {
+            document.querySelectorAll('.tom-select').forEach(function(selectElement) {
+                new TomSelect(selectElement, {
+                    plugins: ['dropdown_input'],
+                    allowEmptyOption: true,
+                    create: false
+                });
+            });
+        }
+
+        // Inisialisasi awal saat page load
+        document.addEventListener('DOMContentLoaded', initTomSelect);
+
+        // Re-init jika Livewire render ulang (jika perlu)
+        Livewire.hook('message.processed', () => {
+            initTomSelect();
         });
     </script>
 @endpush

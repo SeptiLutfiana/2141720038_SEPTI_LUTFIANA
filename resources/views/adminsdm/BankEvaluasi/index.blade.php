@@ -73,7 +73,7 @@
                                                 placeholder="Cari pertanyaan evaluasi..." value="{{ request('search') }}"
                                                 oninput="this.form.submit()">
                                         </div>
-                                        <div class="col-md-3">
+                                        {{-- <div class="col-md-3">
                                             <label>Cari Jenis Evaluasi</label>
                                             <select name="jenis_evaluasi" class="form-control"
                                                 onchange="this.form.submit()">
@@ -85,7 +85,7 @@
                                                     {{ request('jenis_evaluasi') == 'pasca' ? 'selected' : '' }}>Pasca IDP
                                                 </option>
                                             </select>
-                                        </div>
+                                        </div> --}}
                                         <div class="col-md-3">
                                             <label>Cari Tipe Pertanyaan</label>
                                             <select name="tipe_pertanyaan" class="form-control"

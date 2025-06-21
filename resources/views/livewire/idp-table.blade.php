@@ -20,10 +20,10 @@
                         <td class="text-center" style="width: 50px;">
                             {{ $loop->iteration + ($idps->currentPage() - 1) * $idps->perPage() }}
                         </td>
-                        <td class="text-center">{{ $idp->proyeksi_karir }}</td>
-                        <td class="text-center">{{ optional($idp->karyawan)->name ?? '-' }}</td>
-                        <td class="text-center">{{ optional($idp->mentor)->name ?? '-' }}</td>
-                        <td class="text-center">{{ $idp->supervisor->name ?? '-' }}</td>
+                        <td>{{ $idp->proyeksi_karir }}</td>
+                        <td>{{ optional($idp->karyawan)->name ?? '-' }}</td>
+                        <td>{{ optional($idp->mentor)->name ?? '-' }}</td>
+                        <td>{{ $idp->supervisor->name ?? '-' }}</td>
                         {{-- <td class="text-center">{{ $idp->karyawan->learningGroup->nama_LG ?? '-' }}</td> --}}
                         <td>
                             @php
@@ -98,7 +98,7 @@
                 @endforeach
             @else
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-3">
+                    <td colspan="8" class="text-center text-muted py-3">
                         Data Tidak Ditemukan
                     </td>
                 </tr>

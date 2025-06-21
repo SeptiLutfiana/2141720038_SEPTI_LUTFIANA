@@ -61,7 +61,7 @@ class BankIdpTable extends Component
             ->when($this->tahun, function ($query) {
                 return $query->whereYear('waktu_mulai', $this->tahun);
             })
-            ->orderBy('proyeksi_karir')
+            ->orderBy('created_at', 'desc')
             ->paginate(5)
             ->withQueryString();
 

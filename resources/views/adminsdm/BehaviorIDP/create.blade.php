@@ -83,8 +83,8 @@
                                     <div class="row">
                                         <div class="form-group col-md-3">
                                             <label for="filter-jenjang">Filter Jenjang</label>
-                                            <select id="filter-jenjang" class="form-control">
-                                                <option value="">Semua Jenjang</option>
+                                            <select id="filter-jenjang" class="tom-select">
+                                                <option value="" selected disabled hidden>Semua Jenjang</option>
                                                 @foreach ($listJenjang as $item)
                                                     <option value="{{ $item->id_jenjang }}">{{ $item->nama_jenjang }}
                                                     </option>
@@ -94,8 +94,9 @@
 
                                         <div class="form-group col-md-3">
                                             <label for="filter-lg">Filter Learning Group</label>
-                                            <select id="filter-lg" class="form-control">
-                                                <option value="">Semua Learning Group</option>
+                                            <select id="filter-lg" class="tom-select">
+                                                <option value="" selected disabled hidden>Semua Learning Group
+                                                </option>
                                                 @foreach ($listLG as $item)
                                                     <option value="{{ $item->id_LG }}">{{ $item->nama_LG }}</option>
                                                 @endforeach
@@ -104,8 +105,8 @@
 
                                         <div class="form-group col-md-3">
                                             <label for="filter-divisi">Filter Divisi</label>
-                                            <select id="filter-divisi" class="form-control">
-                                                <option value="">Semua Divisi</option>
+                                            <select id="filter-divisi" class="tom-select">
+                                                <option value="" selected disabled hidden>Semua Divisi</option>
                                                 @foreach ($listDivisi as $item)
                                                     <option value="{{ $item->id_divisi }}">{{ $item->nama_divisi }}
                                                     </option>
@@ -115,8 +116,8 @@
 
                                         <div class="form-group col-md-3">
                                             <label for="filter-penempatan">Filter Penempatan</label>
-                                            <select id="filter-penempatan" class="form-control">
-                                                <option value="">Semua Penempatan</option>
+                                            <select id="filter-penempatan" class="tom-select">
+                                                <option value="" selected disabled hidden>Semua Penempatan</option>
                                                 @foreach ($listPenempatan as $item)
                                                     <option value="{{ $item->id_penempatan }}">
                                                         {{ $item->nama_penempatan }}
@@ -176,8 +177,8 @@
                                     <div class="form-group">
                                         <label>Jenjang</label>
                                         <select name="id_jenjang_bank"
-                                            class="form-control @error('id_jenjang_bank') is-invalid @enderror">
-                                            <option value="">-- Pilih Jenjang --</option>
+                                            class="tom-select @error('id_jenjang_bank') is-invalid @enderror">
+                                            <option value="" selected disabled hidden>-- Pilih Jenjang --</option>
                                             @foreach ($listJenjang as $item)
                                                 <option value="{{ $item->id_jenjang }}">{{ $item->nama_jenjang }}
                                                 </option>
@@ -186,8 +187,9 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Learning Group</label>
-                                        <select name="id_LG" class="form-control @error('id_LG') is-invalid @enderror">
-                                            <option value="">-- Pilih Learning Group --</option>
+                                        <select name="id_LG" class="tom-select @error('id_LG') is-invalid @enderror">
+                                            <option value="" selected disabled hidden>-- Pilih Learning Group --
+                                            </option>
                                             @foreach ($listLG as $item)
                                                 <option value="{{ $item->id_LG }}">{{ $item->nama_LG }}</option>
                                             @endforeach
@@ -196,7 +198,7 @@
                                     <div class="form-group">
                                         <label>Supervisor</label>
                                         <select name="id_supervisor_jenjang"
-                                            class="form-control @error('id_supervisor_jenjang') is-invalid @enderror">
+                                            class="tom-select @error('id_supervisor_jenjang') is-invalid @enderror">
                                             <option value="">-- Pilih Supervisor --</option>
                                             @foreach ($supervisors as $item)
                                                 <option value="{{ $item->id }}">{{ $item->name }} -
@@ -248,8 +250,8 @@
                                             <tr>
                                                 <th width="25%">Nama Kompetensi</th>
                                                 <th width="20%">Metode Belajar</th>
-                                                <th width="20%">Sasaran</th>
-                                                <th width="20%">Aksi (Implementasi)</th>
+                                                <th width="30%">Sasaran</th>
+                                                <th width="30%">Aksi (Implementasi)</th>
                                                 <th width="15%">Aksi</th>
                                             </tr>
                                         </thead>
@@ -304,7 +306,7 @@
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label>Jenis Kompetensi</label>
-                                    <select class="form-control jenis_kompetensi" id="modalJenisKompetensi">
+                                    <select class="tom-select jenis_kompetensi" id="modalJenisKompetensi">
                                         <option value="Hard Kompetensi">Hard Kompetensi</option>
                                         <option value="Soft Kompetensi">Soft Kompetensi</option>
                                     </select>
@@ -312,7 +314,7 @@
                                 <!-- Jenjang -->
                                 <div class="form-group col-md-6" id="formJenjangGroup">
                                     <label>Jenjang</label>
-                                    <select class="form-control" id="modalJenjangDropdown">
+                                    <select class="tom-select" id="modalJenjangDropdown">
                                         <option value="">Pilih Jenjang</option>
                                         @foreach ($listJenjang as $item)
                                             <option value="{{ $item->id_jenjang }}">{{ $item->nama_jenjang }}</option>
@@ -323,7 +325,7 @@
                                 <!-- Jabatan -->
                                 <div class="form-group col-md-6" id="formJabatanGroup">
                                     <label>Jabatan</label>
-                                    <select class="form-control" id="modalJabatanDropdown">
+                                    <select class="tom-select" id="modalJabatanDropdown">
                                         <option value="">Pilih Jabatan</option>
                                         @foreach ($listJabatan as $item)
                                             <option value="{{ $item->id_jabatan }}">{{ $item->nama_jabatan }}</option>
@@ -333,14 +335,14 @@
 
                                 <div class="form-group col-md-6">
                                     <label>Kompetensi</label>
-                                    <select class="form-control kompetensi-dropdown" id="modalKompetensiDropdown">
+                                    <select class="tom-select kompetensi-dropdown" id="modalKompetensiDropdown">
                                         <!-- Opsi akan diisi oleh JS -->
                                     </select>
                                 </div>
                                 <!-- Peran Kompetensi, hidden default -->
                                 <div class="form-group col-md-12" id="formPeranGroup">
                                     <label>Peran Kompetensi</label>
-                                    <select class="form-control" id="modalPeranDropdown" name="peran">
+                                    <select class="tom-select" id="modalPeranDropdown" name="peran">
                                         <option value="umum">Kompetensi Umum</option>
                                         <option value="utama">Kompetensi Utama</option>
                                         <option value="kunci_core">Kompetensi Kunci Core</option>
@@ -588,16 +590,28 @@
             // Fungsi untuk mengisi dropdown kompetensi berdasarkan jenis
             function renderKompetensiOptions(jenis_kompetensi) {
                 const kompetensiDropdown = document.getElementById('modalKompetensiDropdown');
-                if (!kompetensiDropdown) return;
+                if (!kompetensiDropdown || !kompetensiDropdown.tomselect) return;
 
-                kompetensiDropdown.innerHTML = '<option value="">-- Pilih Kompetensi --</option>';
+                const ts = kompetensiDropdown.tomselect;
+                ts.clearOptions();
 
-                kompetensiData[jenis_kompetensi].forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.id_kompetensi;
-                    option.textContent = item.nama_kompetensi;
-                    kompetensiDropdown.appendChild(option);
+                ts.addOption({
+                    value: '',
+                    text: '-- Pilih Kompetensi --'
                 });
+
+                const data = kompetensiData[jenis_kompetensi];
+                if (!data || data.length === 0) return;
+
+                data.forEach(item => {
+                    ts.addOption({
+                        value: item.id_kompetensi,
+                        text: item.nama_kompetensi
+                    });
+                });
+
+                ts.refreshOptions(false);
+                ts.setValue('');
             }
 
             // Inisialisasi pertama kali
@@ -673,16 +687,21 @@
                 tbodyHard.innerHTML = '';
                 daftarHard.forEach((item, index) => {
                     tbodyHard.innerHTML += `
-        <tr>
+        <tr class="text-center">
             <td>${item.kompetensiText}</td>
             <td>${item.metodeText}</td>
             <td>${item.sasaran}</td>
             <td>${item.aksi}</td>
-            <td class="text-center">
-                <button type="button" class="btn btn-danger btn-sm" onclick="hapusKompetensi('hard', ${index})">
-                    <i class="fas fa-trash"></i> Hapus
-                </button>
-            </td>
+                <td class="text-center">
+    <button type="button"
+        class="btn btn-outline-danger rounded-circle shadow-sm"
+        style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"
+        onclick="hapusKompetensi('hard', ${index})">
+        <i class="fas fa-trash text-danger"></i>
+    </button>
+</td>
+
+
         </tr>
     `;
 
@@ -703,10 +722,14 @@
             <td>${item.aksi}</td>
             <td>${item.peran}</td>
             <td class="text-center">
-                <button type="button" class="btn btn-danger btn-sm" onclick="hapusKompetensi('soft', ${index})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
+    <button type="button"
+        class="btn btn-outline-danger rounded-circle shadow-sm"
+        style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"
+        onclick="hapusKompetensi('soft', ${index})">
+        <i class="fas fa-trash text-danger"></i>
+    </button>
+</td>
+
         </tr>
     `;
 
@@ -811,18 +834,43 @@
                             url: '/admin/datamaster/behavior/idp/get-jabatan-by-jenjang/' + jenjangId,
                             type: 'GET',
                             success: function(data) {
-                                let jabatanDropdown = $('#modalJabatanDropdown');
-                                jabatanDropdown.empty().append(
-                                    '<option value="">Pilih Jabatan</option>');
-                                data.forEach(function(jabatan) {
-                                    jabatanDropdown.append(
-                                        `<option value="${jabatan.id_jabatan}">${jabatan.nama_jabatan}</option>`
-                                    );
+                                let jabatanDropdown = document.querySelector(
+                                    '#modalJabatanDropdown');
+
+                                // Reset TomSelect-nya jika sudah terinisialisasi
+                                if (jabatanDropdown.tomselect) {
+                                    jabatanDropdown.tomselect
+                                        .clearOptions(); // hapus opsi sebelumnya
+                                    jabatanDropdown.tomselect.addOption({
+                                        value: "",
+                                        text: "Pilih Jabatan"
+                                    }); // tambahkan default option
+
+                                    data.forEach(function(jabatan) {
+                                        jabatanDropdown.tomselect.addOption({
+                                            value: jabatan.id_jabatan,
+                                            text: jabatan.nama_jabatan
+                                        });
+                                    });
+
+                                    jabatanDropdown.tomselect.refreshOptions(false);
+                                }
+
+
+                                // 🔁 Re-inisialisasi TomSelect
+                                if (TomSelect.instances['modalJabatanDropdown']) {
+                                    TomSelect.instances['modalJabatanDropdown'].destroy();
+                                }
+
+                                new TomSelect('#modalJabatanDropdown', {
+                                    plugins: ['dropdown_input'],
+                                    allowEmptyOption: true
                                 });
                             }
                         });
                     }
                 });
+
 
                 // Saat jabatan dipilih -> ambil daftar hard kompetensi
                 $('#modalJabatanDropdown').on('change', function() {
@@ -833,24 +881,209 @@
                                 jabatanId,
                             type: 'GET',
                             success: function(data) {
-                                let kompetensiDropdown = $('#modalKompetensiDropdown');
-                                kompetensiDropdown.empty().append(
-                                    '<option value="">Pilih Kompetensi</option>');
-                                data.forEach(function(komp) {
-                                    kompetensiDropdown.append(
-                                        `<option value="${komp.id_kompetensi}">${komp.nama_kompetensi}</option>`
-                                    );
-                                });
+                                let kompetensiDropdown = document.querySelector(
+                                    '#modalKompetensiDropdown');
+
+                                // Tambahkan validasi jenis
+                                let jenis = document.getElementById('modalJenisKompetensi').value;
+                                if (jenis !== 'Hard Kompetensi')
+                                    return; // ⛔ Hentikan kalau jenis bukan Hard
+
+                                // Clear & reinitialize only if hard kompetensi
+                                if (kompetensiDropdown.tomselect) {
+                                    kompetensiDropdown.tomselect.clearOptions();
+                                    kompetensiDropdown.tomselect.addOption({
+                                        value: '',
+                                        text: 'Pilih Kompetensi'
+                                    });
+
+                                    data.forEach(function(komp) {
+                                        kompetensiDropdown.tomselect.addOption({
+                                            value: komp.id_kompetensi,
+                                            text: komp.nama_kompetensi
+                                        });
+                                    });
+
+                                    kompetensiDropdown.tomselect.refreshOptions(false);
+                                }
                             }
                         });
                     }
                 });
+
+                let modalDropdownsInitialized = false;
+
+                $('#modalTambahKompetensi').on('shown.bs.modal', function() {
+                    if (!modalDropdownsInitialized) {
+                        new TomSelect('#modalJenisKompetensi', {
+                            plugins: ['dropdown_input'],
+                            allowEmptyOption: true
+                        });
+
+                        new TomSelect('#modalJenjangDropdown', {
+                            plugins: ['dropdown_input'],
+                            allowEmptyOption: true
+                        });
+
+                        new TomSelect('#modalJabatanDropdown', {
+                            plugins: ['dropdown_input'],
+                            allowEmptyOption: true
+                        });
+
+                        new TomSelect('#modalKompetensiDropdown', {
+                            plugins: ['dropdown_input'],
+                            allowEmptyOption: true
+                        });
+
+                        new TomSelect('#modalPeranDropdown', {
+                            plugins: ['dropdown_input'],
+                            allowEmptyOption: true
+                        });
+
+                        modalDropdownsInitialized = true;
+                    }
+                });
             });
             new TomSelect("#mentor-select", {
+                plugins: ['dropdown_input'],
                 allowEmptyOption: true
             });
             new TomSelect("#spv-select", {
+                plugins: ['dropdown_input'],
                 allowEmptyOption: true
             });
+            // given
+            new TomSelect('#filter-jenjang', {
+                placeholder: 'Semua Jenjang',
+                plugins: ['dropdown_input'],
+                allowEmptyOption: true
+            });
+
+            new TomSelect('#filter-lg', {
+                placeholder: 'Semua Learning Group',
+                plugins: ['dropdown_input'],
+                allowEmptyOption: true
+            });
+
+            new TomSelect('#filter-divisi', {
+                placeholder: 'Semua Divisi',
+                plugins: ['dropdown_input'],
+                allowEmptyOption: true
+            });
+
+            new TomSelect('#filter-penempatan', {
+                placeholder: 'Semua Penempatan',
+                plugins: ['dropdown_input'],
+                allowEmptyOption: true
+            });
+            //bank idp
+            let metode2Initialized = false;
+
+            function toggleMetode(metode) {
+                const formMetode1 = document.getElementById('form-metode1');
+                const formMetode2 = document.getElementById('form-metode2');
+
+                const selectSupervisor1 = formMetode1.querySelector('select[name="id_supervisor"]');
+                const selectSupervisor2 = formMetode2.querySelector('select[name="id_supervisor_jenjang"]');
+                const selectJenjangBank = formMetode2.querySelector('select[name="id_jenjang_bank"]');
+                const selectLgBank = formMetode2.querySelector('select[name="id_LG"]');
+
+                if (metode == 1) {
+                    formMetode1.style.display = 'block';
+                    formMetode2.style.display = 'none';
+                    selectSupervisor1.disabled = false;
+                    selectSupervisor2.disabled = true;
+                    selectJenjangBank.disabled = true;
+                    selectLgBank.disabled = true;
+                } else {
+                    formMetode1.style.display = 'none';
+                    formMetode2.style.display = 'block';
+                    selectSupervisor1.disabled = true;
+                    selectSupervisor2.disabled = false;
+                    selectJenjangBank.disabled = false;
+                    selectLgBank.disabled = false;
+
+                    // 🔧 Inisialisasi TomSelect hanya satu kali saat pertama Bank IDP dibuka
+                    if (!metode2Initialized) {
+                        new TomSelect('select[name="id_jenjang_bank"]', {
+                            placeholder: 'Pilih Jenjang',
+                            plugins: ['dropdown_input'],
+                            allowEmptyOption: true
+                        });
+                        new TomSelect('select[name="id_LG"]', {
+                            plugins: ['dropdown_input'],
+                            allowEmptyOption: true
+                        });
+                        new TomSelect('select[name="id_supervisor_jenjang"]', {
+                            plugins: ['dropdown_input'],
+                            allowEmptyOption: true
+                        });
+                        metode2Initialized = true;
+                    }
+                }
+            }
+
+            function resetFormModal() {
+                // Reset jenis kompetensi ke default
+                const jenisSelect = document.getElementById('modalJenisKompetensi');
+                if (jenisSelect.tomselect) jenisSelect.tomselect.setValue('Hard Kompetensi');
+
+                // Reset jenjang
+                const jenjangSelect = document.getElementById('modalJenjangDropdown');
+                if (jenjangSelect.tomselect) {
+                    jenjangSelect.tomselect.clearOptions();
+                    jenjangSelect.tomselect.addOption({
+                        value: '',
+                        text: 'Pilih Jenjang'
+                    });
+
+                    // Tambahkan kembali opsi jenjang dari PHP ke TomSelect
+                    const listJenjang = @json($listJenjang);
+                    listJenjang.forEach(function(item) {
+                        jenjangSelect.tomselect.addOption({
+                            value: item.id_jenjang,
+                            text: item.nama_jenjang
+                        });
+                    });
+
+                    jenjangSelect.tomselect.setValue('');
+                    jenjangSelect.tomselect.refreshOptions(false);
+                }
+
+                // Reset jabatan
+                const jabatanSelect = document.getElementById('modalJabatanDropdown');
+                if (jabatanSelect.tomselect) {
+                    jabatanSelect.tomselect.clearOptions();
+                    jabatanSelect.tomselect.addOption({
+                        value: '',
+                        text: 'Pilih Jabatan'
+                    });
+                    jabatanSelect.tomselect.setValue('');
+                }
+
+                // Reset kompetensi
+                const kompetensiSelect = document.getElementById('modalKompetensiDropdown');
+                if (kompetensiSelect.tomselect) {
+                    kompetensiSelect.tomselect.clearOptions();
+                    kompetensiSelect.tomselect.addOption({
+                        value: '',
+                        text: 'Pilih Kompetensi'
+                    });
+                    kompetensiSelect.tomselect.setValue('');
+                }
+
+                // Reset metode belajar
+                if (typeof tomSelectMetodeBelajar !== 'undefined') {
+                    tomSelectMetodeBelajar.clear();
+                }
+
+                // Reset peran
+                const peranSelect = document.getElementById('modalPeranDropdown');
+                if (peranSelect.tomselect) peranSelect.tomselect.setValue('umum');
+
+                // Kosongkan textarea
+                $('#modalSasaran').val('');
+                $('#modalAksi').val('');
+            }
         </script>
     @endpush

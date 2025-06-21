@@ -4,6 +4,33 @@
 @push('style')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap4.min.css">
+    <style>
+        .form-control,
+        .ts-control {
+            height: 45px !important;
+            padding: 0.75rem 0.75rem !important;
+            font-size: 14px;
+            line-height: 1.5;
+            background-color: #fff;
+        }
+
+        .ts-wrapper.single .ts-control {
+            background-image: none;
+        }
+
+        .ts-control:focus,
+        .form-control:focus {
+            border-color: #86b7fe;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+
+        /* Biar teks placeholder sama */
+        .form-control::placeholder {
+            color: #6c757d;
+            opacity: 1;
+        }
+    </style>
 @endpush
 
 @section('main')
@@ -71,7 +98,7 @@
                                 <form method="GET" action="{{ route('adminsdm.data-master.kompetensi.indexHard') }}"
                                     class="mb-3">
                                     <div class="form-row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label>Cari Kompetensi</label>
                                             <input type="text" name="search" class="form-control"
                                                 placeholder="Cari nama kompetensi..." value="{{ request('search') }}"
@@ -79,7 +106,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label>Pilih Jenjang</label>
-                                            <select name="id_jenjang" class="form-control" onchange="this.form.submit()">
+                                            <select name="id_jenjang" class="tom-select" onchange="this.form.submit()">
                                                 <option value="">-- Semua Jenjang --</option>
                                                 @foreach ($listJenjang as $j)
                                                     <option value="{{ $j->id_jenjang }}"
@@ -91,10 +118,10 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label>Pilih Jabatan</label>
-                                            <select name="id_jabatan" class="form-control" onchange="this.form.submit()">
+                                            <select name="id_jabatan" class="tom-select" onchange="this.form.submit()">
                                                 <option value="">-- Semua Jabatan --</option>
                                                 @foreach ($listJabatan as $jab)
-                                                    @if (!$listJenjang || request('id_jenjang') == $jab->id_jenjang)
+                                                    @if (!request('id_jenjang') || $jab->id_jenjang == request('id_jenjang'))
                                                         <option value="{{ $jab->id_jabatan }}"
                                                             {{ request('id_jabatan') == $jab->id_jabatan ? 'selected' : '' }}>
                                                             {{ $jab->nama_jabatan }}
@@ -120,6 +147,7 @@
     </div>
 @endsection
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script>
         Livewire.on('kompetensiDeleted', message => {
             Swal.fire({
@@ -129,6 +157,24 @@
                 timer: 3000,
                 showConfirmButton: false
             });
+        });
+
+        function initTomSelect() {
+            document.querySelectorAll('.tom-select').forEach(function(selectElement) {
+                new TomSelect(selectElement, {
+                    plugins: ['dropdown_input'],
+                    allowEmptyOption: true,
+                    create: false
+                });
+            });
+        }
+
+        // Inisialisasi awal saat page load
+        document.addEventListener('DOMContentLoaded', initTomSelect);
+
+        // Re-init jika Livewire render ulang (jika perlu)
+        Livewire.hook('message.processed', () => {
+            initTomSelect();
         });
     </script>
 @endpush

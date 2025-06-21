@@ -39,12 +39,9 @@
                         <div class="card-body">
 
                             <div class="form-group">
-                                <label for="jenis_evaluasi">Jenis Evaluasi</label>
-                                <select name="jenis_evaluasi" id="jenis_evaluasi" class="form-control" required>
-                                    <option value="">-- Pilih Jenis Evaluasi --</option>
-                                    <option value="onboarding">Onboarding</option>
-                                    <option value="pasca">Pasca</option>
-                                </select>
+                                <label>Jenis Evaluasi</label>
+                                <input type="text" class="form-control" value="Pasca" readonly>
+                                <input type="hidden" name="jenis_evaluasi" value="pasca">
                             </div>
 
                             <div class="form-group">
@@ -73,7 +70,7 @@
 
                         </div>
                         <div class="card-footer text-right">
-                            <button type="submit" class="btn btn-success">Simpan</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
                     </form>
 

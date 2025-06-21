@@ -23,11 +23,6 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="form-group col-12">
-                                    <label>Id Divisi</label>
-                                    <input readonly type="text" class="form-control"
-                                        value="{{ $divisi->id_divisi }}">
-                                </div>
-                                <div class="form-group col-12">
                                     <label>Nama</label>
                                     <input readonly type="text" class="form-control" value="{{ $divisi->nama_divisi }}">
                                 </div>
