@@ -37,11 +37,15 @@ class IdpRekomendasiService
 
                 foreach ($idpKomp->pengerjaans as $pengerjaan) {
                     $ratings = $ratings->merge(
-                        $pengerjaan->nilaiPengerjaanIdp
-                            ->pluck('rating')
-                            ->filter()
-                            ->map(fn($r) => (int) $r)
-                    );
+    $pengerjaan->nilaiPengerjaanIdp()
+        ->whereHas('idpKompetensiPengerjaan.idpKompetensi', function ($query) use ($idp) {
+            $query->where('id_idp', $idp->id_idp);
+        })
+        ->pluck('rating')
+        ->filter()
+        ->map(fn($r) => (float) $r)
+);
+
                 }
 
                 if ($ratings->isEmpty()) {
@@ -66,7 +70,7 @@ class IdpRekomendasiService
                         'ratings' => $ratings->toArray()
                     ];
                 } elseif ($jenis === 'Hard Kompetensi') {
-                    $hards = array_merge($hards, $ratings->toArray());
+                    $hards[] = $ratings->avg(); // hanya ambil rata-rata per kompetensi
                 }
             }
 
@@ -324,7 +328,14 @@ class IdpRekomendasiService
     {
         $soft = $hasilSoft['hasil'];
         $hard = $hasilHard['hasil'];
-
+        // Tambahkan log debug di sini
+        Log::debug('🔍 Debug kombinasi hasil untuk matrix final', [
+            'soft' => $soft,
+            'hard' => $hard,
+            'soft_original' => $hasilSoft,
+            'hard_original' => $hasilHard,
+            'matrix_key_exists' => isset($matrix[$soft][$hard]) ? '✅ YES' : '❌ NO',
+        ]);
         // Jika salah satu masih menunggu hasil
         if ($soft === 'Menunggu Hasil' || $hard === 'Menunggu Hasil') {
             return [
