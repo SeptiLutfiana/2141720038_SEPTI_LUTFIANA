@@ -19,7 +19,7 @@
                 @endif
             </a>
 
-            <div class="dropdown-menu dropdown-list dropdown-menu-right">
+            <div class="dropdown-menu dropdown-list dropdown-menu-right" style="z-index: 1050;">
                 <div class="dropdown-header">
                     Notifications
                     <div class="float-right">

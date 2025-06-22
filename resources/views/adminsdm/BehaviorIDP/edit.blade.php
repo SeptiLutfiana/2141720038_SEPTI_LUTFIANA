@@ -13,7 +13,8 @@
                 <h1>Edit Data IDP</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Data IDP</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.BehaviorIDP.indexGiven') }}">Data IDP</a>
+                    </div>
                     <div class="breadcrumb-item">Edit Data IDP</div>
                 </div>
             </div>
@@ -478,20 +479,15 @@
 
                     // Notifikasi sukses
                     if (typeof Swal !== 'undefined') {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Data kompetensi berhasil diperbarui!',
                             showConfirmButton: false,
                             timer: 3000,
-                            timerProgressBar: true,
-                        });
-
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Data kompetensi berhasil diperbarui!'
+                            timerProgressBar: true
                         });
                     }
-
                     // Debug final
                     debugHiddenInputs();
                 });
@@ -739,30 +735,19 @@
 
                 // Reset form dan tutup modal
                 resetFormModal();
-                const modalTambahKompetensiElement = document.getElementById('modalTambahKompetensi');
-                if (modalTambahKompetensiElement) {
-                    const modalInstance = bootstrap.Modal.getInstance(modalTambahKompetensiElement);
-                    if (modalInstance) {
-                        // Sembunyikan modal jika instance-nya sudah ada
-                        modalInstance.hide();
-                    } else {
-                        // Jika instance belum ada, buat yang baru dan sembunyikan
-                        new bootstrap.Modal(modalTambahKompetensiElement).hide();
-                    }
-                }
+                const modalEl = document.getElementById('modalTambahKompetensi');
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.hide();
+
                 // Tampilkan pesan sukses
                 if (typeof Swal !== 'undefined') {
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Kompetensi baru berhasil ditambahkan!',
                         showConfirmButton: false,
                         timer: 3000,
-                        timerProgressBar: true,
-                    });
-
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'Kompetensi baru berhasil ditambahkan!'
+                        timerProgressBar: true
                     });
                 }
             });
@@ -782,19 +767,16 @@
                     updateTableRowNumbers();
 
                     if (typeof Swal !== 'undefined') {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Kompetensi berhasil dihapus!',
                             showConfirmButton: false,
                             timer: 2000,
-                            timerProgressBar: true,
-                        });
-
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Kompetensi berhasil dihapus!'
+                            timerProgressBar: true
                         });
                     }
+
                 }
             });
 
@@ -961,17 +943,13 @@
                 $(`#modalEditNew${uniqueId}`).remove();
 
                 if (typeof Swal !== 'undefined') {
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Data kompetensi berhasil diperbarui!',
                         showConfirmButton: false,
                         timer: 3000,
-                        timerProgressBar: true,
-                    });
-
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'Data kompetensi berhasil diperbarui!'
+                        timerProgressBar: true
                     });
                 }
             };
