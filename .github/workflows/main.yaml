@@ -51,3 +51,4 @@ jobs:
           **/node_modules/**
           **/storage/imports/**
           vendor/**
+          public/**
