@@ -1,0 +1,53 @@
+name: Development
+on : 
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  web-deploy:
+    name: auto deploy
+    runs-on: ubuntu-latest
+
+    environment: BUILD ENV
+    
+    steps:
+    - name: get latest code
+      uses: actions/checkout@v3
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.4'
+        extensions: mbstring, bcmath
+        
+    - name: Install Composer dependencies
+      run: composer install --no-interaction --prefer-dist --optimize-autoloader
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install NPM dependencies
+      run: npm ci
+      
+    - name: Build application
+      run: npm run build
+
+    - name: FTP Deploy
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.1
+      with:
+        server: 103.150.116.73
+        username: septi
+        password: password
+        port: 21
+        protocol: ftp
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/storage/imports/**
+          vendor/**
