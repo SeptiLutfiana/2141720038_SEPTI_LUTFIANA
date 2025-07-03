@@ -7,8 +7,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 10px;
-            margin: 15px;
+            font-size: 12px;
+            margin: 40px;
         }
 
         .page {
@@ -26,7 +26,7 @@
         .logo {
             position: absolute;
             left: 0;
-            top: -20px;
+            top: -60px;
             width: 100px;
         }
 
@@ -101,6 +101,10 @@
 
 <body>
     <div class="page">
+        <div class="header-container">
+            <img src="{{ public_path('./img/logo-perhutani.png') }}" class="logo" alt="Logo Perhutani">
+            <div class="title">Data Mapping IDP Perum Perhutani</div>
+        </div>
         <table>
             <thead>
                 <tr>
