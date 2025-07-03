@@ -650,7 +650,7 @@ class KaryawanDashboardController extends Controller
             'is_template' => 0,
             'id_idp_template_asal' => $templateIDP->id_idp,
         ]);
-        $mentor = \App\Models\User::find($request->id_mentor);
+        $mentor = User::find($request->id_mentor);
         $mentor->notify(new KaryawanMemilihMentor([
             'id_user' => $user->id,
             'nama_karyawan' => $user->name,

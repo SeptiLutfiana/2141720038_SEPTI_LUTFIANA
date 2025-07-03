@@ -101,15 +101,7 @@
 
 <body>
     @foreach ($idps as $idp)
-        <div class="header-container">
-            <img src="{{ public_path('img/logo-perhutani.png') }}" class="logo" alt="Logo Perhutani">
-            <div class="title">
-                Individual Development Plan <br>
-                Perhutani Forestry Institute <br><br>
-            </div>
-        </div>
         <table>
-
             <head>
                 <thead>
                     <tr>
@@ -120,14 +112,6 @@
                         <th>Waktu</th>
                         <th>Maksimal Kuoat</th>
                         <th>Total Daftar</th>
-                        {{-- <th>Soft Kompetensi</th>
-                        <th>Sasaran</th>
-                        <th>Metode Belajar</th>
-                        <th>Aksi</th>
-                        <th>Hard Kompetensi</th>
-                        <th>Sasaran</th>
-                        <th>Metode Belajar</th>
-                        <th>Aksi</th> --}}
                     </tr>
                 </thead>
             </head>
@@ -142,18 +126,6 @@
                         {{ \Carbon\Carbon::parse($idp->waktu_selesai)->translatedFormat('F Y') }}</td>
                     <td>{{ $idp->max_applies }} Karyawan</td>
                     <td>{{ $idp->current_applies }} Karyawan</td>
-                    {{-- @foreach ($idp->idpKompetensis->where('kompetensi.jenis_kompetensi', 'Soft Kompetensi') as $kom)
-                        <td>{{ $kom->kompetensi->nama_kompetensi }}</td>
-                        <td>{!! nl2br(e($kom->sasaran)) !!}</td>
-                        <td>{{ $kom->metodeBelajars->pluck('nama_metodeBelajar')->implode(', ') }}</td>
-                        <td>{!! nl2br(e($kom->aksi)) !!}</td>
-                    @endforeach
-                    @foreach ($idp->idpKompetensis->where('kompetensi.jenis_kompetensi', 'Hard Kompetensi') as $kom)
-                        <td>{{ $kom->kompetensi->nama_kompetensi }}</td>
-                        <td>{!! nl2br(e($kom->sasaran)) !!}</td>
-                        <td>{{ $kom->metodeBelajars->pluck('nama_metodeBelajar')->implode(', ') }}</td>
-                        <td>{!! nl2br(e($kom->aksi)) !!}</td>
-                    @endforeach --}}
                 </tr>
             </body>
     @endforeach
