@@ -116,7 +116,7 @@
 
                         <div class="card-footer text-right">
                             <a href="{{ route('adminsdm.Panduan.index') }}" class="btn btn-warning">Kembali</a>
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
                     </form>
                 </div>

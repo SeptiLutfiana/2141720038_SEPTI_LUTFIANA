@@ -140,7 +140,7 @@
                             </div>
                         </div>
                         <div class="card-footer text-right">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
                             <button type="reset" class="btn btn-warning">Reset</button>
                         </div>
                     </form>

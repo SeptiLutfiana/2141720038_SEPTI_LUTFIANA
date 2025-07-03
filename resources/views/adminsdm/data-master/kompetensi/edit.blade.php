@@ -102,7 +102,7 @@
                                 <a href="{{ route('adminsdm.data-master.kompetensi.indexHard') }}"
                                     class="btn btn-warning mr-2">Kembali</a>
                             @endif
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
                     </form>
                 </div>
