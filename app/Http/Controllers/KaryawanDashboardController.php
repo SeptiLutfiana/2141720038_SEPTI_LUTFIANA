@@ -278,7 +278,7 @@ class KaryawanDashboardController extends Controller
             ->orderByDesc('created_at')
             ->paginate(10);
 
-        return view('karyawan.idp.index-progres', [
+        return view('karyawan.IDP.index-progres', [
             'idps' => $idps,
             'listJenjang' => $listJenjang,
             'listLG' => $listLG,
