@@ -238,16 +238,40 @@
                                                                     </span>
                                                                 </td>
                                                                 {{-- <td>{{ $peng->saran }}</td> --}}
+                                                                @php
+                                                                    $isWaiting =
+                                                                        $peng->status_pengerjaan ===
+                                                                        'Menunggu Persetujuan';
+                                                                @endphp
+
                                                                 <td class="text-center">
-                                                                    <button type="button" class="btn btn-primary btn-nilai"
-                                                                        data-toggle="modal" data-target="#nilaiModal"
-                                                                        data-id="{{ $peng->id_idpKomPeng }}"
-                                                                        data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
-                                                                        data-status="{{ $peng->status_pengerjaan }}"
-                                                                        data-saran="{{ $peng->saran }}"
-                                                                        data-keterangan="{{ $peng->keterangan_hasil }}">
-                                                                        <i class="bi bi-pencil-square"></i> Nilai
-                                                                    </button>
+                                                                    @if ($isWaiting)
+                                                                        {{-- Selama status masih menunggu, maka bisa dinilai --}}
+                                                                        <button type="button"
+                                                                            class="btn btn-primary btn-sm btn-nilai"
+                                                                            data-toggle="modal" data-target="#nilaiModal"
+                                                                            data-id="{{ $peng->id_idpKomPeng }}"
+                                                                            data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
+                                                                            data-status="{{ $peng->status_pengerjaan }}"
+                                                                            data-saran="{{ $peng->saran }}"
+                                                                            data-keterangan="{{ $peng->keterangan_hasil }}"
+                                                                            data-readonly="false">
+                                                                            <i class="bi bi-pencil-square"></i> Nilai
+                                                                        </button>
+                                                                    @else
+                                                                        {{-- Jika sudah dinilai, maka hanya bisa dilihat detail --}}
+                                                                        <button type="button"
+                                                                            class="btn btn-info btn-sm btn-nilai"
+                                                                            data-toggle="modal" data-target="#nilaiModal"
+                                                                            data-id="{{ $peng->id_idpKomPeng }}"
+                                                                            data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
+                                                                            data-status="{{ $peng->status_pengerjaan }}"
+                                                                            data-saran="{{ $peng->saran }}"
+                                                                            data-keterangan="{{ $peng->keterangan_hasil }}"
+                                                                            data-readonly="true">
+                                                                            <i class="bi bi-eye"></i> Detail
+                                                                        </button>
+                                                                    @endif
                                                                 </td>
                                                             </tr>
                                                         @endforeach
@@ -410,16 +434,29 @@
                                                             </td>
                                                             {{-- <td>{{ $peng->saran }}</td> --}}
                                                             <td class="text-center">
-                                                                <button type="button" class="btn btn-primary btn-nilai"
-                                                                    data-toggle="modal" data-target="#nilaiModal"
-                                                                    data-id="{{ $peng->id_idpKomPeng }}"
-                                                                    data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
-                                                                    data-status="{{ $peng->status_pengerjaan }}"
-                                                                    data-saran="{{ $peng->saran }}"
-                                                                    data-keterangan="{{ $peng->keterangan_hasil }}">
-                                                                    <i class="bi bi-pencil-square"></i> Nilai
-                                                                </button>
-
+                                                                @if ($peng->status_pengerjaan === 'Disetujui Mentor')
+                                                                    <button type="button"
+                                                                        class="btn btn-info btn-sm btn-nilai"
+                                                                        data-toggle="modal" data-target="#nilaiModal"
+                                                                        data-id="{{ $peng->id_idpKomPeng }}"
+                                                                        data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
+                                                                        data-status="{{ $peng->status_pengerjaan }}"
+                                                                        data-saran="{{ $peng->saran }}"
+                                                                        data-keterangan="{{ $peng->keterangan_hasil }}">
+                                                                        <i class="bi bi-eye"></i> Detail
+                                                                    </button>
+                                                                @else
+                                                                    <button type="button"
+                                                                        class="btn btn-primary btn-sm btn-nilai"
+                                                                        data-toggle="modal" data-target="#nilaiModal"
+                                                                        data-id="{{ $peng->id_idpKomPeng }}"
+                                                                        data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
+                                                                        data-status="{{ $peng->status_pengerjaan }}"
+                                                                        data-saran="{{ $peng->saran }}"
+                                                                        data-keterangan="{{ $peng->keterangan_hasil }}">
+                                                                        <i class="bi bi-pencil-square"></i> Nilai
+                                                                    </button>
+                                                                @endif
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -458,7 +495,7 @@
                             <label for="keterangan">Keterangan Hasil</label>
                             <p id="keterangan-hasil" class="form-control bg-light" style="min-height: 4rem;"></p>
                         </div>
-                        <div class="mb-3 text-center">
+                        <div class="mb-3 text-center" id="status-section">
                             <label class="d-block">Pilih Status:</label>
                             @php
                                 $statuses = [
@@ -478,6 +515,8 @@
                                     </label>
                                 </div>
                             @endforeach
+                            <div id="status-error" class="text-danger mt-2" style="display:none;">Status wajib dipilih.
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="saran">Saran</label>
@@ -485,8 +524,9 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">Simpan</button>
-                        <button type="button" class="btn btn-warning" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="button" id="btn-cancel" class="btn btn-warning"
+                            data-dismiss="modal">Batal</button>
                     </div>
                 </div>
             </form>
@@ -494,7 +534,9 @@
     </div>
     </section>
     </div>
-
+@endsection
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
@@ -517,35 +559,69 @@
             const saranInput = document.getElementById('saran');
             const keteranganOutput = document.getElementById('keterangan-hasil');
             const statusRadios = nilaiModal.querySelectorAll('input[name="status_pengerjaan"]');
+            const simpanButton = form.querySelector('button[type="submit"]');
+            const statusSection = document.getElementById('status-section');
+            const cancelBtn = document.getElementById('btn-cancel');
 
-            // Ketika modal dibuka lewat tombol "Nilai"
             document.querySelectorAll('.btn-nilai').forEach(button => {
                 button.addEventListener('click', () => {
-                    // Ambil data dari button
-                    const id = button.getAttribute('data-id');
-                    const kompetensi = button.getAttribute('data-kompetensi');
-                    const status = button.getAttribute('data-status');
-                    const saran = button.getAttribute('data-saran');
-                    const keterangan = button.getAttribute('data-keterangan');
+                    const id = button.dataset.id;
+                    const kompetensi = button.dataset.kompetensi;
+                    const status = button.dataset.status;
+                    const saran = button.dataset.saran || '';
+                    const keterangan = button.dataset.keterangan || '-';
+                    const isReadonly = button.dataset.readonly === 'true';
 
-                    // Update judul modal
-                    modalTitle.textContent = 'Persetujuan Implementasi IDP oleh Mentor: ' +
-                        kompetensi;
-                    keteranganOutput.textContent = keterangan || '-';
+                    // Update title
+                    modalTitle.textContent = isReadonly ?
+                        'Detail Implementasi IDP: ' + kompetensi :
+                        'Persetujuan Implementasi IDP oleh Mentor: ' + kompetensi;
 
-                    // Update action form sesuai ID
+                    // Set form action
                     form.action = '/mentor/behavior/idp/penilaian/idp/' + id;
 
-                    // Set nilai radio status_pengerjaan sesuai data
+                    // Set output keterangan
+                    keteranganOutput.textContent = keterangan;
+
+                    // Set status radio
                     statusRadios.forEach(radio => {
                         radio.checked = (radio.value === status);
+                        radio.disabled = isReadonly;
+
+                        const label = form.querySelector(`label[for="${radio.id}"]`);
+                        if (label) {
+                            if (isReadonly) {
+                                label.classList.add('disabled');
+                            } else {
+                                label.classList.remove('disabled');
+                            }
+                        }
                     });
 
-                    // Isi textarea saran
-                    saranInput.value = saran || '';
+                    // Set saran field
+                    saranInput.value = saran;
+                    saranInput.readOnly = isReadonly;
+
+                    // Tampilkan/sembunyikan tombol & section
+                    simpanButton.style.display = isReadonly ? 'none' : '';
+                    statusSection.style.display = isReadonly ? 'none' : '';
+                    cancelBtn.textContent = isReadonly ? 'Kembali' : 'Batal';
                 });
             });
         });
     </script>
-
-@endsection
+    @if (session('msg-success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('msg-success') }}',
+                    timer: 2500, // dalam milidetik (2.5 detik)
+                    showConfirmButton: false,
+                    timerProgressBar: true
+                });
+            });
+        </script>
+    @endif
+@endpush

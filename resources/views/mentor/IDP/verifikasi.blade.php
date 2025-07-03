@@ -58,60 +58,6 @@
                                     <input readonly type="text" class="form-control"
                                         value="{{ \Carbon\Carbon::parse($idps->waktu_selesai)->format('d-m-Y') }}">
                                 </div>
-                                <!-- Ganti dengan select status approval mentor yang bisa diedit -->
-                                <div class="form-group col-md-12">
-                                    <label>Status Approval Mentor</label>
-                                    <select name="status_approval_mentor" class="form-control"
-                                        {{ $idps->status_approval_mentor == 'Disetujui' ? 'disabled' : '' }} required>
-                                        <option value="Menunggu Persetujuan"
-                                            {{ $idps->status_approval_mentor == 'Menunggu Persetujuan' ? 'selected' : '' }}>
-                                            Menunggu Persetujuan
-                                        </option>
-                                        <option value="Disetujui"
-                                            {{ $idps->status_approval_mentor == 'Disetujui' ? 'selected' : '' }}>
-                                            Disetujui
-                                        </option>
-                                        <option value="Ditolak"
-                                            {{ $idps->status_approval_mentor == 'Ditolak' ? 'selected' : '' }}>
-                                            Ditolak
-                                        </option>
-                                    </select>
-                                    @if ($idps->status_approval_mentor == 'Disetujui')
-                                        <input type="hidden" name="status_approval_mentor"
-                                            value="{{ $idps->status_approval_mentor }}">
-                                    @else
-                                        {{-- Kalau belum disetujui, tetap gunakan select untuk input --}}
-                                    @endif
-                                </div>
-                                <!-- Status Pengajuan IDP -->
-                                <div class="form-group col-md-12">
-                                    <label>Status Pengajuan IDP</label>
-                                    <select name="status_pengajuan_idp" class="form-control" required>
-                                        <option value="Menunggu Persetujuan"
-                                            {{ $idps->status_pengajuan_idp == 'Menunggu Persetujuan' ? 'selected' : '' }}>
-                                            Menunggu Persetujuan
-                                        </option>
-                                        <option value="Revisi"
-                                            {{ $idps->status_pengajuan_idp == 'Revisi' ? 'selected' : '' }}>
-                                            Revisi
-                                        </option>
-                                        <option value="Disetujui"
-                                            {{ $idps->status_pengajuan_idp == 'Disetujui' ? 'selected' : '' }}>
-                                            Disetujui
-                                        </option>
-                                        <option value="Tidak Disetujui"
-                                            {{ $idps->status_pengajuan_idp == 'Tidak Disetujui' ? 'selected' : '' }}>
-                                            Tidak Disetujui
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-md-12">
-                                    <label>Saran Pengajuan IDP</label>
-                                    <textarea name="saran_idp"
-                                        class="form-control @if (old('saran_idp')) is-valid @endif
-                                @error('saran_idp') is-invalid @enderror"
-                                        class="form-control" style="height:6rem;">{{ old('saran_idp', $idps->saran_idp) }}</textarea>
-                                </div>
                                 <div class="form-group col-md-12">
                                     <label>Daftar Kompetensi</label> <br>
                                     <label> Soft Kompetensi</label>
@@ -166,6 +112,68 @@
                                             </div>
                                         </div>
                                     @endforeach
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <label>Status Approval Mentor</label>
+                                    <select name="status_approval_mentor" class="form-control"
+                                        {{ $idps->status_approval_mentor == 'Disetujui' ? 'disabled' : '' }} required>
+                                        <option value="Menunggu Persetujuan"
+                                            {{ $idps->status_approval_mentor == 'Menunggu Persetujuan' ? 'selected' : '' }}>
+                                            Menunggu Persetujuan
+                                        </option>
+                                        <option value="Disetujui"
+                                            {{ $idps->status_approval_mentor == 'Disetujui' ? 'selected' : '' }}>
+                                            Disetujui
+                                        </option>
+                                        <option value="Ditolak"
+                                            {{ $idps->status_approval_mentor == 'Ditolak' ? 'selected' : '' }}>
+                                            Ditolak
+                                        </option>
+                                    </select>
+                                    @if ($idps->status_approval_mentor == 'Disetujui')
+                                        <input type="hidden" name="status_approval_mentor"
+                                            value="{{ $idps->status_approval_mentor }}">
+                                    @else
+                                        {{-- Kalau belum disetujui, tetap gunakan select untuk input --}}
+                                    @endif
+                                </div>
+                                <!-- Status Pengajuan IDP -->
+                                <div class="form-group col-md-12">
+                                    <label>Status Pengajuan IDP</label>
+                                    @if ($idps->id_idp_template_asal !== null)
+                                        {{-- Tampilkan sebagai teks saja --}}
+                                        <input type="hidden" name="status_pengajuan_idp"
+                                            value="{{ $idps->status_pengajuan_idp }}">
+                                        <input type="text" class="form-control"
+                                            value="{{ $idps->status_pengajuan_idp }}" readonly>
+                                    @else
+                                        {{-- Tampilkan dropdown seperti biasa --}}
+                                        <select name="status_pengajuan_idp" class="form-control" required>
+                                            <option value="Menunggu Persetujuan"
+                                                {{ $idps->status_pengajuan_idp == 'Menunggu Persetujuan' ? 'selected' : '' }}>
+                                                Menunggu Persetujuan
+                                            </option>
+                                            <option value="Revisi"
+                                                {{ $idps->status_pengajuan_idp == 'Revisi' ? 'selected' : '' }}>
+                                                Revisi
+                                            </option>
+                                            <option value="Disetujui"
+                                                {{ $idps->status_pengajuan_idp == 'Disetujui' ? 'selected' : '' }}>
+                                                Disetujui
+                                            </option>
+                                            <option value="Tidak Disetujui"
+                                                {{ $idps->status_pengajuan_idp == 'Tidak Disetujui' ? 'selected' : '' }}>
+                                                Tidak Disetujui
+                                            </option>
+                                        </select>
+                                    @endif
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <label>Saran Pengajuan IDP</label>
+                                    <textarea name="saran_idp"
+                                        class="form-control @if (old('saran_idp')) is-valid @endif
+                                @error('saran_idp') is-invalid @enderror"
+                                        class="form-control" style="height:6rem;">{{ old('saran_idp', $idps->saran_idp) }}</textarea>
                                 </div>
                             </div>
                         </div>

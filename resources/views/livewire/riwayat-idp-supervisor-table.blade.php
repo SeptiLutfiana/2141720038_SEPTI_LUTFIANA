@@ -2,6 +2,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th class="text-center">cek</th>
                 <th class="text-center">No</th>
                 <th class="text-center">Proyeksi Karir</th>
                 <th class="text-center">Nama Karyawan</th>
@@ -17,6 +18,9 @@
             @if ($idps->count())
                 @foreach ($idps as $idp)
                     <tr>
+                        <td style="width: 50px;">
+        <input type="checkbox" wire:model="selectedIdps" value="{{ $idp->id }}" style="width: 12px; height: 12px;">
+    </td>
                         <td class="text-center" style="width: 50px;">
                             {{ $loop->iteration + ($idps->currentPage() - 1) * $idps->perPage() }}
                         </td>
@@ -76,7 +80,7 @@
                 @endforeach
             @else
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-3">
+                    <td colspan="8" class="text-center text-muted py-3">
                         Data Tidak Ditemukan
                     </td>
                 </tr>

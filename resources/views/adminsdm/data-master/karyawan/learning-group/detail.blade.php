@@ -10,11 +10,11 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Detail Learning Group</h1>
+                <h1>Detail Direktorat</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.karyawan.learning-group.index') }}">Data Learning Group</a></div>
-                    <div class="breadcrumb-item">Detail Learning Group</div>
+                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.karyawan.learning-group.index') }}">Data Direktorat</a></div>
+                    <div class="breadcrumb-item">Detail Direktorat</div>
                 </div>
             </div>
             <div class="section-body">
@@ -22,11 +22,6 @@
                     <div class="col-12 col-md-12">
                         <div class="card">
                             <div class="card-body">
-                                <div class="form-group col-12">
-                                    <label>Id Learning Group</label>
-                                    <input readonly type="text" class="form-control"
-                                        value="{{ $LG->id_LG }}">
-                                </div>
                                 <div class="form-group col-12">
                                     <label>Nama</label>
                                     <input readonly type="text" class="form-control" value="{{ $LG->nama_LG }}">

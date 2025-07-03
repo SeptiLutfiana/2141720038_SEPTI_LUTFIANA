@@ -157,7 +157,15 @@ class KompetensiController extends Controller
         }
 
         // Jika user memilih upload file
-        if ($request->hasFile('file_import')) {
+        // if ($request->hasFile('file_import')) {
+            $request->validate([
+        'file_import' => 'required|file|mimes:xlsx,csv|max:10240',
+    ], [
+        'file_import.required' => 'File harus diupload.',
+        'file_import.mimes' => 'File harus berformat .xlsx atau .csv',
+        'file_import.max' => 'Ukuran file maksimal 10MB.',
+    ]);
+
             try {
                 // Ambil data dari file excel tanpa langsung import ke DB
                 $headingRow = (new HeadingRowImport)->toArray($request->file('file_import'))[0][0];
@@ -193,7 +201,7 @@ class KompetensiController extends Controller
             } catch (\Exception $e) {
                 return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
             }
-        }
+        // }
 
         return redirect()->back()->with('msg-error', 'Tidak ada data yang dikirim.');
     }

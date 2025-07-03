@@ -196,7 +196,7 @@ class KaryawanDashboardController extends Controller
             ->when($search, function ($query, $search) {
                 return $query->whereHas('karyawan', function ($q) use ($search) {
                     $q->where('proyeksi_karir', 'like', "%$search%")
-                        ->orWhere('id_karyawan', 'like', "%$search%");
+                        ->orWhere('id_user', 'like', "%$search%");
                 });
             })
             ->when($id_jenjang, function ($query, $id_jenjang) {
@@ -227,6 +227,70 @@ class KaryawanDashboardController extends Controller
             'type_menu' => 'karyawan',
         ]);
     }
+    public function indexProgresKaryawan(Request $request)
+    {
+        $user = Auth::user(); // Ambil user yang sedang login
+        $search = $request->query('search');
+        $id_jenjang = $request->query('id_jenjang');
+        $id_LG = $request->query('lg');
+        $tahun = $request->query('tahun');
+        $listTahun = IDP::whereNotNull('waktu_mulai')
+            ->selectRaw('YEAR(waktu_mulai) as tahun')
+            ->distinct()
+            ->orderByDesc('tahun')
+            ->pluck('tahun');
+        $listJenjang = Jenjang::all();
+        $listLG = LearingGroup::all();
+        $idps = IDP::with([
+            'mentor',
+            'supervisor',
+            'idpKompetensis.kompetensi',
+            'idpKompetensis.metodeBelajars',
+            'karyawan',
+            'karyawan.jenjang',
+            'karyawan.learningGroup',
+            'rekomendasis'
+        ])
+            ->where('id_user', $user->id) // Ambil IDP hanya milik user login
+            ->whereHas('rekomendasis', function ($q) {
+                $q->whereNotNull('hasil_rekomendasi')
+                    ->where('hasil_rekomendasi', '!=', '');
+            })
+            ->when($search, function ($query, $search) {
+                return $query->whereHas('karyawan', function ($q) use ($search) {
+                    $q->where('proyeksi_karir', 'like', "%$search%")
+                        ->orWhere('id_user', 'like', "%$search%");
+                });
+            })
+            ->when($id_jenjang, function ($query, $id_jenjang) {
+                return $query->whereHas('karyawan', function ($q) use ($id_jenjang) {
+                    $q->where('id_jenjang', $id_jenjang);
+                });
+            })
+            ->when($id_LG, function ($query, $id_LG) {
+                return $query->whereHas('karyawan', function ($q) use ($id_LG) {
+                    $q->where('lg', $id_LG);
+                });
+            })
+            ->when($tahun, function ($query, $tahun) {
+                return $query->whereYear('waktu_mulai', $tahun);
+            })
+            ->orderByDesc('created_at')
+            ->paginate(10);
+
+        return view('karyawan.idp.index-progres', [
+            'idps' => $idps,
+            'listJenjang' => $listJenjang,
+            'listLG' => $listLG,
+            'listTahun' => $listTahun,
+            'search' => $search,
+            'id_jenjang' => $id_jenjang,
+            'lg' => $id_LG,
+            'tahun' => $tahun,
+            'type_menu' => 'karyawan',
+        ]);
+    }
+
     public function showKaryawan($id, Request $request)
     {
         if ($request->has('notification_id')) {
@@ -581,7 +645,7 @@ class KaryawanDashboardController extends Controller
             'waktu_selesai' => $templateIDP->waktu_selesai,
             'deskripsi_idp' => $templateIDP->deskripsi_idp,
             'status_approval_mentor' => $templateIDP->status_approval_mentor,
-            'status_pengajuan_idp' => $templateIDP->status_pengajuan_idp,
+            'status_pengajuan_idp' => 'Disetujui',
             'status_pengerjaan' => $templateIDP->status_pengerjaan,
             'is_template' => 0,
             'id_idp_template_asal' => $templateIDP->id_idp,
@@ -590,7 +654,7 @@ class KaryawanDashboardController extends Controller
         $mentor->notify(new KaryawanMemilihMentor([
             'id_user' => $user->id,
             'nama_karyawan' => $user->name,
-            'id_idp' => $idp->id_idp, // <- Tambahkan ini
+            'id_idp' => $idp->id_idp,
             'untuk_role' => 'mentor',
         ]));
         // 3. Copy kompetensi + metode belajar ke IDP baru
@@ -826,10 +890,10 @@ class KaryawanDashboardController extends Controller
         $request->validate([
             'proyeksi_karir' => 'required|string|max:255',
             'waktu_mulai' => 'required|date',
-            'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
+            'waktu_selesai' => 'required|date|after:waktu_mulai',
             'id_mentor' => 'nullable|exists:users,id',
             'id_supervisor' => 'required|exists:users,id',
-            'deskripsi_idp' => 'nullable|string',
+            'deskripsi_idp' => 'required|string',
             'saran_idp' => 'nullable|string',
             'kompetensi' => 'required|array',
             'kompetensi.*.id_kompetensi' => 'required|exists:kompetensis,id_kompetensi',
@@ -838,6 +902,21 @@ class KaryawanDashboardController extends Controller
             'kompetensi.*.sasaran' => 'required|string',
             'kompetensi.*.aksi' => 'required|string',
             'kompetensi.*.peran' => 'required|in:umum,utama,kunci_core,kunci_bisnis,kunci_enabler',
+        ], [
+            'proyeksi_karir.required' => 'Proyeksi Karir wajib diisi.',
+            'proyeksi_karir.string' => 'Proyeksi Karir harus berupa teks.',
+            'proyeksi_karir.max' => 'Proyeksi Karir tidak boleh lebih dari 255 karakter.',
+            'deskripsi_idp.required' => 'Deskripsi IDP Wajib di isi',
+            'waktu_mulai.required' => 'Waktu Mulai wajib diisi.',
+            'waktu_mulai.date' => 'Waktu Mulai harus berupa tanggal yang valid.',
+            'waktu_selesai.required' => 'Waktu Selesai wajib diisi.',
+            'waktu_selesai.date' => 'Waktu Selesai harus berupa tanggal yang valid.',
+            'waktu_selesai.after' => 'Waktu Selesai harus lebih besar dari Waktu Mulai',
+            'id_mentor.exists' => 'Mentor yang dipilih tidak valid.',
+            'id_mentor.required' => 'Mentor wajib diisi',
+            'id_supervisor.required' => 'Supervisor wajib diisi.',
+            'id_supervisor.exists' => 'Supervisor yang dipilih tidak valid.',
+            'kompetensi.required' => 'Kompetensi wajib diisi.',
         ]);
 
         DB::transaction(function () use ($request, $user) {
@@ -1011,9 +1090,7 @@ class KaryawanDashboardController extends Controller
                                 ]);
                                 Log::debug("Kompetensi baru berhasil dibuat dengan ID: {$newIdpKompetensi->id_idpKom}");
 
-                                // --- BARIS KRITIS YANG PERLU DITAMBAHKAN ---
                                 // Tambahkan ID kompetensi BARU ke array $submittedIdpKompetensiIds
-                                // Ini penting agar tidak dihapus di langkah selanjutnya
                                 $submittedIdpKompetensiIds[] = $newIdpKompetensi->id_idpKom;
                                 // --------------------------------------------
 
@@ -1114,7 +1191,7 @@ class KaryawanDashboardController extends Controller
             }); // Akhir DB::transaction
 
             return redirect()->route('karyawan.IDP.indexKaryawan')
-                ->with('success', 'Data IDP berhasil diperbarui.');
+                ->with('msg-success', 'Data IDP berhasil diperbarui.');
         } catch (Exception $e) {
             // DB::rollBack() sudah ditangani secara otomatis oleh DB::transaction jika terjadi Exception
             Log::error('Error saat memperbarui IDP: ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile());
@@ -1123,4 +1200,5 @@ class KaryawanDashboardController extends Controller
                 ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
         }
     }
+    
 }

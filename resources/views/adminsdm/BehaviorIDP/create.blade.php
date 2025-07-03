@@ -30,6 +30,7 @@
                             </ul>
                         </div>
                     @endif
+
                     <div class="card" style="border-left: 5px solid #28a745; background-color: #e6f9d7;">
                         <div class="card-body" style="color: #212529;">
                             <strong>Petunjuk untuk Admin:</strong>
@@ -39,7 +40,7 @@
                                     kepada karyawan. IDP yang diberikan akan otomatis muncul di halaman karyawan sesuai
                                     jenjang,
                                     learning group dan supervisor yang dipilih.</li>
-                                <li><strong>Bank IDP</strong>: Gunakan fitur ini untuk menambahkan daftar perencanaan IDP
+                                <li><strong>Mapping IDP</strong>: Gunakan fitur ini untuk menambahkan daftar perencanaan IDP
                                     umum
                                     yang dapat dipilih secara mandiri oleh karyawan sesuai proyeksi karir masing-masing.
                                 </li>
@@ -63,7 +64,7 @@
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" name="metode" id="metode2"
                                             value="2" onclick="toggleMetode(2)">
-                                        <label class="form-check-label" for="metode2">Bank IDP</label>
+                                        <label class="form-check-label" for="metode2">Mapping IDP</label>
                                     </div>
                                 </div>
                                 {{-- Form Tambahan --}}

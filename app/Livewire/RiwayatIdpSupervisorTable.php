@@ -15,6 +15,7 @@ class RiwayatIdpSupervisorTable extends Component
     public $jenjang;
     public $lg;
     public $tahun;
+    public $selectedIdps = [];
     protected string $paginationTheme = 'bootstrap';
     protected $updatesQueryString = ['search', 'jenjang', 'lg', 'tahun'];
 

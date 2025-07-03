@@ -357,6 +357,7 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
     // IDP
     Route::prefix('karyawan/behavior/idp')->name('karyawan.IDP.')->group(function () {
         Route::get('/', [KaryawanDashboardController::class, 'indexKaryawan'])->name('indexKaryawan');
+        Route::get('/progres', [KaryawanDashboardController::class, 'indexProgresKaryawan'])->name('indexProgresKaryawan');
         Route::get('/{id}/detail', [KaryawanDashboardController::class, 'showKaryawan'])->name('showKaryawan');
         Route::post('/idp/implementasi/soft/{id_idpKom}', [KaryawanDashboardController::class, 'storeImplementasiSoft'])->name('storeImplementasiSoft');
         Route::post('/idp/implementasi/hard/{id_idpKom}', [KaryawanDashboardController::class, 'storeImplementasiHard'])->name('storeImplementasiHard');
@@ -371,6 +372,8 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::post('/store', [KaryawanDashboardController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [KaryawanDashboardController::class, 'editIdp'])->name('editIdp');
         Route::put('/{id}/update', [KaryawanDashboardController::class, 'updateIdp'])->name('updateIdp');
+        // Route::delete('/hapus-kompetensi/{kompetensiId}', [KaryawanDashboardController::class, 'hapusKompetensi'])->name('hapusKompetensi');
+
     });
     // PANDUAN IDP KARYWAN
     Route::prefix('karyawan/panduan/idp')->name('karyawan.Panduan.')->group(function () {

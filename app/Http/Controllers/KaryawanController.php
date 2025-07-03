@@ -159,7 +159,7 @@ class KaryawanController extends Controller
         }
 
         // Jika user memilih upload file
-        if ($request->hasFile('file_import')) {
+        
             // Validasi file upload (CSV atau XLSX dengan ukuran maksimal 10MB)
             $request->validate([
                 'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maksimal 10MB
@@ -180,7 +180,7 @@ class KaryawanController extends Controller
                 // Jika ada error saat mengimpor, tangani dan tampilkan pesan error
                 return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
             }
-        }
+        
 
         // Kalau tidak dua-duanya
         return redirect()->back()->with('msg-error', 'Tidak ada data yang dikirim.');

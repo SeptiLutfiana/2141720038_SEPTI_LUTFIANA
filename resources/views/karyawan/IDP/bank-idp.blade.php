@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('title', 'Bank IDP')
+@push('style')
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.default.min.css" rel="stylesheet">
+@endpush
 @section('main')
     <div class="main-content">
         <section class="section">
@@ -59,8 +62,8 @@
                     <input type="hidden" name="id_idp_template" value="{{ $idp->id_idp }}">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="modalIdpLabel{{ $idp->id_idp }}">
-                                Daftar IDP: {{ $idp->proyeksi_karir }}</h5>
+                            <h4 class="modal-title" id="modalIdpLabel{{ $idp->id_idp }}">
+                                Daftar IDP: {{ $idp->proyeksi_karir }}</h4>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
@@ -101,7 +104,7 @@
                                         <button class="accordion-button text-start w-100 d-flex align-items-center"
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
-                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="accordion-icon me-2 bi bi-chevron-right"></span>
                                             <span class="kompetensi-nama">
                                                 {{ $kom->kompetensi->nama_kompetensi }}
                                             </span>
@@ -124,7 +127,7 @@
                                         <button class="accordion-button text-start w-100 d-flex align-items-center"
                                             onclick="toggleAccordion(this)"
                                             style="border: none; background: none; padding: 0;">
-                                            <span class="accordion-icon me-2">›</span>
+                                            <span class="accordion-icon me-2 bi bi-chevron-right"></span>
                                             <p></p><span class="kompetensi-nama">
                                                 {{ $kom->kompetensi->nama_kompetensi }}
                                             </span></p>
@@ -145,18 +148,19 @@
 
                             <div class="form-group mt-3">
                                 <label for="mentorSelect{{ $idp->id }}" class="form-label">
-                                    <strong>Pilih Mentor <span class="text-danger">*</span></strong>
+                                    <span>Pilih Mentor <span class="text-danger">*</span></span>
                                 </label>
-                                <select class="form-control" name="id_mentor" id="mentorSelect{{ $idp->id }}"
-                                    required>
+                                <select class="tom-select" name="id_mentor"
+                                    id="mentorSelect{{ $idp->id }}" required>
                                     <option value="">-- Pilih Mentor --</option>
                                     @foreach ($mentors as $mentor)
                                         <option value="{{ $mentor->id }}">{{ $mentor->name }}</option>
                                     @endforeach
                                 </select>
-                                <small class="form-text text-muted">Pilih mentor yang akan membimbing Anda dalam
-                                    program IDP ini.</small>
+                                <small class="form-text text-muted">Pilih mentor yang akan membimbing Anda dalam program IDP
+                                    ini.</small>
                             </div>
+
 
                             <div class="alert alert-info mt-3">
                                 <i class="fas fa-info-circle"></i>
@@ -183,6 +187,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     {{-- Swal success alert --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -215,12 +220,15 @@
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
             const icon = button.querySelector('.accordion-icon');
+
             if (content.style.display === "none" || content.style.display === "") {
                 content.style.display = "block";
-                icon.innerHTML = "˅";
+                icon.classList.remove('bi-chevron-right');
+                icon.classList.add('bi-chevron-down');
             } else {
                 content.style.display = "none";
-                icon.innerHTML = "›";
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-right');
             }
         }
         document.addEventListener('DOMContentLoaded', function() {
@@ -247,6 +255,17 @@
             modals.forEach(modal => {
                 modal.addEventListener('shown.bs.modal', function() {
                     modal.querySelector('select[name="mentor_id"]').value = '';
+                });
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi TomSelect untuk semua elemen select dengan class .tom-select
+            document.querySelectorAll('.tom-select').forEach(function(element) {
+                new TomSelect(element, {
+                    plugins: ['dropdown_input'],
+                    allowEmptyOption: true,
+                    create: false,
+                    placeholder: "Pilih Mentor"
                 });
             });
         });

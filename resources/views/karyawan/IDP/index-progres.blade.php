@@ -72,10 +72,10 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form method="GET" action="{{ route('karyawan.IDP.indexKaryawan') }}" class="mb-3">
+                                <form method="GET" action="{{ route('karyawan.IDP.indexProgresKaryawan') }}" class="mb-3">
                                     <div class="form-row">
                                         <div class="col-md-3">
-                                            <label>Cari </label>
+                                            <label>CarI</label>
                                             <input type="text" name="search" class="form-control"
                                                 placeholder="Cari..." value="{{ request('search') }}"
                                                 oninput="this.form.submit()">
@@ -119,7 +119,7 @@
                                     </div>
                                 </form>
                                 <div class="table-responsive">
-                                    @livewire('karyawan-given-idp', [
+                                    @livewire('progres-idp-karyawan-table', [
                                         'search' => request('search'),
                                         'jenjang' => request('id_jenjang'),
                                         'lg' => request('id_LG'),

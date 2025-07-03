@@ -59,7 +59,8 @@
                             <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/create') }}">Tambah IDP</a>
                         </li>
                         <li class="{{ Request::is('admin/datamaster/behavior/idp/bank/idp') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/bank/idp') }}">Bank IDP</a>
+                            <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/bank/idp') }}">Mapping
+                                IDP</a>
                         </li>
                         <li class="{{ Request::is('admin/datamaster/behavior/idp/given/idp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/given/idp') }}">
@@ -98,7 +99,7 @@
                             <a class="nav-link" href="{{ url('admin/datamaster/jenjang') }}">Jenjang</a>
                         </li>
                         <li class="{{ Request::is('admin/datamaster/learning/group') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('admin/datamaster/learning/group') }}">Learning Group</a>
+                            <a class="nav-link" href="{{ url('admin/datamaster/learning/group') }}">Direktorat</a>
                         </li>
                         <li class="{{ Request::is('admin/datamaster/semester') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/semester') }}">Semester</a>
@@ -249,11 +250,14 @@
                         <li class="{{ Request::is('karyawan/behavior/idp/create') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('karyawan/behavior/idp/create') }}">Tambah IDP</a>
                         </li>
-                        <li class="{{ Request::is('karyawan/behavior/idp/bank-id') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('karyawan/behavior/idp/bank-idp') }}">Bank IDP</a>
+                        <li class="{{ Request::is('karyawan/behavior/idp/bank-id*') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('karyawan/behavior/idp/bank-idp') }}">Mapping IDP</a>
                         </li>
                         <li class="{{ Request::is('karyawan/behavior/idp') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('karyawan/behavior/idp') }}">List Perencanaan IDP</a>
+                        </li>
+                        <li class="{{ Request::is('karyawan/behavior/idp/progres') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('karyawan/behavior/idp/progres') }}">Progres Perencanaan IDP</a>
                         </li>
                         <li class="{{ Request::is('karyawan/behavior/idp/riwayat') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('karyawan/behavior/idp/riwayat') }}">Riwayat Perencanaan
@@ -269,8 +273,7 @@
                     <a href="#" class="nav-link has-dropdown"><i class="fas fa-poll"></i>
                         <span>Evaluasi</span></a>
                     <ul class="dropdown-menu">
-                        <li
-                            class="{{ Request::is('karyawan/evaluasi/onboarding/idp') ? 'active' : '' }}">
+                        <li class="{{ Request::is('karyawan/evaluasi/onboarding/idp') ? 'active' : '' }}">
                             <a href="{{ url('karyawan/evaluasi/onboarding/idp') }}">Evaluasi On Boarding</a>
                         </li>
                         <li class="{{ Request::is('karyawan/bank/evaluasi/idp') ? 'active' : '' }}">

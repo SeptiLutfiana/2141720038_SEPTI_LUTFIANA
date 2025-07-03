@@ -56,7 +56,17 @@
                         Forgot password?
                     </a>
                 </div>
-
+                <input type="hidden" name="g-recaptcha-response" id="recaptchaToken">
+                <script src="https://www.google.com/recaptcha/api.js?render={{ env('NOCAPTCHA_SITEKEY') }}"></script>
+                <script>
+                    grecaptcha.ready(function() {
+                        grecaptcha.execute('{{ env('NOCAPTCHA_SITEKEY') }}', {
+                            action: 'login'
+                        }).then(function(token) {
+                            document.getElementById('recaptchaToken').value = token;
+                        });
+                    });
+                </script>
                 <button type="submit"
                     class="w-full sm:w-1/2 mx-auto block bg-green-800 hover:bg-green-900 text-white py-2 rounded-full font-semibold transition">
                     Login
@@ -80,7 +90,7 @@
 
         </div>
     </div>
-
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </body>
 
 </html>

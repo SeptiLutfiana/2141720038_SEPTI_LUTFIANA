@@ -188,7 +188,7 @@ class IdpController extends Controller
             'id_mentor' => 'nullable|exists:users,id',
             'proyeksi_karir' => 'required|string|max:255',
             'waktu_mulai' => 'required|date',
-            'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
+            'waktu_selesai' => 'required|date|after:waktu_mulai',
             'status_approval_mentor' => 'nullable|in:Menunggu Persetujuan,Disetujui,Ditolak',
             'status_pengajuan_idp' => 'nullable|in:Menunggu Persetujuan,Revisi,Disetujui,Tidak Disetujui',
             'status_pengerjaan' => 'nullable|in:Menunggu Tindakan,Revisi,Sedang Dikerjakan,Selesai',
@@ -498,7 +498,7 @@ class IdpController extends Controller
         $validated = $request->validate([
             'proyeksi_karir' => 'required|string|max:255',
             'waktu_mulai' => 'required|date',
-            'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
+            'waktu_selesai' => 'required|date|after:waktu_mulai',
             'deskripsi_idp' => 'nullable|string',
             'id_mentor' => 'required|exists:users,id',
             'id_supervisor' => 'required|exists:users,id',
@@ -652,7 +652,7 @@ class IdpController extends Controller
             }); // Akhir DB::transaction
 
             return redirect()->route('adminsdm.BehaviorIDP.indexGiven')
-                ->with('success', 'Data IDP berhasil diperbarui.');
+                ->with('msg-success', 'Data IDP berhasil diperbarui.');
         } catch (Exception $e) {
             // DB::rollBack() sudah ditangani secara otomatis oleh DB::transaction jika terjadi Exception
             Log::error('Error saat memperbarui IDP: ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile());
@@ -698,7 +698,7 @@ class IdpController extends Controller
         $validated = $request->validate([
             'proyeksi_karir' => 'required|string|max:255',
             'waktu_mulai' => 'required|date',
-            'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
+            'waktu_selesai' => 'required|date|after:waktu_mulai',
             'deskripsi_idp' => 'nullable|string',
             'id_supervisor' => 'required|exists:users,id',
             'max_applies' => 'required|integer',
@@ -851,7 +851,7 @@ class IdpController extends Controller
             }); // Akhir DB::transaction
 
             return redirect()->route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp')
-                ->with('success', 'Data IDP berhasil diperbarui.');
+                ->with('msg-success', 'Data IDP berhasil diperbarui.');
         } catch (Exception $e) {
             // DB::rollBack() sudah ditangani secara otomatis oleh DB::transaction jika terjadi Exception
             Log::error('Error saat memperbarui IDP: ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile());

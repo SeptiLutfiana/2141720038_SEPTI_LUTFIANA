@@ -139,7 +139,8 @@
                             @if (
                                 ($item->status_approval_mentor === 'Menunggu Persetujuan' &&
                                     $item->status_pengajuan_idp === 'Menunggu Persetujuan') ||
-                                    ($item->status_approval_mentor === 'Disetujui' && $item->status_pengajuan_idp === 'Menunggu Persetujuan'))
+                                    ($item->status_approval_mentor === 'Disetujui' && $item->status_pengajuan_idp === 'Menunggu Persetujuan') ||
+                                    ($item->status_approval_mentor === 'Menunggu Persetujuan' && $item->status_pengajuan_idp === 'Disetujui'))
                                 <a href="{{ route('mentor.IDP.verfikasi', $item->id_idp) }}"
                                     class="btn btn-warning btn-sm mb-1">
                                     <i class="fas fa-edit"></i> Verifikasi
@@ -151,6 +152,7 @@
                                 </a>
                             @endif
                         </td>
+
                     </tr>
                 @empty
                     <tr>

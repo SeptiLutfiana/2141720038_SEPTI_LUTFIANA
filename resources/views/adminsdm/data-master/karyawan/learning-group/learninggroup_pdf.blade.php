@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Data Learning Group Perum Perhutani</title>
+    <title>Data Direktorat Perum Perhutani</title>
     <style>
         body {
             font-family: Arial, sans-serif;

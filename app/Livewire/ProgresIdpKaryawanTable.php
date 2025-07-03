@@ -8,8 +8,7 @@ use Livewire\WithPagination;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
-
-class KaryawanGivenIdp extends Component
+class ProgresIdpKaryawanTable extends Component
 {
     use WithPagination;
     public $search;
@@ -42,14 +41,8 @@ class KaryawanGivenIdp extends Component
         $idps = IDP::with(['mentor', 'supervisor', 'karyawan'])
             ->where('id_user', $userId) // Filter utama untuk Bank IDP
             ->doesntHave('rekomendasis') // Tidak punya data rekomendasi sama sekali
-            ->whereIn('status_pengajuan_idp', ['Revisi', 'Menunggu Persetujuan', 'Tidak Disetujui'])
-            ->whereIn('status_approval_mentor', ['Menunggu Persetujuan', 'Disetujui', 'Ditolak'])
-            ->orWhere(function ($query) {
-                $query->where('status_pengajuan_idp', 'Disetujui') // Status pengajuan IDP Disetujui
-                    ->whereIn('status_approval_mentor', ['Ditolak', 'Menunggu Persetujuan']) // Status approval mentor Ditolak atau Menunggu Persetujuan
-                    ->whereNotNull('id_idp_template_asal') // Memastikan id_idp_template_asal ada
-                    ->where('id_idp_template_asal', '!=', ''); // Memastikan id_idp_template_asal tidak kosong
-            })
+            ->where('status_approval_mentor', 'Disetujui')
+            ->where('status_pengajuan_idp', 'Disetujui')
             ->when($this->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->whereHas('karyawan', function ($q2) use ($search) {
@@ -85,7 +78,7 @@ class KaryawanGivenIdp extends Component
             ->orderBy('created_at', 'desc')
             ->paginate(5)
             ->withQueryString();
-        return view('livewire.karyawan-given-idp', [
+        return view('livewire.progres-idp-karyawan-table', [
             'idps' => $idps,
         ]);
     }

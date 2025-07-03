@@ -81,81 +81,41 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            {{-- Mentor --}}
-                            <div class="form-group">
-                                <label>Mentor <span class="text-danger">*</span></label>
-                                @if ($idp->status_approval_mentor === 'Disetujui')
-                                    <input type="hidden" name="id_mentor" value="{{ $idp->id_mentor }}">
-                                    <input type="text" class="form-control"
-                                        value="{{ $idp->mentor->name ?? 'Data tidak ditemukan' }}" readonly>
-                                @else
-                                    <select name="id_mentor" class="form-control @error('id_mentor') is-invalid @enderror"
-                                        required>
-                                        <option value="">-- Pilih Mentor --</option>
-                                        @foreach ($mentors as $item)
-                                            <option value="{{ $item->id }}"
-                                                {{ old('id_mentor', $idp->id_mentor) == $item->id ? 'selected' : '' }}>
-                                                {{ $item->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('id_mentor')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                @endif
-                            </div>
-                            {{-- Supervisor --}}
-                            <div class="form-group">
-                                <label>Supervisor <span class="text-danger">*</span></label>
-                                @if ($idp->status_approval_mentor === 'Disetujui')
-                                    <input type="hidden" name="id_supervisor" value="{{ $idp->id_supervisor }}">
-                                    <input type="text" class="form-control"
-                                        value="{{ $idp->supervisor->name ?? 'Data tidak ditemukan' }}" readonly>
-                                @else
-                                    <select name="id_supervisor"
-                                        class="form-control @error('id_supervisor') is-invalid @enderror"
-                                        {{ $mentorOnlyEdit ? 'disabled' : '' }} required>
-                                        <option value="">-- Pilih Supervisor --</option>
-                                        @foreach ($supervisors as $item)
-                                            <option value="{{ $item->id }}"
-                                                {{ old('id_supervisor', $idp->id_supervisor) == $item->id ? 'selected' : '' }}>
-                                                {{ $item->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @if ($mentorOnlyEdit)
-                                        <input type="hidden" name="id_supervisor" value="{{ $idp->id_supervisor }}">
-                                    @endif
-                                    @error('id_supervisor')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                @endif
-                            </div>
-                            <div class="form-group">
-                                <label>Saran IDP</label>
-                                <textarea name="saran_idp" id="saran_idp" class="form-control" readonly style="height:6rem;">{{ old('saran_idp', $idp->saran_idp) }}</textarea>
-                            </div>
-
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label>Waktu Mulai</label>
-                                    <input type="date" name="waktu_mulai"
-                                        class="form-control @if (old('waktu_mulai')) is-valid @endif @error('waktu_mulai') is-invalid @enderror"
-                                        value="{{ old('waktu_mulai', $idp->waktu_mulai) }}"
-                                        {{ $mentorOnlyEdit ? 'readonly' : '' }}>
-                                    @error('waktu_mulai')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    @if ($mentorOnlyEdit)
+                                        <input type="hidden" name="waktu_mulai"
+                                            value="{{ \Carbon\Carbon::parse($idp->waktu_mulai)->format('Y-m-d') }}">
+                                        <input type="text" class="form-control"
+                                            value="{{ \Carbon\Carbon::parse($idp->waktu_mulai)->translatedFormat('d F Y') }}"
+                                            readonly>
+                                    @else
+                                        <input type="date" name="waktu_mulai"
+                                            class="form-control @error('waktu_mulai') is-invalid @enderror"
+                                            value="{{ old('waktu_mulai', \Carbon\Carbon::parse($idp->waktu_mulai)->format('Y-m-d')) }}">
+                                        @error('waktu_mulai')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    @endif
+
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Waktu Selesai</label>
-                                    <input type="date" name="waktu_selesai"
-                                        class="form-control @if (old('waktu_selesai')) is-valid @endif @error('waktu_selesai') is-invalid @enderror"
-                                        value="{{ old('waktu_selesai', $idp->waktu_selesai) }}"
-                                        {{ $mentorOnlyEdit ? 'readonly' : '' }}>
-                                    @error('waktu_selesai')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    @if ($mentorOnlyEdit)
+                                        <input type="hidden" name="waktu_selesai"
+                                            value="{{ \Carbon\Carbon::parse($idp->waktu_selesai)->format('Y-m-d') }}">
+                                        <input type="text" class="form-control"
+                                            value="{{ \Carbon\Carbon::parse($idp->waktu_selesai)->translatedFormat('d F Y') }}"
+                                            readonly>
+                                    @else
+                                        <input type="date" name="waktu_selesai"
+                                            class="form-control @error('waktu_selesai') is-invalid @enderror"
+                                            value="{{ old('waktu_selesai', \Carbon\Carbon::parse($idp->waktu_selesai)->format('Y-m-d')) }}">
+                                        @error('waktu_selesai')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    @endif
                                 </div>
                             </div>
                             <div id="hiddenKompetensiInputs">
@@ -169,19 +129,19 @@
                                     <input type="hidden" name="kompetensi[{{ $kom->id_idpKom }}][peran]"
                                         value="{{ $kom->peran ?? 'umum' }}">
                                     @foreach ($kom->metodeBelajars as $metode)
-                                        <input type="hidden"
-                                            name="kompetensi[{{ $kom->id_idpKom }}][id_metode_belajar][]"
+                                        <input type="hidden" name="kompetensi[{{ $kom->id_idpKom }}][id_metode_belajar][]"
                                             value="{{ $metode->id_metodeBelajar }}">
                                     @endforeach
                                 @endforeach
                             </div>
                             <div class="form-group">
                                 <label>Kompetensi</label> <br>
-                                <button type="button" id="btn-tambah-kompetensi" class="btn btn-primary mb-3"
-                                    data-toggle="modal" data-target="#modalTambahKompetensi"
-                                    {{ $punyaTemplateAsal ? 'disabled' : '' }}>
-                                    <i class="fas fa-plus-circle"></i> Tambah Kompetensi
-                                </button>
+                                @if (!$mentorOnlyEdit)
+                                    <button type="button" id="btn-tambah-kompetensi" class="btn btn-primary mb-3"
+                                        data-toggle="modal" data-target="#modalTambahKompetensi">
+                                        <i class="fas fa-plus-circle"></i> Tambah Kompetensi
+                                    </button>
+                                @endif
                                 <br>
                                 <label>Soft Kompetensi</label>
                                 <table class="table table-bordered">
@@ -198,12 +158,20 @@
                                                 <td style="width: 50px;">{{ $index + 1 }}</td>
                                                 <td>{{ $kom->kompetensi->nama_kompetensi }}</td>
                                                 <td style="width: 50px;">
-                                                    <button type="button" class="btn btn-warning btn-sm"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#modalKompetensi{{ $kom->id_idpKom }}">
-                                                        {{-- PERBAIKAN DI SINI --}}
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
+                                                    @if (!$mentorOnlyEdit)
+                                                        <button type="button" class="btn btn-warning btn-sm mb-1"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modalKompetensi{{ $kom->id_idpKom }}">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <!-- Delete Button -->
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm delete-kompetensi mb-1"
+                                                            data-id="{{ $kom->id_idpKom }}"
+                                                            data-nama="{{ $kom->kompetensi->nama_kompetensi }}">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -228,16 +196,83 @@
                                                 <td style="width: 50px;">{{ $index + 1 }}</td>
                                                 <td>{{ $kom->kompetensi->nama_kompetensi }}</td>
                                                 <td style="width: 50px;">
-                                                    <button type="button" class="btn btn-warning btn-sm"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#modalHardKompetensi{{ $kom->id_idpKom }}">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
+                                                    @if (!$mentorOnlyEdit)
+                                                        <button type="button" class="btn btn-warning btn-sm mb-1"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modalHardKompetensi{{ $kom->id_idpKom }}">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <!-- Delete Button -->
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm delete-kompetensi mb-1"
+                                                            data-id="{{ $kom->id_idpKom }}"
+                                                            data-nama="{{ $kom->kompetensi->nama_kompetensi }}">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
+                            </div>
+                            <div class="form-group">
+                                <label>Saran IDP</label>
+                                <textarea name="saran_idp" id="saran_idp" class="form-control" readonly style="height:6rem;">{{ old('saran_idp', $idp->saran_idp) }}</textarea>
+                            </div>
+                            {{-- SPV --}}
+                            <div class="form-group">
+                                <label>Supervisor <span class="text-danger">*</span></label>
+                                @if ($mentorOnlyEdit)
+                                    <small class="form-text text-muted">Supervisor tidak dapat diubah karena IDP berasal
+                                        dari Mapping IDP</small>
+                                @endif
+                                @if ($idp->status_approval_mentor === 'Disetujui')
+                                    <input type="hidden" name="id_supervisor" value="{{ $idp->id_supervisor }}">
+                                    <input type="text" class="form-control"
+                                        value="{{ $idp->supervisor->name ?? 'Data tidak ditemukan' }}" readonly>
+                                @else
+                                    <select name="id_supervisor"
+                                        class="form-control @error('id_supervisor') is-invalid @enderror"
+                                        {{ $mentorOnlyEdit ? 'disabled' : '' }} required>
+                                        <option value="">-- Pilih Supervisor --</option>
+                                        @foreach ($supervisors as $item)
+                                            <option value="{{ $item->id }}"
+                                                {{ old('id_supervisor', $idp->id_supervisor) == $item->id ? 'selected' : '' }}>
+                                                {{ $item->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @if ($mentorOnlyEdit)
+                                        <input type="hidden" name="id_supervisor" value="{{ $idp->id_supervisor }}">
+                                    @endif
+                                    @error('id_supervisor')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                @endif
+                            </div>
+                            {{-- Mentor --}}
+                            <div class="form-group">
+                                <label>Mentor <span class="text-danger">*</span></label>
+                                @if ($idp->status_approval_mentor === 'Disetujui')
+                                    <input type="hidden" name="id_mentor" value="{{ $idp->id_mentor }}">
+                                    <input type="text" class="form-control"
+                                        value="{{ $idp->mentor->name ?? 'Data tidak ditemukan' }}" readonly>
+                                @else
+                                    <select name="id_mentor" class="form-control @error('id_mentor') is-invalid @enderror"
+                                        required>
+                                        <option value="">-- Pilih Mentor --</option>
+                                        @foreach ($mentors as $item)
+                                            <option value="{{ $item->id }}"
+                                                {{ old('id_mentor', $idp->id_mentor) == $item->id ? 'selected' : '' }}>
+                                                {{ $item->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('id_mentor')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                @endif
                             </div>
                         </div>
                         <div class="card-footer text-right">
@@ -322,7 +357,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Tutup</button>
                         @unless ($punyaTemplateAsal)
                             <button type="button" class="btn btn-primary btn-simpan-kompetensi"
                                 data-id="{{ $kom->id_idpKom }}">Simpan</button>
@@ -435,6 +470,56 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> {{-- Tambahkan SweetAlert2 untuk umpan balik pengguna yang lebih baik --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Tangani tombol hapus kompetensi
+            document.querySelectorAll('.delete-kompetensi').forEach(button => {
+                button.addEventListener('click', function() {
+                    const kompetensiId = this.dataset.id; // Ambil ID kompetensi
+                    const kompetensiNama = this.dataset.nama; // Ambil Nama Kompetensi
+
+                    // Konfirmasi penghapusan
+                    Swal.fire({
+                        title: 'Apakah Anda yakin?',
+                        text: `Anda akan menghapus kompetensi: ${kompetensiNama}`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Jika pengguna mengonfirmasi, kirim permintaan penghapusan ke server
+                            fetch(`/hapus-kompetensi/${kompetensiId}`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector(
+                                            'meta[name="csrf-token"]').getAttribute(
+                                            'content')
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire('Dihapus!',
+                                            'Kompetensi telah berhasil dihapus.',
+                                            'success');
+                                        // Hapus baris dari tabel
+                                        const row = button.closest('tr');
+                                        row.remove();
+                                    } else {
+                                        Swal.fire('Gagal!',
+                                            'Terjadi kesalahan saat menghapus kompetensi.',
+                                            'error');
+                                    }
+                                });
+                        }
+                    });
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
             // Debug: Log semua hidden inputs sebelum submit
             function debugHiddenInputs() {
                 console.log('=== DEBUG HIDDEN INPUTS ===');
@@ -452,10 +537,7 @@
                     const komId = this.dataset.id; // ID dari id_idpKom
                     const jenis = this.dataset
                         .jenis; // Jenis: 'Soft Kompetensi' atau 'Hard Kompetensi'
-
                     const modal = this.closest('.modal');
-
-                    console.log(`Updating kompetensi ID: ${komId}, Jenis: ${jenis}`);
 
                     // Ambil nilai sasaran, aksi, dan peran
                     const sasaran = modal.querySelector(`.modal-sasaran[data-id="${komId}"]`).value;
@@ -464,35 +546,39 @@
                     const checkedMetodes = modal.querySelectorAll(
                         `.modal-metode[data-id="${komId}"]:checked`);
 
+                    // Ambil nilai yang sudah ada (original) untuk membandingkan apakah ada perubahan
+                    const originalSasaran = document.querySelector(
+                        `input[name="kompetensi[${komId}][sasaran]"]`).value;
+                    const originalAksi = document.querySelector(
+                        `input[name="kompetensi[${komId}][aksi]"]`).value;
+                    const originalPeran = document.querySelector(
+                        `input[name="kompetensi[${komId}][peran]"]`).value;
+                    const originalMetodeIds = Array.from(document.querySelectorAll(
+                        `input[name^="kompetensi[${komId}][id_metode_belajar]"]`)).map(input =>
+                        input.value);
+
+                    // Cek apakah ada perubahan
+                    const isChanged = sasaran !== originalSasaran || aksi !== originalAksi ||
+                        peran !== originalPeran || !arraysEqual(Array.from(checkedMetodes).map(
+                            checkbox => checkbox.value), originalMetodeIds);
+
+                    if (!isChanged) {
+                        // Jika tidak ada perubahan, keluar dari fungsi tanpa menampilkan notifikasi
+                        console.log("Tidak ada perubahan data.");
+                        return; // Tidak menampilkan notifikasi dan keluar dari fungsi
+                    }
+
                     // Update input tersembunyi untuk sasaran, aksi, dan peran
-                    const hiddenSasaran = document.querySelector(
-                        `input[name="kompetensi[${komId}][sasaran]"]`);
-                    const hiddenAksi = document.querySelector(
-                        `input[name="kompetensi[${komId}][aksi]"]`);
-                    const hiddenPeran = document.querySelector(
-                        `input[name="kompetensi[${komId}][peran]"]`);
-
-                    if (hiddenSasaran) {
-                        hiddenSasaran.value = sasaran;
-                        console.log(`Sasaran diperbarui untuk ID ${komId}: ${sasaran}`);
-                    }
-
-                    if (hiddenAksi) {
-                        hiddenAksi.value = aksi;
-                        console.log(`Aksi diperbarui untuk ID ${komId}: ${aksi}`);
-                    }
-
-                    if (hiddenPeran) {
-                        hiddenPeran.value = peran;
-                        console.log(`Peran diperbarui untuk ID ${komId}: ${peran}`);
-                    }
+                    document.querySelector(`input[name="kompetensi[${komId}][sasaran]"]`).value =
+                        sasaran;
+                    document.querySelector(`input[name="kompetensi[${komId}][aksi]"]`).value = aksi;
+                    document.querySelector(`input[name="kompetensi[${komId}][peran]"]`).value =
+                        peran;
 
                     // Hapus semua input metode belajar sebelumnya
                     document.querySelectorAll(
                         `input[name^="kompetensi[${komId}][id_metode_belajar]"]`).forEach(
-                        input => {
-                            input.remove();
-                        });
+                        input => input.remove());
 
                     // Tambahkan kembali input metode belajar yang dicentang
                     const hiddenContainer = document.getElementById('hiddenKompetensiInputs');
@@ -502,31 +588,25 @@
                         hiddenInput.name = `kompetensi[${komId}][id_metode_belajar][]`;
                         hiddenInput.value = checkbox.value;
                         hiddenInput.className = `hidden_metode_${komId}`;
-                        hiddenInput.setAttribute('data-id_idpKom', komId);
                         hiddenContainer.appendChild(hiddenInput);
-                        console.log(
-                            `Menambahkan metode belajar: ${checkbox.value} untuk ID ${komId}`
-                        );
                     });
 
-                    // Tutup modal
-                    const modalInstance = bootstrap.Modal.getInstance(modal) || new bootstrap.Modal(
-                        modal);
+                    // Tutup modal menggunakan instance bootstrap
+                    const modalInstance = bootstrap.Modal.getInstance(modal);
                     modalInstance.hide();
 
-                    // Notifikasi sukses
-                    if (typeof Swal !== 'undefined') {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
+                    // Jika ada perubahan, tampilkan notifikasi
+                    if (isChanged && typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Data kompetensi berhasil diperbarui!',
                             showConfirmButton: false,
                             timer: 3000,
-                            timerProgressBar: true,
-                        });
-
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Data kompetensi berhasil diperbarui!'
+                            toast: false, // Menghilangkan toast, tampilkan sebagai dialog
+                            position: 'center', // Menampilkan di tengah layar
+                            customClass: {
+                                popup: 'center-popup' // Kelas CSS untuk menyesuaikan tampilan
+                            }
                         });
                     }
 
@@ -535,6 +615,24 @@
                 });
             });
 
+            // Utility function to compare two arrays
+            function arraysEqual(a, b) {
+                if (a.length !== b.length) return false;
+                for (let i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) return false;
+                }
+                return true;
+            }
+
+            // Fungsi untuk debug input tersembunyi
+            function debugHiddenInputs() {
+                console.log('=== DEBUG HIDDEN INPUTS ===');
+                const hiddenInputs = document.querySelectorAll('#hiddenKompetensiInputs input[type="hidden"]');
+                hiddenInputs.forEach(input => {
+                    console.log(`Name: ${input.name}, Value: ${input.value}`);
+                });
+                console.log('=== END DEBUG ===');
+            }
 
             // Tangani pengiriman form dengan debugging
             document.getElementById('mainForm').addEventListener('submit', function(e) {
@@ -664,11 +762,11 @@
                 <td style="width: 50px;">${newRowNumber}</td>
                 <td>${data.kompetensiText}</td>
                 <td style="width: 50px;">
-                        <button type="button" class="btn btn-warning btn-sm edit-new-kompetensi mb-2"
+                        <button type="button" class="btn btn-warning btn-sm edit-new-kompetensi mb-1"
                         data-id="${uniqueId}" data-jenis="${jenis}">
                         <i class="fas fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-danger btn-sm delete-new-kompetensi mb-2"
+                        <button type="button" class="btn btn-danger btn-sm delete-new-kompetensi mb-1"
                         data-id="${uniqueId}">
                         <i class="fas fa-trash"></i>
                         </button>
@@ -790,50 +888,56 @@
                 }
                 // Tampilkan pesan sukses
                 if (typeof Swal !== 'undefined') {
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                    });
-
-                    Toast.fire({
+                    Swal.fire({
                         icon: 'success',
-                        title: 'Kompetensi baru berhasil ditambahkan!'
+                        title: 'Kompetensi baru berhasil ditambahkan!',
+                        showConfirmButton: false, 
+                        confirmButtonText: 'Tutup', 
+                        position: 'center', 
+                        timer: 3000, 
+                        timerProgressBar: true, 
                     });
                 }
+
             });
 
             // Event handler untuk tombol hapus kompetensi baru
             $(document).on('click', '.delete-new-kompetensi', function() {
                 const uniqueId = $(this).data('id');
+                const kompetensiNama = $(this).data(
+                    'nama'); // Menambahkan nama kompetensi untuk ditampilkan di konfirmasi
 
-                if (confirm('Apakah Anda yakin ingin menghapus kompetensi ini?')) {
-                    // Hapus baris dari tabel
-                    $(`tr[data-new-kompetensi="${uniqueId}"]`).remove();
+                // Konfirmasi penghapusan dengan Swal
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: `Anda akan menghapus kompetensi: ${kompetensiNama}`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Jika pengguna mengonfirmasi, hapus baris dan data terkait
+                        $(`tr[data-new-kompetensi="${uniqueId}"]`).remove(); // Hapus baris
+                        $(`.new_kompetensi_${uniqueId}`).remove(); // Hapus hidden inputs
 
-                    // Hapus hidden inputs
-                    $(`.new_kompetensi_${uniqueId}`).remove();
+                        // Update nomor urut tabel
+                        updateTableRowNumbers();
 
-                    // Update nomor urut pada tabel
-                    updateTableRowNumbers();
-
-                    if (typeof Swal !== 'undefined') {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
+                        // Tampilkan notifikasi sukses dengan SweetAlert2
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Kompetensi berhasil dihapus!',
                             showConfirmButton: false,
                             timer: 2000,
-                            timerProgressBar: true,
-                        });
-
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Kompetensi berhasil dihapus!'
+                            position: 'top-end',
+                            toast: true, // Menampilkan sebagai toast
+                            timerProgressBar: true
                         });
                     }
-                }
+                });
             });
 
             // Event handler untuk tombol edit kompetensi baru
@@ -944,8 +1048,6 @@
 
                 return checkboxes;
             }
-
-            // Fungsi untuk menyimpan perubahan kompetensi baru
             // Fungsi untuk menyimpan perubahan kompetensi baru
             window.saveEditNewKompetensi = function(uniqueId) {
                 const sasaran = $(`#editSasaran${uniqueId}`).val();
@@ -955,24 +1057,28 @@
                     return $(this).val();
                 }).get();
 
-                if (!sasaran.trim() || !aksi.trim()) {
-                    alert("Harap isi sasaran dan aksi");
+                // Cek jika ada perubahan
+                const originalSasaran = $(`input[name="kompetensi[new_${uniqueId}][sasaran]"]`).val();
+                const originalAksi = $(`input[name="kompetensi[new_${uniqueId}][aksi]"]`).val();
+                const originalPeran = $(`input[name="kompetensi[new_${uniqueId}][peran]"]`).val();
+                const originalMetodeIds = $(`input[name="kompetensi[new_${uniqueId}][id_metode_belajar][]"]`)
+                    .map(function() {
+                        return $(this).val();
+                    }).get();
+
+                // Cek apakah ada perubahan
+                const isChanged = sasaran !== originalSasaran || aksi !== originalAksi || peran !==
+                    originalPeran || !arraysEqual(metodeIds, originalMetodeIds);
+
+                if (!isChanged) {
+                    // Jika tidak ada perubahan, tidak tampilkan notifikasi
                     return;
                 }
 
-                if (metodeIds.length === 0) {
-                    alert("Harap pilih minimal satu metode belajar");
-                    return;
-                }
-
-                // PERBAIKAN: Deklarasikan hiddenContainer di awal
+                // Jika ada perubahan, update hidden inputs
                 const hiddenContainer = document.getElementById('hiddenKompetensiInputs');
-
-                // Update hidden inputs
                 $(`input[name="kompetensi[new_${uniqueId}][sasaran]"]`).val(sasaran);
                 $(`input[name="kompetensi[new_${uniqueId}][aksi]"]`).val(aksi);
-
-                // Hapus input peran lama dan buat yang baru
                 $(`input[name="kompetensi[new_${uniqueId}][peran]"]`).remove();
                 const hiddenPeran = document.createElement('input');
                 hiddenPeran.type = 'hidden';
@@ -987,33 +1093,41 @@
 
                 metodeIds.forEach(metodeId => {
                     const hiddenMetode = document.createElement('input');
-                    hiddenMetode.type = 'hidden'; // PERBAIKAN: Hapus duplikasi yang salah
+                    hiddenMetode.type = 'hidden';
                     hiddenMetode.name = `kompetensi[new_${uniqueId}][id_metode_belajar][]`;
                     hiddenMetode.value = metodeId;
                     hiddenMetode.className = `new_kompetensi_${uniqueId}`;
                     hiddenContainer.appendChild(hiddenMetode);
                 });
 
-                // Tutup modal
+                // Tutup modal dan hapus modal
                 $(`#modalEditNew${uniqueId}`).modal('hide');
                 $(`#modalEditNew${uniqueId}`).remove();
 
-                if (typeof Swal !== 'undefined') {
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
+                // Tampilkan notifikasi jika ada perubahan
+                if (isChanged && typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Data kompetensi berhasil diperbarui!',
                         showConfirmButton: false,
                         timer: 3000,
-                        timerProgressBar: true,
-                    });
-
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'Data kompetensi berhasil diperbarui!'
+                        toast: false, // Mengubah toast ke false agar tampil seperti dialog
+                        position: 'center', // Menampilkan di tengah layar
+                        customClass: {
+                            popup: 'center-popup' // Anda bisa menambahkan class khusus untuk penyesuaian lebih lanjut
+                        }
                     });
                 }
             };
 
+            // Utility function to compare two arrays
+            function arraysEqual(a, b) {
+                if (a.length !== b.length) return false;
+                for (let i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) return false;
+                }
+                return true;
+            }
             // Fungsi untuk update nomor urut tabel
             function updateTableRowNumbers() {
                 $('.table tbody').each(function() {

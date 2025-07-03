@@ -153,7 +153,7 @@
                                                                 class="d-flex justify-content-center align-items-center mb-3">
                                                                 <i class="fas fa-cloud-upload-alt fa-2x text-muted"></i>
                                                             </div>
-                                                            <p>Choose a file or drag & drop it here</p>
+                                                            <p>Choose a file</p>
                                                             <p class="text-muted">Format pdf,doc,docx,xlsx,jpg,jpeg,png,csv
                                                                 , ukuran file
                                                                 5MB</p>
@@ -180,7 +180,7 @@
                                                     </div>
 
                                                     <div class="d-flex justify-content-end mt-4">
-                                                        <button type="submit" class="btn btn-success me-2">
+                                                        <button type="submit" class="btn btn-primary me-2">
                                                             <i class="fas fa-save me-1"></i> Simpan
                                                         </button>
                                                     </div>
@@ -192,8 +192,8 @@
                                                     <tr class="text-center">
                                                         <th width="2%">No</th>
                                                         <th width="5%">File</th>
-                                                        <th width="40%">Keterangan</th>
-                                                        <th width="10%">Tanggal Upload</th>
+                                                        <th width="35%">Keterangan</th>
+                                                        <th width="15%">Tanggal Upload</th>
                                                         <th width="15%">Status</th>
                                                         <th width="15%">Saran</th>
                                                     </tr>
@@ -247,7 +247,7 @@
                                                                     </a>
                                                                 @endif
                                                             </td>
-                                                            <td>{{ $peng->keterangan_hasil ?? '-' }}</td>
+                                                            <td>{{ $peng->keterangan_hasil ?? ' ' }}</td>
                                                             <td class="text-center">
                                                                 {{ $peng->updated_at != $peng->created_at
                                                                     ? $peng->updated_at->format('d-m-Y H:i')
@@ -298,7 +298,7 @@
                                                                     </button>
                                                                 @else
                                                                     <span
-                                                                        style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 4px 10px; border-radius: 9999px;">
+                                                                        style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 0px 4px; border-radius: 9999px;">
                                                                         {{ $peng->status_pengerjaan }}
                                                                     </span>
                                                                 @endif
@@ -527,7 +527,7 @@
                                                                     </button>
                                                                 @else
                                                                     <span
-                                                                        style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 4px 10px; border-radius: 9999px;">
+                                                                        style="background-color: {{ $bgColor }}; color: {{ $textColor }}; padding: 0px 4px; border-radius: 9999px;">
                                                                         {{ $peng->status_pengerjaan }}
                                                                     </span>
                                                                 @endif
@@ -545,7 +545,7 @@
                         </div>
                     </div>
                     <div class="card-footer text-right">
-                        <a class="btn btn-warning" href="{{ route('karyawan.IDP.indexKaryawan') }}">Kembali</a>
+                        <a class="btn btn-warning" href="{{ route('karyawan.IDP.indexProgresKaryawan') }}">Kembali</a>
                     </div>
                 </div>
             </div>

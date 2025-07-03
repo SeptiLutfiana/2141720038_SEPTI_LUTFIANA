@@ -11,7 +11,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($idps as $index => $idp)
+            @forelse ($idps as $index => $idp)
                 <tr class="text-center">
                     <td>{{ $idps->firstItem() + $index }}</td>
                     <td>{{ $idp->user->name }}</td>
@@ -66,7 +66,13 @@
                         </a>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        Tidak ada evaluasi onboarding untuk saat ini.
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 

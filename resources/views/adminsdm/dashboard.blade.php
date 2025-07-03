@@ -44,7 +44,7 @@
                     <div class="card h-100">
                         <div class="card-header d-flex align-items-center">
                             <i class="fas fa-chart-line text-primary mr-2"></i>
-                            <h4 class="mb-0 font-weight-bold">Informasi Bank IDP</h4>
+                            <h4 class="mb-0 font-weight-bold">Informasi Mapping IDP</h4>
                         </div>
                         <hr class="m-0">
                         <div class="card-body">
@@ -52,14 +52,14 @@
                                 @php
                                     $dataProgres = [
                                         [
-                                            'title' => 'Total Bank IDP',
+                                            'title' => 'Total Mapping IDP',
                                             'count' => $jumlahIDPBank,
                                             'icon' => 'fa-database',
                                             'bg' => 'bg-danger',
                                             'border' => 'border-danger',
                                         ],
                                         [
-                                            'title' => 'Total Apply Bank IDP',
+                                            'title' => 'Total Apply Mapping IDP',
                                             'count' => $jumlahApplyBankIdp,
                                             'icon' => 'fa-copy',
                                             'bg' => 'bg-info',
@@ -332,7 +332,7 @@
                     <div class="card h-100">
                         <div class="card-header d-flex align-items-center">
                             <i class="fas fa-layer-group text-primary mr-2"></i>
-                            <h4 class="mb-0 font-weight-bold">Learning Group</h4>
+                            <h4 class="mb-0 font-weight-bold">Direktorat</h4>
                         </div>
                         <hr class="m-0">
                         <div class="card-body">
@@ -522,7 +522,7 @@
                 data: {
                     labels: LGLabels,
                     datasets: [{
-                        label: 'Learning Group',
+                        label: 'Direktorat',
                         data: LGTotals,
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.6)',
@@ -549,7 +549,7 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Learning Group'
+                            text: 'Direktorat'
                         },
                         legend: {
                             display: true,

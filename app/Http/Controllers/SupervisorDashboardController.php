@@ -479,8 +479,8 @@ class SupervisorDashboardController extends Controller
             'idpKompetensis.metodeBelajars',
             'idpKompetensis.pengerjaans.nilaiPengerjaanIdp'
         ])
-            ->where('id_supervisor', $user->id); // Ambil IDP hanya milik user login
-
+            ->where('id_supervisor', $user->id) // Ambil IDP hanya milik user login
+            ->where('is_template', false);
 
         if ($request->filled('search')) {
             $search = $request->search;

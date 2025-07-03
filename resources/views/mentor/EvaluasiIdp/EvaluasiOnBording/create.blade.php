@@ -52,8 +52,17 @@
                     $mingguTotal = ceil($totalHari / 7);
                     $mingguSisa = max(0, ceil($sisaHari / 7));
 
-                    $estimasiTarget = 50; // target % jika setengah waktu sudah lewat
-                    $harusnyaSudah = $mingguBerjalan >= floor($mingguTotal / 2) ? 'Ya' : 'Belum';
+                    // Target minimal default 50%
+                    $estimasiTarget = 50;
+                    $targetNote = 'Target Minimal Saat Ini (karena waktu sudah setengah jalan)';
+
+                    // Jika sudah H-1 atau kurang, target minimal naik ke 80%
+                    if ($sisaHari <= 1) {
+                        $estimasiTarget = 80;
+                        $targetNote = 'Target Minimal Saat Ini (H-1 penutupan)';
+                    }
+
+                    $harusnyaSudah = $persen >= $estimasiTarget ? 'Ya' : 'Belum';
 
                 @endphp
 
@@ -89,8 +98,11 @@
                                 hari)</span>
                         </div>
                         <div class="col-md-6 mb-2">
-                            <span class="badge badge-light">Target Minimal Saat Ini:
-                                <strong>{{ $estimasiTarget }}%</strong></span>
+                            <span class="badge badge-light">
+                                {{ $targetNote }}:
+                                <strong>{{ $estimasiTarget }}%</strong>
+                            </span>
+
                         </div>
                         <div class="col-md-6">
                             <span class="badge badge-{{ $harusnyaSudah === 'Ya' ? 'success' : 'danger' }}">
@@ -111,8 +123,8 @@
                 <div class="card-body">
                     <h6 class="mb-2">📊 <strong>Progres Kompetensi</strong></h6>
                     <div class="mb-1 text-muted" style="font-size: 12px;">
-                        <i class="fas fa-check-circle mr-1 text-success"></i> {{ $jumlahSelesai }}/{{ $totalKompetensi }}
-                        Kompetensi Diselesaikan ({{ $persen }}%)
+                        <i class="fas fa-check-circle mr-1 text-success"></i>
+                        {{ $jumlahSelesai }}/{{ $totalKompetensi }} Kompetensi Diselesaikan ({{ $persen }}%)
                     </div>
                     <div class="progress mb-3" style="height: 10px; border-radius: 999px;">
                         <div class="progress-bar {{ $warna }}" role="progressbar"
@@ -120,8 +132,20 @@
                             aria-valuemin="0" aria-valuemax="100">
                         </div>
                     </div>
-                </div>
 
+                    @if ($persen >= $estimasiTarget)
+                        <div class="alert alert-success mt-3" role="alert" style="font-size: 14px;">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            Progres <strong>sudah mencapai target minimal</strong> ({{ $estimasiTarget }}%). Good job!
+                        </div>
+                    @elseif ($persen < $estimasiTarget && $harusnyaSudah === 'Ya')
+                        <div class="alert alert-danger mt-3" role="alert" style="font-size: 14px;">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            Progres <strong>belum mencapai target minimal</strong> ({{ $estimasiTarget }}%). Mohon segera
+                            ditingkatkan.
+                        </div>
+                    @endif
+                </div>
                 <form action="{{ route('mentor.EvaluasiIdp.EvaluasiOnBording.store') }}" method="POST">
                     @csrf
                     {{-- Data IDP dan User --}}

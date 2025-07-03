@@ -10,12 +10,12 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Learning Gorup</h1>
+                <h1>Direktorat</h1>
 
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
                     <div class="breadcrumb-item"><a
-                            href="{{ route('adminsdm.data-master.karyawan.learning-group.index') }}">Learning Group</a>
+                            href="{{ route('adminsdm.data-master.karyawan.learning-group.index') }}">Direktorat</a>
                     </div>
                 </div>
             </div>
@@ -36,7 +36,7 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Data Learing Group</h4>
+                                <h4>Data Direktorat</h4>
                                 <div class="card-header-action">
                                     <div class="dropdown mr-2">
                                         <button type="button" class="btn btn-danger rounded-pill dropdown-toggle"

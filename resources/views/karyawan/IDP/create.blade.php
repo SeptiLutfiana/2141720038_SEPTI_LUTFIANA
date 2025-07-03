@@ -64,23 +64,28 @@
                                         value="{{ old('proyeksi_karir') }}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="deskripsi_idp">Deskripsi</label>
+                                    <label for="deskripsi_idp">Deskripsi/ Alasan Proyeksi Karir</label>
                                     <textarea name="deskripsi_idp" id="deskripsi_idp" class="form-control @error('deskripsi_idp') is-invalid @enderror"
                                         style="height:6rem;">{{ old('deskripsi_idp') }}</textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label>Mentor</label>
+                                    <label for="id_mentor">Mentor</label>
                                     <select name="id_mentor" id="id_mentor"
                                         class="tom-select @error('id_mentor') is-invalid @enderror">
                                         <option value="">-- Pilih Mentor --</option>
                                         @foreach ($mentors as $item)
-                                            <option value="{{ $item->id }}">{{ $item->name }} -
-                                                {{ $item->divisi->nama_divisi }} - {{ $item->penempatan->nama_penempatan }}
+                                            <option value="{{ $item->id }}">
+                                                {{ $item->name }} - {{ $item->divisi->nama_divisi }} -
+                                                {{ $item->penempatan->nama_penempatan }}
                                             </option>
                                         @endforeach
                                     </select>
+                                    <!-- Keterangan tambahan untuk memandu pengguna -->
+                                    <small class="form-text text-muted">
+                                        Pilih mentor yang sesuai dengan bidang atau divisi Anda. Mentor akan memberikan
+                                        bimbingan selama program.
+                                    </small>
                                 </div>
-
                                 <div class="form-group">
                                     <label>Supervisor</label>
                                     <select name="id_supervisor" id="id_supervisor"
@@ -172,7 +177,7 @@
         <!-- Modal Tambah Kompetensi -->
         <div class="modal fade" id="modalTambahKompetensi" tabindex="-1" role="dialog"
             aria-labelledby="modalTambahKompetensiLabel">
-            <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="modalTambahKompetensiLabel">Tambah Kompetensi</h5>
@@ -298,16 +303,13 @@
         <!-- Tom Select JS -->
         <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
         <script>
-            // Gunakan event listener pada radio button itu sendiri, atau pada name 'metode'
+            let lastJenjangHard = null;
+            let lastJabatanHard = null;
             document.querySelectorAll('input[name="metode"]').forEach(radio => {
                 radio.addEventListener('change', function() {
-                    toggleMetode(this.value); // Panggil fungsi toggleMetode dengan nilai radio yang dipilih
+                    toggleMetode(this.value);
                 });
             });
-
-            // Panggil toggleMetode saat halaman pertama kali dimuat untuk memastikan tampilan awal sesuai
-            // berdasarkan radio button yang checked
-            // Inisialisasi TomSelect untuk Metode Belajar - PERBAIKAN UTAMA
             let tomSelectMetodeBelajar;
             if (document.getElementById('modalMetodeBelajar')) {
                 tomSelectMetodeBelajar = new TomSelect("#modalMetodeBelajar", {
@@ -358,8 +360,14 @@
             document.getElementById('modalJenisKompetensi').addEventListener('change', function() {
                 renderKompetensiOptions(this.value);
             });
-
+            $('#mainIdpForm').submit(function(event) {
+                // Cek validasi kompetensi sebelum submit
+                if (!validateCompetencies()) {
+                    event.preventDefault(); // Mencegah form untuk disubmit jika validasi gagal
+                }
+            });
             // Event listener untuk tombol simpan kompetensi
+            // Fungsi untuk menangani klik simpan kompetensi
             document.getElementById('btnSimpanKompetensi').addEventListener('click', function() {
                 const jenis = document.getElementById('modalJenisKompetensi').value;
                 const kompetensiDropdown = document.getElementById('modalKompetensiDropdown');
@@ -375,23 +383,20 @@
                 const aksi = document.getElementById('modalAksi').value;
                 const peran = document.getElementById('modalPeranDropdown').value;
 
-                // Validasi
-                if (!kompetensiId) {
-                    alert("Harap pilih kompetensi");
+                // Validasi untuk kompetensi yang sudah ada
+                if (kompetensiId && checkIfCompetencyExists(kompetensiId)) {
+                    alert("Kompetensi ini sudah ada di tabel Kompetensi.");
+                    return; // Jangan menambahkannya lagi
+                }
+
+                // Validasi lainnya
+                if (!kompetensiId || metodeIds.length === 0 || !sasaran || !aksi) {
+                    alert("Harap pilih kompetensi, metode belajar, sasaran, dan aksi.");
                     return;
                 }
 
-                if (metodeIds.length === 0) {
-                    alert("Harap pilih minimal satu metode belajar");
-                    return;
-                }
-
-                if (!sasaran || !aksi) {
-                    alert("Harap isi sasaran dan aksi");
-                    return;
-                }
-
-                const data = {
+                // Menambahkan kompetensi ke dalam daftar berdasarkan jenis kompetensi
+                const newCompetency = {
                     kompetensiId,
                     kompetensiText,
                     metodeIds,
@@ -402,89 +407,108 @@
                 };
 
                 if (jenis === "Hard Kompetensi") {
-                    daftarHard.push(data);
+                    daftarHard.push(newCompetency);
                 } else {
-                    daftarSoft.push(data);
+                    daftarSoft.push(newCompetency);
                 }
 
-                renderTabel();
-                resetFormModal();
-                $('#modalTambahKompetensi').modal('hide');
+                renderTabel(); // Update tabel untuk menampilkan kompetensi yang baru ditambahkan
+                resetFormModal(); // Reset form modal setelah kompetensi ditambahkan
+                $('#modalTambahKompetensi').modal('hide'); // Menutup modal setelah kompetensi ditambahkan
+
+                updateKompetensiDropdown(); // Memperbarui dropdown kompetensi agar yang sudah dipilih tidak muncul lagi
             });
 
+
+            function validateCompetencies() {
+                const totalHardCompetencies = daftarHard.length;
+                const totalSoftCompetencies = daftarSoft.length;
+
+                // Cek apakah ada minimal 3 kompetensi pada hard atau soft
+                if (totalHardCompetencies < 3 && totalSoftCompetencies < 3) {
+                    alert("Anda harus memilih minimal 3 Kompetensi Hard atau 3 Kompetensi Soft.");
+                    return false; // Menghentikan submit
+                }
+
+                return true; // Lanjutkan submit jika validasi lulus
+            }
+
+
+            function checkIfCompetencyExists(competencyId) {
+                // Cek di daftar hard dan soft kompetensi
+                const allCompetencies = [...daftarHard, ...daftarSoft];
+                return allCompetencies.some(item => item.kompetensiId === competencyId);
+            }
+
+            // Fungsi untuk merender tabel setelah kompetensi ditambahkan
             function renderTabel() {
                 const tbodyHard = document.querySelector('#tabel-hard tbody');
                 const tbodySoft = document.querySelector('#tabel-soft tbody');
-                const form = document.querySelector('form');
+                const form = document.getElementById('mainIdpForm'); // Ambil form untuk menambahkan hidden inputs
+
+                // Kosongkan tabel sebelum render
+                tbodyHard.innerHTML = '';
+                tbodySoft.innerHTML = '';
 
                 // Kosongkan input hidden sebelumnya
                 document.querySelectorAll('input[name^="kompetensi["]').forEach(el => el.remove());
 
                 // Render tabel Hard Kompetensi
-                tbodyHard.innerHTML = '';
                 daftarHard.forEach((item, index) => {
                     tbodyHard.innerHTML += `
-        <tr>
-            <td>${item.kompetensiText}</td>
-            <td>${item.metodeText}</td>
-            <td>${item.sasaran}</td>
-            <td>${item.aksi}</td>
-            <td class="text-center">
-    <button type="button"
-        class="btn btn-outline-danger rounded-circle shadow-sm"
-        style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"
-        onclick="hapusKompetensi('hard', ${index})">
-        <i class="fas fa-trash text-danger"></i>
-    </button>
-</td>
-        </tr>
-    `;
+            <tr>
+                <td>${item.kompetensiText}</td>
+                <td>${item.metodeText}</td>
+                <td>${item.sasaran}</td>
+                <td>${item.aksi}</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-outline-danger rounded-circle shadow-sm" 
+                    style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"
+                    onclick="hapusKompetensi('hard', ${index})">
+                        <i class="fas fa-trash text-danger"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
 
-                    // Tambahkan input hidden dengan format yang benar
+                    // Tambahkan input hidden untuk data kompetensi
                     addHiddenInputs(item, index);
                 });
 
                 // Render tabel Soft Kompetensi
-                tbodySoft.innerHTML = '';
                 daftarSoft.forEach((item, index) => {
-                    const globalIndex = daftarHard.length + index;
-
                     tbodySoft.innerHTML += `
-        <tr>
-            <td>${item.kompetensiText}</td>
-            <td>${item.metodeText}</td>
-            <td>${item.sasaran}</td>
-            <td>${item.aksi}</td>
-            <td>${item.peran}</td>
-            <td class="text-center">
-    <button type="button"
-        class="btn btn-outline-danger rounded-circle shadow-sm"
-        style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"
-        onclick="hapusKompetensi('soft', ${index})">
-        <i class="fas fa-trash text-danger"></i>
-    </button>
-</td>
-        </tr>
-    `;
+            <tr>
+                <td>${item.kompetensiText}</td>
+                <td>${item.metodeText}</td>
+                <td>${item.sasaran}</td>
+                <td>${item.aksi}</td>
+                <td>${item.peran}</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-outline-danger rounded-circle shadow-sm" 
+                    style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"
+                    onclick="hapusKompetensi('soft', ${index})">
+                        <i class="fas fa-trash text-danger"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
 
-                    // Tambahkan input hidden dengan format yang benar
-                    addHiddenInputs(item, globalIndex);
+                    // Tambahkan input hidden untuk data kompetensi
+                    addHiddenInputs(item, index);
                 });
             }
-
+            // Fungsi untuk menambahkan input hidden ke dalam form
             function addHiddenInputs(item, index) {
                 const form = document.getElementById('mainIdpForm');
-
-                // Buat div container untuk input hidden
                 const container = document.createElement('div');
 
-                // Tambahkan input hidden untuk data kompetensi
+                // Menambahkan input hidden untuk data kompetensi
                 container.innerHTML += `
         <input type="hidden" name="kompetensi[${index}][id_kompetensi]" value="${item.kompetensiId}">
         <input type="hidden" name="kompetensi[${index}][sasaran]" value="${item.sasaran}">
         <input type="hidden" name="kompetensi[${index}][aksi]" value="${item.aksi}">
         <input type="hidden" name="kompetensi[${index}][peran]" value="${item.peran}">
-
     `;
 
                 // Tambahkan input hidden untuk metode belajar (array)
@@ -494,6 +518,7 @@
         `;
                 });
 
+                // Menambahkan input hidden ke dalam form
                 form.appendChild(container);
             }
 
@@ -509,29 +534,73 @@
             }
 
             function resetFormModal() {
-                // Reset jenis kompetensi ke default
-                $('#modalJenisKompetensi').val('Hard Kompetensi').trigger('change');
+                const jenis = document.getElementById('modalJenisKompetensi');
+                if (jenis && jenis.tomselect) {
+                    jenis.tomselect.setValue('Hard Kompetensi');
+                }
 
-                // Reset input teks
                 $('#modalSasaran').val('');
                 $('#modalAksi').val('');
 
-                // Reset dropdown jenjang
-                $('#modalJenjangDropdown').val('').trigger('change');
+                // Reset dropdown jenjang dengan nilai terakhir
+                const jenjangDropdown = document.getElementById('modalJenjangDropdown');
+                if (jenjangDropdown && jenjangDropdown.tomselect) {
+                    if (lastJenjangHard) {
+                        jenjangDropdown.tomselect.setValue(lastJenjangHard);
+                    } else {
+                        jenjangDropdown.tomselect.clear(true);
+                    }
+                }
 
-                // Kosongkan dropdown jabatan
-                $('#modalJabatanDropdown').empty().append('<option value="">Pilih Jabatan</option>');
+                // Reset dropdown jabatan dengan nilai terakhir
+                const jabatanDropdown = document.getElementById('modalJabatanDropdown');
+                if (jabatanDropdown && jabatanDropdown.tomselect) {
+                    if (lastJabatanHard) {
+                        jabatanDropdown.tomselect.setValue(lastJabatanHard);
+                    } else {
+                        jabatanDropdown.tomselect.clearOptions();
+                        jabatanDropdown.tomselect.setValue('');
+                        jabatanDropdown.tomselect.addOption({
+                            value: "",
+                            text: "Pilih Jabatan"
+                        });
+                        jabatanDropdown.tomselect.refreshOptions(false);
+                    }
+                }
 
-                // Kosongkan dropdown kompetensi
-                $('#modalKompetensiDropdown').empty().append('<option value="">Pilih Kompetensi</option>');
+                // Reset dropdown kompetensi
+                const kompetensiDropdown = document.getElementById('modalKompetensiDropdown');
+                if (kompetensiDropdown && kompetensiDropdown.tomselect) {
+                    kompetensiDropdown.tomselect.clearOptions();
+                    kompetensiDropdown.tomselect.setValue('');
+                    kompetensiDropdown.tomselect.addOption({
+                        value: "",
+                        text: "Pilih Kompetensi"
+                    });
+                    kompetensiDropdown.tomselect.refreshOptions(false);
+                }
 
-                // Reset metode belajar (kalau pakai Tom Select misalnya)
-                if (typeof tomSelectMetodeBelajar !== 'undefined') {
+                // Reset metode belajar
+                if (typeof tomSelectMetodeBelajar !== 'undefined' && tomSelectMetodeBelajar) {
                     tomSelectMetodeBelajar.clear();
                 }
+
+                // Reset peran ke default
+                const peranDropdown = document.getElementById('modalPeranDropdown');
+                if (peranDropdown && peranDropdown.tomselect) {
+                    peranDropdown.tomselect.setValue('umum');
+                }
+
+                // Trigger jenis kompetensi agar tampilan ikut menyesuaikan
+                $('#modalJenisKompetensi').trigger('change');
             }
 
-
+            // Fungsi untuk memeriksa apakah kompetensi sudah ada dalam daftar
+            function checkIfCompetencyExists(competencyId) {
+                // Cek di daftar hard dan soft kompetensi
+                const allCompetencies = [...daftarHard, ...daftarSoft];
+                return allCompetencies.some(item => item.kompetensiId === competencyId);
+            }
             // Inisialisasi modal saat ditampilkan
             $('#modalTambahKompetensi').on('show.bs.modal', function() {
                 resetFormModal();
@@ -563,43 +632,34 @@
                 // Saat jenjang dipilih -> ambil jabatan berdasarkan jenjang
                 $('#modalJenjangDropdown').on('change', function() {
                     let jenjangId = $(this).val();
+                    lastJenjangHard = jenjangId; // Simpan jenjang yang terakhir dipilih
                     if (jenjangId) {
                         $.ajax({
                             url: '/admin/datamaster/behavior/idp/get-jabatan-by-jenjang/' + jenjangId,
                             type: 'GET',
                             success: function(data) {
-                                let jabatanDropdown = document.querySelector(
+                                const jabatanDropdown = document.querySelector(
                                     '#modalJabatanDropdown');
 
                                 // Reset TomSelect-nya jika sudah terinisialisasi
                                 if (jabatanDropdown.tomselect) {
-                                    jabatanDropdown.tomselect
-                                        .clearOptions(); // hapus opsi sebelumnya
+                                    jabatanDropdown.tomselect.clearOptions(); // Hapus opsi lama
                                     jabatanDropdown.tomselect.addOption({
-                                        value: "",
-                                        text: "Pilih Jabatan"
-                                    }); // tambahkan default option
+                                        value: '',
+                                        text: 'Pilih Jabatan'
+                                    }); // Tambahkan opsi default
+                                }
 
-                                    data.forEach(function(jabatan) {
-                                        jabatanDropdown.tomselect.addOption({
-                                            value: jabatan.id_jabatan,
-                                            text: jabatan.nama_jabatan
-                                        });
+                                // Tambahkan jabatan baru
+                                data.forEach(function(jabatan) {
+                                    jabatanDropdown.tomselect.addOption({
+                                        value: jabatan.id_jabatan,
+                                        text: jabatan.nama_jabatan
                                     });
-
-                                    jabatanDropdown.tomselect.refreshOptions(false);
-                                }
-
-
-                                // 🔁 Re-inisialisasi TomSelect
-                                if (TomSelect.instances['modalJabatanDropdown']) {
-                                    TomSelect.instances['modalJabatanDropdown'].destroy();
-                                }
-
-                                new TomSelect('#modalJabatanDropdown', {
-                                    plugins: ['dropdown_input'],
-                                    allowEmptyOption: true
                                 });
+
+                                // Refresh dropdown untuk memastikan opsi diperbarui
+                                jabatanDropdown.tomselect.refreshOptions(false);
                             }
                         });
                     }
@@ -608,6 +668,7 @@
                 // Saat jabatan dipilih -> ambil daftar hard kompetensi
                 $('#modalJabatanDropdown').on('change', function() {
                     let jabatanId = $(this).val();
+                    lastJabatanHard = jabatanId;
                     if (jabatanId) {
                         $.ajax({
                             url: '/admin/datamaster/behavior/idp/get-kompetensi-by-jabatan/' +
@@ -617,19 +678,23 @@
                                 let kompetensiDropdown = document.querySelector(
                                     '#modalKompetensiDropdown');
 
-                                // Tambahkan validasi jenis
+                                // Ambil jenis kompetensi
                                 let jenis = document.getElementById('modalJenisKompetensi').value;
-                                if (jenis !== 'Hard Kompetensi')
-                                    return; // ⛔ Hentikan kalau jenis bukan Hard
 
-                                // Clear & reinitialize only if hard kompetensi
-                                if (kompetensiDropdown.tomselect) {
-                                    kompetensiDropdown.tomselect.clearOptions();
+                                // Jika jenis kompetensi bukan 'Hard Kompetensi', hentikan
+                                if (jenis !== 'Hard Kompetensi') return;
+
+                                // Jika TomSelect sudah ada, bersihkan opsi
+                                if (kompetensiDropdown && kompetensiDropdown.tomselect) {
+                                    kompetensiDropdown.tomselect.clearOptions(); // Hapus opsi lama
                                     kompetensiDropdown.tomselect.addOption({
                                         value: '',
                                         text: 'Pilih Kompetensi'
-                                    });
+                                    }); // Tambahkan opsi default
+                                }
 
+                                // Tambahkan kompetensi baru dari response data
+                                if (data && Array.isArray(data)) {
                                     data.forEach(function(komp) {
                                         kompetensiDropdown.tomselect.addOption({
                                             value: komp.id_kompetensi,
@@ -637,12 +702,63 @@
                                         });
                                     });
 
-                                    kompetensiDropdown.tomselect.refreshOptions(false);
+                                    // Refresh dan tampilkan opsi yang baru
+                                    if (kompetensiDropdown.tomselect) {
+                                        kompetensiDropdown.tomselect.refreshOptions(false);
+                                    }
                                 }
+                            },
+                            error: function(err) {
+                                console.error("Error fetching kompetensi:", err);
                             }
                         });
+                    } else {
+                        // Jika jabatanId kosong, reset kompetensi dropdown
+                        let kompetensiDropdown = document.querySelector('#modalKompetensiDropdown');
+                        if (kompetensiDropdown && kompetensiDropdown.tomselect) {
+                            kompetensiDropdown.tomselect.clearOptions();
+                            kompetensiDropdown.tomselect.addOption({
+                                value: '',
+                                text: 'Pilih Kompetensi'
+                            });
+                            kompetensiDropdown.tomselect.refreshOptions(false);
+                        }
                     }
                 });
+                // Fungsi untuk memperbarui dropdown Kompetensi dengan menghapus yang sudah ada
+                function updateKompetensiDropdown() {
+                    const kompetensiDropdown = document.getElementById('modalKompetensiDropdown');
+                    if (!kompetensiDropdown || !kompetensiDropdown.tomselect) return;
+
+                    const ts = kompetensiDropdown.tomselect;
+                    ts.clearOptions(); // Hapus semua opsi yang ada di dropdown
+
+                    ts.addOption({
+                        value: '',
+                        text: '-- Pilih Kompetensi --'
+                    });
+
+                    const jenis = document.getElementById('modalJenisKompetensi').value;
+                    const data = kompetensiData[jenis];
+
+                    if (!data || data.length === 0) return;
+
+                    // Menambahkan kompetensi yang belum dimasukkan
+                    data.forEach(item => {
+                        // Cek apakah kompetensi sudah ada di daftar (Hard/Soft)
+                        const isAlreadyAdded = [...daftarHard, ...daftarSoft].some(existingItem => existingItem
+                            .kompetensiId === item.id_kompetensi);
+
+                        if (!isAlreadyAdded) {
+                            ts.addOption({
+                                value: item.id_kompetensi,
+                                text: item.nama_kompetensi
+                            });
+                        }
+                    });
+
+                    ts.refreshOptions(false); // Refresh dropdown setelah menambahkan opsi yang baru
+                }
                 let modalDropdownsInitialized = false;
 
                 $('#modalTambahKompetensi').on('shown.bs.modal', function() {

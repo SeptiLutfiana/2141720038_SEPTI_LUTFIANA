@@ -15,7 +15,7 @@ class AutoRekomendasiIdp extends Command
 
     public function handle()
     {
-        $$now = now();
+        $now = now();
 
         $idps = IDP::with('idpKompetensis.pengerjaans')
             ->where('waktu_selesai', '<', $now)

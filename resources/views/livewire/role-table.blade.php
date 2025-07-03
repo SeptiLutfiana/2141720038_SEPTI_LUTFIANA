@@ -30,7 +30,7 @@
                                     href="{{ route('adminsdm.data-master.karyawan.role.show', $item->id_role) }}">
                                     <i class="fas fa-info-circle text-success mr-2" style="width: 18px;"></i> Detail
                                 </a>
-                                <a href="#" class="dropdown-item text-danger d-flex align-items-center py-1"
+                                {{-- <a href="#" class="dropdown-item text-danger d-flex align-items-center py-1"
                                     onclick="event.preventDefault(); if(confirm('Yakin ingin menghapus data ini?')) document.getElementById('delete-role-{{ $item->id_role }}').submit();">
                                     <i class="fas fa-trash-alt mr-2" style="width: 18px;"></i> Hapus
                                 </a>
@@ -39,7 +39,7 @@
                                     method="POST" style="display: none;">
                                     @csrf
                                     @method('DELETE')
-                                </form>
+                                </form> --}}
                             </div>
                         </div>
                     </td>

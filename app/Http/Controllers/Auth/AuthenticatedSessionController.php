@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Http;
 class AuthenticatedSessionController extends Controller
 {
     /**
@@ -29,7 +29,20 @@ class AuthenticatedSessionController extends Controller
         $request->validate([
             'login' => 'required|string',
             'password' => 'required|string',
+            'g-recaptcha-response' => 'required|string',
         ]);
+        // Validasi token ke Google
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => env('NOCAPTCHA_SECRET'),
+            'response' => $request->input('g-recaptcha-response'),
+            'remoteip' => $request->ip(),
+        ]);
+
+        $result = $response->json();
+        Log::info('reCAPTCHA response:', $result);
+        if (!($result['success'] ?? false) || ($result['score'] ?? 0) < 0.5) {
+            return back()->withErrors(['login' => 'Verifikasi reCAPTCHA gagal. Silakan coba lagi.']);
+        }
 
         // Tentukan apakah login pakai email atau NPK
         $loginType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'npk';

@@ -112,8 +112,8 @@
             </div>
 
             <small class="text-muted d-block mt-1">
-                Nama Lengkap: {{ $idp->karyawan->name }} <br>
-                NPK: {{ $idp->karyawan->npk }} <br>
+                Nama Lengkap: {{ $idp->karyawan->name  ?? '-'}} <br>
+                NPK: {{ $idp->karyawan->npk ?? '-' }} <br>
                 Jenjang: {{ $idp->jenjang->nama_jenjang ?? '-' }} <br>
                 Jabatan: {{ $idp->jabatan->nama_jabatan ?? '-' }} <br>
                 Divisi: {{ $idp->divisi->nama_divisi ?? '-' }} <br>
@@ -135,11 +135,11 @@
                 </tr>
                 <tr>
                     <td>Mentor</td>
-                    <td colspan="4">{{ $idp->mentor->name }}</td>
+                    <td colspan="4">{{ $idp->mentor->name ?? '-'}}</td>
                 </tr>
                 <tr>
                     <td>Supervisor</td>
-                    <td colspan="4">{{ $idp->supervisor->name }}</td>
+                    <td colspan="4">{{ $idp->supervisor->name ??'-'}}</td>
                 </tr>
                 <tr>
                     <td>Waktu Mulai</td>

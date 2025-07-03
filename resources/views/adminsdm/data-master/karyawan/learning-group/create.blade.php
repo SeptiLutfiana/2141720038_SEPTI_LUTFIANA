@@ -6,11 +6,11 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Tambah Data Learning Group</h1>
+                <h1>Tambah Data Direktorat</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.karyawan.learning-group.index') }}">Data Learning Group</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.karyawan.learning-group.create') }}">Tambah Data Learning Group</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.karyawan.learning-group.index') }}">Data Direktorat</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.karyawan.learning-group.create') }}">Tambah Data Direktorat</a></div>
                 </div>
             </div>
 
@@ -31,7 +31,7 @@
                 @endif
                 <div class="card">
                     <div class="card-header">
-                        <h4>Tambah Data Learning Group</h4>
+                        <h4>Tambah Data Direktorat</h4>
                     </div>
                     <form action="{{ route('adminsdm.data-master.karyawan.learning-group.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -45,7 +45,7 @@
                             <!-- Input Manual -->
                             <div id="input-manual">
                                 <div class="form-group">
-                                    <label>Nama Learning Group</label>
+                                    <label>Nama Direktorat</label>
                                     <input type="text" name="nama_LG" class="form-control @error('nama_LG') is-invalid @enderror" value="{{ old('nama_LG') }}">
                                 </div>
                                 <div class="form-group">
