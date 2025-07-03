@@ -100,23 +100,23 @@
 </head>
 
 <body>
-    @foreach ($idps as $idp)
-        <table>
-            <head>
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Proyeksi Karir</th>
-                        <th>Deskripsi IDP</th>
-                        <th>Supervisor</th>
-                        <th>Waktu</th>
-                        <th>Maksimal Kuoat</th>
-                        <th>Total Daftar</th>
-                    </tr>
-                </thead>
-            </head>
+    <table>
+        <head>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Proyeksi Karir</th>
+                    <th>Deskripsi IDP</th>
+                    <th>Supervisor</th>
+                    <th>Waktu</th>
+                    <th>Maksimal Kuoat</th>
+                    <th>Total Daftar</th>
+                </tr>
+            </thead>
+        </head>
 
-            <body>
+        <body>
+            @foreach ($idps as $idp)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $idp->proyeksi_karir }}</td>
@@ -127,6 +127,6 @@
                     <td>{{ $idp->max_applies }} Karyawan</td>
                     <td>{{ $idp->current_applies }} Karyawan</td>
                 </tr>
-            </body>
-    @endforeach
+        </body>
+        @endforeach
 </body>
