@@ -100,32 +100,36 @@
 </head>
 
 <body>
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Proyeksi Karir</th>
-                <th>Deskripsi IDP</th>
-                <th>Supervisor</th>
-                <th>Waktu</th>
-                <th>Maksimal Kuoat</th>
-                <th>Total Daftar</th>
-            </tr>
-            </head>
-
-        <tbody>
-            @foreach ($idps as $idp)
+    <div class="page">
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $idp->proyeksi_karir }}</td>
-                    <td>{{ $idp->deskripsi_idp }}</td>
-                    <td>{{ $idp->supervisor->name }}</td>
-                    <td>{{ \Carbon\Carbon::parse($idp->waktu_mulai)->translatedFormat('F Y') }} -
-                        {{ \Carbon\Carbon::parse($idp->waktu_selesai)->translatedFormat('F Y') }}</td>
-                    <td>{{ $idp->max_applies }} Karyawan</td>
-                    <td>{{ $idp->current_applies }} Karyawan</td>
+                    <th>No</th>
+                    <th>Proyeksi Karir</th>
+                    <th>Deskripsi IDP</th>
+                    <th>Supervisor</th>
+                    <th>Waktu</th>
+                    <th>Maksimal Kuota</th>
+                    <th>Total Daftar</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+
+            <tbody>
+                @foreach ($idps as $idp)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $idp->proyeksi_karir }}</td>
+                        <td>{{ $idp->deskripsi_idp }}</td>
+                        <td>{{ $idp->supervisor->name }}</td>
+                        <td>{{ \Carbon\Carbon::parse($idp->waktu_mulai)->translatedFormat('F Y') }} -
+                            {{ \Carbon\Carbon::parse($idp->waktu_selesai)->translatedFormat('F Y') }}</td>
+                        <td>{{ $idp->max_applies }} Karyawan</td>
+                        <td>{{ $idp->current_applies }} Karyawan</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 </body>
+
+</html>
