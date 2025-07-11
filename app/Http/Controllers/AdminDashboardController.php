@@ -60,7 +60,8 @@ class AdminDashboardController extends Controller
         })->where('hasil_rekomendasi', 'Disarankan dengan Pengembangan')->count();
 
         $jumlahTidakDisarankan = IdpRekomendasi::whereHas('idp', function ($q) use ($tahunDipilih) {
-            $q->whereYear('waktu_mulai', $tahunDipilih);
+            $q->whereYear('waktu_mulai', $tahunDipilih)
+            ->where('is_template', false);
         })->where('hasil_rekomendasi', 'Tidak Disarankan')->count();
 
         $jumlahRekomendasiMenunggu = IdpRekomendasi::whereNull('hasil_rekomendasi')

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+
 class AuthenticatedSessionController extends Controller
 {
     /**
@@ -147,7 +148,7 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
-
+        $request->session()->flush();
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
