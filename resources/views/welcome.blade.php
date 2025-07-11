@@ -200,7 +200,7 @@
                 <div class="footer-links">
                     <h4 class="text-white font-semibold mb-4">Company</h4>
                     <ul class="list-none">
-                        <li><a href="#about" class="hover:text-gray-500">About us</a></li>
+                        <li><a href="#about" class="hover:text-gray-900">About us</a></li>
                         <li><a href="https://phtforestryinstitute.id/" class="hover:text-gray-900">Blog</a></li>
                         <li><a href="#contact" class="hover:text-gray-900">Contact us</a></li>
                         <li><a href="#fitur" class="hover:text-gray-900">Fitur</a></li>
