@@ -11,6 +11,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 </head>
 
@@ -59,7 +60,8 @@
 
         </div>
 
-        <div x-show="isOpen" class="md:hidden" id="mobile-menu">
+        <div x-show="isOpen" x-transition class="md:hidden absolute top-full left-0 w-full bg-white shadow-md z-50"
+            id="mobile-menu">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="#home"
                     class="text-gray-900 hover:bg-green-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Home</a>
