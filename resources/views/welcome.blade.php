@@ -63,20 +63,20 @@
         <div x-show="isOpen" x-transition class="md:hidden absolute top-full left-0 w-full bg-white shadow-md z-50"
             id="mobile-menu">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#home"
+                <a href="#home" @click="isOpen = false"
                     class="text-gray-900 hover:bg-green-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Home</a>
-                <a href="#about"
+                <a href="#about" @click="isOpen = false"
                     class="text-gray-900 hover:bg-green-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">About
                     Us</a>
-                <a href="#fitur"
+                <a href="#fitur" @click="isOpen = false"
                     class="text-gray-900 hover:bg-green-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Fitur</a>
-                <a href="#benefit"
+                <a href="#benefit" @click="isOpen = false"
                     class="text-gray-900 hover:bg-green-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Benefit</a>
-                <a href="#contact"
+                <a href="#contact" @click="isOpen = false"
                     class="text-gray-900 hover:bg-green-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Contact
                     Us</a>
-                <div class="mt-4"> <a href="{{ route('login') }}"
-                        class="items-center bg-green-700 text-white block rounded-md px-3 py-2 text-base font-medium hover:bg-green-800">
+                <div class="mt-4"> <a href="{{ route('login') }}" 
+                        class="items-center bg-gray-500 text-white block rounded-md px-3 py-2 text-base font-medium hover:bg-green-800">
                         <i class="fas fa-user mr-2"></i> Login
                     </a>
                 </div>
@@ -181,16 +181,16 @@
                 </div>
                 <p class="text-sm">Copyright © 2024 menarapeFI. <br> All rights reserved.</p>
                 <div class="flex justify-center md:justify-start mt-4 space-x-4">
-                    <a href="https://www.instagram.com/perhutani_pefi/" class="hover:text-gray-500">
+                    <a href="https://www.instagram.com/perhutani_pefi/" class="hover:text-gray-900">
                         <i class="fab fa-instagram text-xl"></i>
                     </a>
-                    <a href="https://www.facebook.com/phtforestryinstitute/" class="hover:text-gray-500">
+                    <a href="https://www.facebook.com/phtforestryinstitute/" class="hover:text-gray-900">
                         <i class="fab fa-facebook text-xl"></i>
                     </a>
-                    <a href="https://phtforestryinstitute.id/" class="hover:text-gray-500">
+                    <a href="https://phtforestryinstitute.id/" class="hover:text-gray-900">
                         <i class="fab fa-dribbble text-xl"></i>
                     </a>
-                    <a href="https://www.youtube.com/@perhutaniforestryinstitute4448" class="hover:text-gray-500">
+                    <a href="https://www.youtube.com/@perhutaniforestryinstitute4448" class="hover:text-gray-900">
                         <i class="fab fa-youtube text-xl"></i>
                     </a>
                 </div>
@@ -201,9 +201,9 @@
                     <h4 class="text-white font-semibold mb-4">Company</h4>
                     <ul class="list-none">
                         <li><a href="#about" class="hover:text-gray-500">About us</a></li>
-                        <li><a href="https://phtforestryinstitute.id/" class="hover:text-gray-500">Blog</a></li>
-                        <li><a href="#contact" class="hover:text-gray-500">Contact us</a></li>
-                        <li><a href="#fitur" class="hover:text-gray-500">Fitur</a></li>
+                        <li><a href="https://phtforestryinstitute.id/" class="hover:text-gray-900">Blog</a></li>
+                        <li><a href="#contact" class="hover:text-gray-900">Contact us</a></li>
+                        <li><a href="#fitur" class="hover:text-gray-900">Fitur</a></li>
                     </ul>
                 </div>
             </div>
