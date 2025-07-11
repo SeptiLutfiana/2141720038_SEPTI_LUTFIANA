@@ -155,7 +155,7 @@ class SupervisorDashboardController extends Controller
                     ->where('sebagai_role', 'supervisor');
             })
             ->count();
-
+        IdpController::autoGenerateRekomendasi();
         return view('supervisor.spv-dashboard', [
             'type_menu' => 'dashboard',
             'tahunDipilih' => $tahunDipilih,

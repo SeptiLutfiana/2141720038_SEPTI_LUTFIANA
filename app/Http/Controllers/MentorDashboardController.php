@@ -159,7 +159,7 @@ class MentorDashboardController extends Controller
             ->with('user')
             ->limit(5)
             ->get();
-
+        IdpController::autoGenerateRekomendasi();
         return view('mentor.dashboard-mentor', [
             'type_menu' => 'dashboard',
             'tahunDipilih' => $tahunDipilih,

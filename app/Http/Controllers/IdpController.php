@@ -23,7 +23,7 @@ use App\Notifications\GivenIDPNotification;
 use App\Notifications\IDPBaruDibuatNotification;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
-
+use App\Models\IdpRekomendasi;
 class IdpController extends Controller
 {
     public function indexGiven(Request $request)
@@ -914,5 +914,35 @@ class IdpController extends Controller
         $kompetensi = $query->get(['id_kompetensi', 'nama_kompetensi']);
 
         return response()->json($kompetensi);
+    }
+    public static function autoGenerateRekomendasi()
+    {
+        $now = now();
+
+        $idps = IDP::with('idpKompetensis.pengerjaans')
+            ->where('waktu_selesai', '<', $now)
+            ->doesntHave('rekomendasis')
+            ->where('is_template', '!=', 1) // tidak hitung template
+            ->get();
+
+        foreach ($idps as $idp) {
+            $belumDikerjakan = $idp->idpKompetensis->filter(function ($komp) {
+                return $komp->pengerjaans->isEmpty();
+            });
+
+            if ($belumDikerjakan->isEmpty() && $idp->status_pengerjaan === 'Disetujui Mentor') {
+                continue;
+            }
+
+            if ($belumDikerjakan->isNotEmpty()) {
+                IdpRekomendasi::create([
+                    'id_idp' => $idp->id_idp,
+                    'hasil_rekomendasi' => 'Tidak Disarankan',
+                    'deskripsi_rekomendasi' => 'IDP tidak disarankan karena tidak semua kompetensi dikerjakan hingga batas waktu.',
+                    'nilai_akhir_soft' => null,
+                    'nilai_akhir_hard' => null,
+                ]);
+            }
+        }
     }
 }

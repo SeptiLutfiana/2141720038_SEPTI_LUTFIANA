@@ -61,7 +61,7 @@ class AdminDashboardController extends Controller
 
         $jumlahTidakDisarankan = IdpRekomendasi::whereHas('idp', function ($q) use ($tahunDipilih) {
             $q->whereYear('waktu_mulai', $tahunDipilih)
-            ->where('is_template', false);
+                ->where('is_template', false);
         })->where('hasil_rekomendasi', 'Tidak Disarankan')->count();
 
         $jumlahRekomendasiMenunggu = IdpRekomendasi::whereNull('hasil_rekomendasi')
@@ -133,7 +133,7 @@ class AdminDashboardController extends Controller
         $totalEvaluasiPasca = EvaluasiIdp::where('jenis_evaluasi', 'pasca')
             ->whereYear('created_at', $tahunDipilih)
             ->count();
-
+        IdpController::autoGenerateRekomendasi();
         return view('adminsdm.dashboard', [
             'type_menu' => 'dashboard',
             'jumlahKaryawan' => $jumlahKaryawan,

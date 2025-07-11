@@ -295,6 +295,7 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::get('/evaluasi/export-csv', [EvaluasiPascaIdpController::class, 'exportCSV'])->name('EvaluasiPascaIdp.exportCSV');
     });
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    Route::get('/auto-rekomendasi', [IdpController::class, 'autoGenerateRekomendasi'])->name('admin.auto-rekomendasi');
 });
 Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
     // SUPERVISOR
@@ -318,6 +319,7 @@ Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
         Route::post('/idp/store', [EvaluasiPascaIdpController::class, 'storeSpv'])->name('storeSpv');
     });
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    Route::get('/auto-rekomendasi', [IdpController::class, 'autoGenerateRekomendasi'])->name('admin.auto-rekomendasi');
 });
 // MENTOR
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
@@ -349,6 +351,7 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::post('/store', [EvaluasiOnBordingMentorController::class, 'store'])->name('store');
     });
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    Route::get('/auto-rekomendasi', [IdpController::class, 'autoGenerateRekomendasi'])->name('admin.auto-rekomendasi');
 });
 // KARYAWAN
 Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
@@ -389,6 +392,7 @@ Route::middleware(['auth', 'karyawan:4,3,2'])->group(function () {
         Route::get('/detail/{id_idp}', [EvaluasiOnBordingMentorController::class, 'detail'])->name('detail');
     });
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    Route::get('/auto-rekomendasi', [IdpController::class, 'autoGenerateRekomendasi'])->name('admin.auto-rekomendasi');
 });
 // PROFILE
 Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
