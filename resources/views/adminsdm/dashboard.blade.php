@@ -25,18 +25,21 @@
                         berjalan baik!</small>
                 </div>
             </div>
-            <form method="GET" action="{{ route('adminsdm.dashboard') }}" class="form-inline mb-4">
-                <label for="filterTahun" class="mr-2 font-weight-bold">Tahun Periode:</label>
-                <select name="tahun" id="filterTahun" class="form-control mr-2" style="width: 100px;"
-                    onchange="this.form.submit()">
-                    @foreach ($listTahun as $th)
-                        <option value="{{ $th }}" {{ request('tahun', $tahunDipilih) == $th ? 'selected' : '' }}>
-                            {{ $th }}
-                        </option>
-                    @endforeach
-                </select>
-                <noscript><button type="submit" class="btn btn-primary">Terapkan</button></noscript>
-            </form>
+            <div style="position: relative;">
+                <form method="GET" action="{{ route('adminsdm.dashboard') }}" class="form-inline mb-4">
+                    <label for="filterTahun" class="mr-2 font-weight-bold">Tahun Periode:</label>
+                    <select name="tahun" id="filterTahun" class="form-control mr-2" style="width: 100px;"
+                        onchange="this.form.submit()">
+                        @foreach ($listTahun as $th)
+                            <option value="{{ $th }}"
+                                {{ request('tahun', $tahunDipilih) == $th ? 'selected' : '' }}>
+                                {{ $th }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <noscript><button type="submit" class="btn btn-primary">Terapkan</button></noscript>
+                </form>
+            </div>
             {{-- Total Bank IDP --}}
             <div class="row">
                 {{-- KIRI: Informasi Bank IDP --}}
