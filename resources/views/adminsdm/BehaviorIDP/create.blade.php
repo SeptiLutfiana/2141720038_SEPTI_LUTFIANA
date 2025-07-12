@@ -246,37 +246,41 @@
                                     <h4>Daftar Hard Kompetensi</h4>
                                 </div>
                                 <div class="card-header">
-                                    <table class="table table-bordered table-hover" id="tabel-hard">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th width="25%">Nama Kompetensi</th>
-                                                <th width="20%">Metode Belajar</th>
-                                                <th width="30%">Sasaran</th>
-                                                <th width="30%">Aksi (Implementasi)</th>
-                                                <th width="15%">Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover" id="tabel-hard">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th width="25%">Nama Kompetensi</th>
+                                                    <th width="20%">Metode Belajar</th>
+                                                    <th width="30%">Sasaran</th>
+                                                    <th width="30%">Aksi (Implementasi)</th>
+                                                    <th width="15%">Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
                                 </div>
 
                                 <div class="card-header">
                                     <h4>Daftar Soft Kompetensi</h4>
                                 </div>
                                 <div class="card-header">
-                                    <table class="table table-bordered table-hover" id="tabel-soft">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th width="25%">Nama Kompetensi</th>
-                                                <th width="20%">Metode Belajar</th>
-                                                <th width="20%">Sasaran</th>
-                                                <th width="20%">Aksi (implementasi)</th>
-                                                <th width="20%">Peran</th>
-                                                <th width="15%">Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover" id="tabel-soft">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th width="25%">Nama Kompetensi</th>
+                                                    <th width="20%">Metode Belajar</th>
+                                                    <th width="20%">Sasaran</th>
+                                                    <th width="20%">Aksi (implementasi)</th>
+                                                    <th width="20%">Peran</th>
+                                                    <th width="15%">Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
                                 </div>
 
                                 <div class="text-right mt-4">
