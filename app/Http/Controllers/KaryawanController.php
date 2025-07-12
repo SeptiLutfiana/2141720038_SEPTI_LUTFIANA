@@ -101,7 +101,7 @@ class KaryawanController extends Controller
         if ($request->filled('input_manual')) {
             // Validasi untuk input manual
             $request->validate([
-                'id_role' => 'required|exists:roles,id_role',
+                // 'id_role' => 'required|exists:roles,id_role',
                 'id_jenjang' => 'required|exists:jenjangs,id_jenjang',
                 'id_jabatan' => 'required|exists:jabatans,id_jabatan',
                 'id_angkatanpsp' => 'required|exists:angkatan_psps,id_angkatanpsp',
@@ -117,7 +117,7 @@ class KaryawanController extends Controller
                 'foto_profile' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
                 'status' => 'required',
             ], [
-                'id_role.required' => 'Role harus dipilih.',
+                // 'id_role.required' => 'Role harus dipilih.',
                 'id_jenjang.required' => 'Jenjang harus dipilih.',
                 'id_jabatan.required' => 'Jabatan harus dipilih.',
                 'id_angkatanpsp.required' => 'Angkatan PSP harus dipilih.',
@@ -136,7 +136,7 @@ class KaryawanController extends Controller
             ]);
 
             $user = User::create([
-                'id_role' => $request->id_role,
+                'id_role' => 4,
                 'id_jenjang' => $request->id_jenjang,
                 'id_jabatan' => $request->id_jabatan,
                 'id_angkatanpsp' => $request->id_angkatanpsp,
@@ -151,7 +151,7 @@ class KaryawanController extends Controller
                 'password' => Hash::make($request->npk),
                 'status' => $request->status,
             ]);
-            $user->roles()->attach($request->id_role);
+            $user->roles()->attach(4);
 
 
             return redirect()->route('adminsdm.data-master.karyawan.data-karyawan.index')
@@ -159,31 +159,31 @@ class KaryawanController extends Controller
         }
 
         // Jika user memilih upload file
-        
-            // Validasi file upload (CSV atau XLSX dengan ukuran maksimal 10MB)
-            $request->validate([
-                'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maksimal 10MB
-            ], [
-                'file_import.required' => 'File harus diupload.',
-                'file_import.mimes' => 'File harus berformat .xlsx atau .csv.',
-                'file_import.max' => 'Ukuran file maksimal 10MB.',
-            ]);
 
-            try {
-                // Proses impor data dari file (gunakan paket Laravel Excel)
-                Excel::import(new UserImport, $request->file('file_import'));
+        // Validasi file upload (CSV atau XLSX dengan ukuran maksimal 10MB)
+        $request->validate([
+            'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maksimal 10MB
+        ], [
+            'file_import.required' => 'File harus diupload.',
+            'file_import.mimes' => 'File harus berformat .xlsx atau .csv.',
+            'file_import.max' => 'Ukuran file maksimal 10MB.',
+        ]);
 
-                // Redirect ke halaman Data dengan pesan sukses
-                return redirect()->route('adminsdm.data-master.karyawan.data-karyawan.index')
-                    ->with('msg-success', 'Berhasil mengimpor data karyawan dari file.');
-            } catch (\Exception $e) {
-                // Jika ada error saat mengimpor, tangani dan tampilkan pesan error
-                return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
-            }
-        
+        try {
+            // Proses impor data dari file (gunakan paket Laravel Excel)
+            Excel::import(new UserImport, $request->file('file_import'));
+
+            // Redirect ke halaman Data dengan pesan sukses
+            return redirect()->route('adminsdm.data-master.karyawan.data-karyawan.index')
+                ->with('msg-success', 'Berhasil mengimpor data karyawan dari file.');
+        } catch (\Exception $e) {
+            // Jika ada error saat mengimpor, tangani dan tampilkan pesan error
+            return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
+        }
+
 
         // Kalau tidak dua-duanya
-        return redirect()->back()->with('msg-error', 'Tidak ada data yang dikirim.');
+        // return redirect()->back()->with('msg-error', 'Tidak ada data yang dikirim.');
     }
 
     public function show($id)
@@ -225,9 +225,8 @@ class KaryawanController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-
+        $request->merge(['id_role' => 4]);
         $request->validate([
-            'id_role' => 'required|exists:roles,id_role',
             'id_jenjang' => 'required|exists:jenjangs,id_jenjang',
             'id_jabatan' => 'required|exists:jabatans,id_jabatan',
             'id_angkatanpsp' => 'required|exists:angkatan_psps,id_angkatanpsp',
@@ -243,7 +242,6 @@ class KaryawanController extends Controller
             'foto_profile' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'status' => 'required',
         ], [
-            'id_role.required' => 'Role harus dipilih.',
             'id_jenjang.required' => 'Jenjang harus dipilih.',
             'id_jabatan.required' => 'Jabatan harus dipilih.',
             'id_angkatanpsp.required' => 'Angkatan PSP harus dipilih.',

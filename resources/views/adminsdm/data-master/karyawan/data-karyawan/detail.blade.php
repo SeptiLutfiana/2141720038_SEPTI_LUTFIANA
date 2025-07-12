@@ -55,7 +55,7 @@
                                     <input readonly type="text" class="form-control" value="{{ $user->penempatan->nama_penempatan}}">
                                 </div>
                                 <div class="form-group col-12">
-                                    <label>Learning Group</label>
+                                    <label>Direktorat</label>
                                     <input readonly type="text" class="form-control" value="{{ $user->learninggroup->nama_LG}}">
                                 </div>
                                  <div class="form-group col-12">

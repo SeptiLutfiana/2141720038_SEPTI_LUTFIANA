@@ -99,31 +99,31 @@
                     <a href="#" class="nav-link has-dropdown"><i class="fas fa-users"></i>
                         <span>Data Karyawan</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('admin/datamaster/karyawan') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/karyawan*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/karyawan') }}">Data Karyawan</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/divisi') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/divisi*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('/admin/datamaster/divisi') }}">Data Divisi</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/jabatan') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/jabatan*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('/admin/datamaster/jabatan') }}">Data Jabatan</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/angkatanpsp') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/angkatanpsp*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/angkatanpsp') }}">Angkatan PSP</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/penempatan') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/penempatan*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/penempatan') }}">Penempatan</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/jenjang') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/jenjang*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/jenjang') }}">Jenjang</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/learning/group') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/learning/group*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/learning/group') }}">Direktorat</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/semester') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/semester*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/semester') }}">Semester</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/role') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/role*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/role') }}">Role User</a>
                         </li>
                     </ul>

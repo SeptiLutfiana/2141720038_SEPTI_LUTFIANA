@@ -119,9 +119,9 @@
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <label>Pilih Learning Group</label>
+                                            <label>Pilih Direktorat</label>
                                             <select name="lg" class="tom-select" onchange="this.form.submit()">
-                                                <option value="">-- Pilih Learning Group --</option>
+                                                <option value="">-- Pilih Direktorat --</option>
                                                 @foreach ($listLG as $lg)
                                                     <option value="{{ $lg->id_LG }}"
                                                         {{ request('lg') == $lg->id_LG ? 'selected' : '' }}>

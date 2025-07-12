@@ -4,6 +4,7 @@
 
 @push('style')
     <link rel="stylesheet" href="{{ asset('library/select2/dist/css/select2.min.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
 @endpush
 
 @section('main')
@@ -46,22 +47,20 @@
                             @method('PUT')
 
                             <div class="form-group">
-                                <label>Role User</label>
-                                <select name="id_role_display" class="form-control" disabled>
-                                    @foreach ($roles as $role)
-                                        <option value="{{ $role->id_role }}"
-                                            {{ old('id_role', $user->id_role) == $role->id_role ? 'selected' : '' }}>
-                                            {{ $role->nama_role }}
-                                        </option>
+                                <label>Role User <span class="text-muted" style="font-size: 0.9em;"></span></label>
+                                <div>
+                                    @foreach ($user->roles as $role)
+                                        <span class="badge badge-primary mr-2">{{ $role->nama_role }}</span>
+                                        <input type="hidden" name="id_role[]" value="{{ $role->id_role }}">
                                     @endforeach
-                                </select>
-                                <!-- input hidden agar value tetap terkirim -->
-                                <input type="hidden" name="id_role" value="{{ old('id_role', $user->id_role) }}">
+                                </div>
+                                <small class="form-text text-muted">Role ditentukan oleh sistem dan tidak dapat diubah
+                                    secara manual.</small>
                             </div>
 
                             <div class="form-group">
                                 <label>Jenjang</label>
-                                <select name="id_jenjang" class="form-control">
+                                <select name="id_jenjang" class="form-control tom-select">
                                     @foreach ($jenjang as $item)
                                         <option value="{{ $item->id_jenjang }}"
                                             {{ old('id_jenjang', $user->id_jenjang) == $item->id_jenjang ? 'selected' : '' }}>
@@ -72,7 +71,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Jabatan</label>
-                                <select name="id_jabatan" class="form-control">
+                                <select name="id_jabatan" class="form-control tom-select">
                                     @foreach ($jabatan as $item)
                                         <option value="{{ $item->id_jabatan }}"
                                             {{ old('id_jabatan', $user->id_jabatan) == $item->id_jabatan ? 'selected' : '' }}>
@@ -83,7 +82,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Angkatan PSP</label>
-                                <select name="id_angkatanpsp" class="form-control">
+                                <select name="id_angkatanpsp" class="form-control tom-select">
                                     @foreach ($angkatanpsp as $item)
                                         <option value="{{ $item->id_angkatanpsp }}"
                                             {{ old('id_angkatanpsp', $user->id_angkatanpsp) == $item->id_angkatanpsp ? 'selected' : '' }}>
@@ -95,7 +94,7 @@
 
                             <div class="form-group">
                                 <label>Divisi</label>
-                                <select name="id_divisi" class="form-control">
+                                <select name="id_divisi" class="form-control tom-select">
                                     @foreach ($divisi as $item)
                                         <option value="{{ $item->id_divisi }}"
                                             {{ old('id_divisi', $user->id_divisi) == $item->id_divisi ? 'selected' : '' }}>
@@ -106,7 +105,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Penempatan</label>
-                                <select name="id_penempatan" class="form-control">
+                                <select name="id_penempatan" class="form-control tom-select">
                                     @foreach ($penempatan as $item)
                                         <option value="{{ $item->id_penempatan }}"
                                             {{ old('id_penempatan', $user->id_penempatan) == $item->id_penempatan ? 'selected' : '' }}>
@@ -116,8 +115,8 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Learning Group</label>
-                                <select name="id_LG" class="form-control">
+                                <label>Direktorat</label>
+                                <select name="id_LG" class="form-control tom-select">
                                     @foreach ($LG as $item)
                                         <option value="{{ $item->id_LG }}"
                                             {{ old('id_LG', $user->id_LG) == $item->id_LG ? 'selected' : '' }}>
@@ -128,7 +127,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Semester</label>
-                                <select name="id_semester" class="form-control">
+                                <select name="id_semester" class="form-control tom-select">
                                     @foreach ($semester as $item)
                                         <option value="{{ $item->id_semester }}"
                                             {{ old('id_semester', $user->id_semester) == $item->id_semester ? 'selected' : '' }}>
@@ -167,7 +166,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Status</label>
-                                <select name="status" class="form-control">
+                                <select name="status" class="form-control tom-select">
                                     <option value="aktif" {{ old('status', $user->status) == 'aktif' ? 'selected' : '' }}>
                                         Aktif</option>
                                     <option value="verify"
@@ -187,3 +186,21 @@
 
     </div>
 @endsection
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi semua elemen dengan class .tom-select
+            document.querySelectorAll('.tom-select').forEach((el) => {
+                new TomSelect(el, {
+                    create: false,
+                    allowEmptyOption: false,
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    }
+                });
+            });
+        });
+    </script>
+@endpush
