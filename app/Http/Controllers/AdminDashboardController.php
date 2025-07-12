@@ -102,7 +102,7 @@ class AdminDashboardController extends Controller
             $LGTotals[] = (int) $data->total;
         }
 
-        $totalPanduan = Panduan::count();
+        $totalPanduan = Panduan::whereYear('created_at', $tahunDipilih)->count();
 
         $rekomendasiData = IdpRekomendasi::whereHas('idp', function ($q) use ($tahunDipilih) {
             $q->whereYear('waktu_mulai', $tahunDipilih);
