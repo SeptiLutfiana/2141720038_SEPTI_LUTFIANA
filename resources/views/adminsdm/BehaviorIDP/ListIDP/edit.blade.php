@@ -14,7 +14,7 @@
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
                     <div class="breadcrumb-item active"><a
-                            href="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}">Data Bank
+                            href="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}">Data Mapping
                             IDP</a></div>
                     <div class="breadcrumb-item">Edit Data IDP</div>
                 </div>
@@ -187,7 +187,13 @@
                             </div>
                         </div>
                         <div class="card-footer text-right">
-                            <button type="submit" class="btn btn-primary">Simpan</button>
+                            <a href="{{ route('adminsdm.BehaviorIDP.ListIDP.indexBankIdp') }}"
+                                class="btn btn-warning mr-2">
+                                <i class="fas fa-arrow-left"></i> Kembali
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                Simpan
+                            </button>
                         </div>
                     </form>
                 </div>

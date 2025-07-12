@@ -207,7 +207,7 @@
                     @foreach ($kom->pengerjaans as $peng)
                         <tr>
                             <td colspan="4" class="text-left">{{ $peng->keterangan_hasil }}</td>
-                            <td class="text-center">{{ $peng->nilaiPengerjaanIdp->rating }}</td>
+                            <td class="text-center">{{ $peng->nilaiPengerjaanIdp->rating ??  '-'}}</td>
                         </tr>
                     @endforeach
                 @endforeach

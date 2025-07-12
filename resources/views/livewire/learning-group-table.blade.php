@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <th class="text-center">No</th>
-                <th class="text-center">Nama Learning Gorup</th>
+                <th class="text-center">Nama Direktorat</th>
                 <th class="text-center">Keterangan</th>
                 <th class="text-center">Aksi</th>
             </tr>

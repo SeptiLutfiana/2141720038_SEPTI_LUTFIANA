@@ -6,6 +6,7 @@
     <!-- CSS Libraries -->
     <link rel="stylesheet" href="{{ asset('library/jqvmap/dist/jqvmap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/css/bootstrap-select.min.css">
 @endpush
 
 @section('main')
@@ -26,9 +27,9 @@
                 </div>
             </div>
             <div style="position: relative;">
-                <form method="GET" action="{{ route('adminsdm.dashboard') }}" class="form-inline mb-4">
-                    <label for="filterTahun" class="mr-2 font-weight-bold">Tahun Periode:</label>
-                    <select name="tahun" id="filterTahun" class="form-control mr-2" style="width: 100px;"
+                <form method="GET" action="{{ route('adminsdm.dashboard') }}" class="form-inline mb-2">
+                    <label for="filterTahun" class="mr-1 font-weight-bold">Tahun Periode:</label>
+                    <select name="tahun" class="selectpicker" data-style="btn-outline-primary"
                         onchange="this.form.submit()">
                         @foreach ($listTahun as $th)
                             <option value="{{ $th }}"
@@ -437,6 +438,7 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/js/bootstrap-select.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

@@ -6,7 +6,7 @@
                 <th>Nama Karyawan</th>
                 {{-- <th>NPK Karyawan</th>
                 <th>Jenjang Karyawan</th> --}}
-                <th>Learning Group</th>
+                <th>Direktorat</th>
                 <th>Proyeksi Karir</th>
                 <th>Nama Mentor</th>
                 <th>Rating Rekomendasi</th>

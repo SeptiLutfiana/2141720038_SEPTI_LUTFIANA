@@ -4,7 +4,7 @@
             <tr>
                 <th class="text-center">No</th>
                 <th class="text-center">Nama Mentor</th>
-                <th class="text-center">Learning Group</th>
+                <th class="text-center">Direktorat</th>
                 <th class="text-center">Penempatan</th>
                 <th class="text-center">Role User</th>
                 <th class="text-center">Aksi</th>

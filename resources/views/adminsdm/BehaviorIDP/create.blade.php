@@ -69,7 +69,7 @@
                                 </div>
                                 {{-- Form Tambahan --}}
                                 <div class="form-group">
-                                    <label for="proyeksi_karir">Proyeksi Karir</label>
+                                    <label for="proyeksi_karir">Proyeksi Karir/ Alasan Proyeksi Karir</label>
                                     <input type="text" name="proyeksi_karir" id="proyeksi_karir"
                                         class="form-control @error('proyeksi_karir') is-invalid @enderror"
                                         value="{{ old('proyeksi_karir') }}">
@@ -94,9 +94,9 @@
                                         </div>
 
                                         <div class="form-group col-md-3">
-                                            <label for="filter-lg">Filter Learning Group</label>
+                                            <label for="filter-lg">Filter Direktorat</label>
                                             <select id="filter-lg" class="tom-select">
-                                                <option value="" selected disabled hidden>Semua Learning Group
+                                                <option value="" selected disabled hidden>Semua Direktorat
                                                 </option>
                                                 @foreach ($listLG as $item)
                                                     <option value="{{ $item->id_LG }}">{{ $item->nama_LG }}</option>

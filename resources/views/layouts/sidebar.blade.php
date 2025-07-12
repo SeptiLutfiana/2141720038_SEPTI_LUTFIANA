@@ -58,19 +58,38 @@
                         <li class="{{ Request::is('admin/datamaster/behavior/idp/create') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/create') }}">Tambah IDP</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/behavior/idp/bank/idp') ? 'active' : '' }}">
+                        <li
+                            class="{{ Request::is('admin/datamaster/behavior/idp/bank/idp') ||
+                            Request::is('admin/datamaster/behavior/idp/*/edit/bank/idp') ||
+                            (Request::is('admin/datamaster/behavior/idp/*/detail') && !Request::is('admin/datamaster/behavior/idp/*/detail/given'))
+                                ? 'active'
+                                : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/bank/idp') }}">Mapping
                                 IDP</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/behavior/idp/given/idp') ? 'active' : '' }}">
+                        <li
+                            class="{{ Request::is('admin/datamaster/behavior/idp/given/idp') ||
+                            Request::is('admin/datamaster/behavior/idp/*/detail/given') ||
+                            Request::is('admin/datamaster/behavior/idp/*/edit')
+                                ? 'active'
+                                : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/given/idp') }}">
                                 List Perencanaan IDP</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/behavior/idp/riwayat/idp') ? 'active' : '' }}">
+                        <li
+                            class="{{ Request::is('admin/datamaster/behavior/idp/riwayat/idp') ||
+                            Request::is('admin/datamaster/behavior/idp/*/riwayat/idp')
+                                ? 'active'
+                                : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/behavior/idp/riwayat/idp') }}">Riwayat
                                 Perencanaan IDP</a>
                         </li>
-                        <li class="{{ Request::is('admin/datamaster/panduan/idp') ? 'active' : '' }}">
+                        <li
+                            class="{{ Request::is('admin/datamaster/panduan/idp') ||
+                            Request::is('admin/datamaster/panduan/idp/*/edit') ||
+                            Request::is('admin/datamaster/panduan/idp/*/detail')
+                                ? 'active'
+                                : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/panduan/idp') }}">Panduan</a>
                         </li>
                     </ul>

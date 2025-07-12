@@ -138,7 +138,7 @@ class PanduanController extends Controller
         // Ambil panduan pertama yang ditujukan untuk role karyawan
         $panduan = Panduan::whereHas('roles', function ($query) {
             $query->where('nama_role', 'karyawan');
-        })->first();
+        })->latest()->first();
 
         if (!$panduan) {
             return view('karyawan.Panduan.kosong'); // bisa isi dengan "Panduan belum tersedia"
@@ -163,7 +163,7 @@ class PanduanController extends Controller
         // Ambil panduan pertama yang ditujukan untuk role karyawan
         $panduan = Panduan::whereHas('roles', function ($query) {
             $query->where('nama_role', 'mentor');
-        })->first();
+        })->latest()->first();
         return view('mentor.Panduan.index', [
             'panduan' => $panduan,
             'type_menu' => 'mentor',
@@ -183,7 +183,7 @@ class PanduanController extends Controller
         // Ambil panduan pertama yang ditujukan untuk role karyawan
         $panduan = Panduan::whereHas('roles', function ($query) {
             $query->where('nama_role', 'supervisor');
-        })->first();
+        })->latest()->first();
         return view('supervisor.Panduan.index', [
             'panduan' => $panduan,
             'type_menu' => 'supervisor',

@@ -5,7 +5,7 @@
                 <th class="text-center">No</th>
                 <th class="text-center">Proyeksi Karir</th>
                 <th class="text-center">Sasaran Jenjang</th>
-                <th class="text-center">Learning Group</th>
+                <th class="text-center">Direktorat</th>
                 <th class="text-center">Nama Supervisor</th>
                 <th class="text-center">Kuota IDP</th>
                 <th class="text-center">Jumlah Karyawan</th>
