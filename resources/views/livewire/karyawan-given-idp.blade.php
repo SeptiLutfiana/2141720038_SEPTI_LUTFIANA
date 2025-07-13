@@ -81,31 +81,34 @@
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Aksi
                                 </button>
-                                <div class="dropdown-menu dropdown-menu-right p-1" style="min-width: 120px; width: 120px;">
-    @if (
-        // Cek jika status pengajuan IDP tidak disetujui
-        $item->status_pengajuan_idp !== 'Tidak Disetujui' && 
-        (
-            // Status mentor 'Disetujui' dan pengajuan IDP 'Revisi' atau kondisi lainnya
-            ($item->status_pengajuan_idp === 'Revisi' && $item->status_approval_mentor === 'Disetujui') ||
-            ($item->status_pengajuan_idp === 'Tidak Disetujui' && $item->status_approval_mentor === 'Ditolak') ||
-            ($item->status_pengajuan_idp === 'Tidak Disetujui' && $item->status_approval_mentor === 'Disetujui') ||
-            $item->status_approval_mentor === 'Ditolak'
-        ))
-        <a class="dropdown-item d-flex align-items-center py-1" href="{{ route('karyawan.IDP.editIdp', $item->id_idp) }}">
-            <i class="fas fa-edit text-warning mr-2" style="width: 18px;"></i> Edit
-        </a>
-    @elseif ($item->status_pengajuan_idp === 'Disetujui' && $item->status_approval_mentor === 'Disetujui')
-        <a class="dropdown-item d-flex align-items-center py-1" href="{{ route('karyawan.IDP.showKaryawan', ['id' => $item->id_idp, 'pengerjaan' => $item->id_pengerjaan ?? '']) }}">
-            <i class="fas fa-external-link-alt text-primary mr-2" style="width: 18px;"></i> Kerjakan
-        </a>
-    @endif
+                                <div class="dropdown-menu dropdown-menu-right p-1"
+                                    style="min-width: 120px; width: 120px;">
+                                    @if (
+                                        // Cek jika status pengajuan IDP tidak disetujui
+                                        $item->status_pengajuan_idp !== 'Tidak Disetujui' &&
+                                            // Status mentor 'Disetujui' dan pengajuan IDP 'Revisi' atau kondisi lainnya
+                                            (($item->status_pengajuan_idp === 'Revisi' && $item->status_approval_mentor === 'Disetujui') ||
+                                                ($item->status_pengajuan_idp === 'Tidak Disetujui' && $item->status_approval_mentor === 'Ditolak') ||
+                                                ($item->status_pengajuan_idp === 'Tidak Disetujui' && $item->status_approval_mentor === 'Disetujui') ||
+                                                $item->status_approval_mentor === 'Ditolak'))
+                                        <a class="dropdown-item d-flex align-items-center py-1"
+                                            href="{{ route('karyawan.IDP.editIdp', $item->id_idp) }}">
+                                            <i class="fas fa-edit text-warning mr-2" style="width: 18px;"></i> Edit
+                                        </a>
+                                    @elseif ($item->status_pengajuan_idp === 'Disetujui' && $item->status_approval_mentor === 'Disetujui')
+                                        <a class="dropdown-item d-flex align-items-center py-1"
+                                            href="{{ route('karyawan.IDP.showKaryawan', ['id' => $item->id_idp, 'pengerjaan' => $item->id_pengerjaan ?? '']) }}">
+                                            <i class="fas fa-external-link-alt text-primary mr-2"
+                                                style="width: 18px;"></i> Kerjakan
+                                        </a>
+                                    @endif
 
-    <!-- Selalu tampilkan tombol Detail, kecuali jika status pengajuan IDP adalah 'Tidak Disetujui' -->
-    <a class="dropdown-item d-flex align-items-center py-1" href="{{ route('karyawan.IDP.detailKaryawan', $item->id_idp) }}">
-        <i class="fas fa-eye text-info mr-2" style="width: 18px;"></i> Detail
-    </a>
-</div>
+                                    <!-- Selalu tampilkan tombol Detail, kecuali jika status pengajuan IDP adalah 'Tidak Disetujui' -->
+                                    <a class="dropdown-item d-flex align-items-center py-1"
+                                        href="{{ route('karyawan.IDP.detailKaryawan', $item->id_idp) }}">
+                                        <i class="fas fa-eye text-info mr-2" style="width: 18px;"></i> Detail
+                                    </a>
+                                </div>
 
                             </div>
                         </td>

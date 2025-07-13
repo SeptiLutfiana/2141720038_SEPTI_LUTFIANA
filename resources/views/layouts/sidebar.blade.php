@@ -293,14 +293,24 @@
                     <li class="{{ Request::is('karyawan/behavior/idp/bank-id*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ url('karyawan/behavior/idp/bank-idp') }}">Mapping IDP</a>
                     </li>
-                    <li class="{{ Request::is('karyawan/behavior/idp') ? 'active' : '' }}">
+                    <li
+                        class="{{ Request::is('karyawan/behavior/idp') ||
+                        Request::is('karyawan/behavior/idp/*/edit') ||
+                        Request::is('karyawan/behavior/idp/*/detail/idp')
+                            ? 'active'
+                            : '' }}">
                         <a class="nav-link" href="{{ url('karyawan/behavior/idp') }}">List Perencanaan IDP</a>
                     </li>
-                    <li class="{{ Request::is('karyawan/behavior/idp/progres') ? 'active' : '' }}">
+                    <li
+                        class="{{ Request::is('karyawan/behavior/idp/progres') ||
+                        (Request::is('karyawan/behavior/idp/*/detail') && request()->has('pengerjaan'))
+                            ? 'active'
+                            : '' }}">
                         <a class="nav-link" href="{{ url('karyawan/behavior/idp/progres') }}">Progres Perencanaan
                             IDP</a>
                     </li>
-                    <li class="{{ Request::is('karyawan/behavior/idp/riwayat') ? 'active' : '' }}">
+                    <li
+                        class="{{ Request::is('karyawan/behavior/idp/riwayat') || Request::is('karyawan/behavior/idp/*/riwayat') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ url('karyawan/behavior/idp/riwayat') }}">Riwayat Perencanaan
                             IDP</a>
                     </li>
@@ -314,10 +324,16 @@
                 <a href="#" class="nav-link has-dropdown"><i class="fas fa-poll"></i>
                     <span>Evaluasi</span></a>
                 <ul class="dropdown-menu">
-                    <li class="{{ Request::is('karyawan/evaluasi/onboarding/idp') ? 'active' : '' }}">
+                    <li
+                        class="{{ Request::is('karyawan/evaluasi/onboarding/idp') || Request::is('karyawan/evaluasi/onboarding/detail/*')
+                            ? 'active'
+                            : '' }}">
                         <a href="{{ url('karyawan/evaluasi/onboarding/idp') }}">Evaluasi On Boarding</a>
                     </li>
-                    <li class="{{ Request::is('karyawan/bank/evaluasi/idp') ? 'active' : '' }}">
+                    <li
+                        class="{{ Request::is('karyawan/bank/evaluasi/idp') || Request::is('karyawan/bank/evaluasi/idp/create')
+                            ? 'active'
+                            : '' }}">
                         <a href="{{ url('karyawan/bank/evaluasi/idp') }}">Evaluasi Pasca IDP</a>
                     </li>
                 </ul>
