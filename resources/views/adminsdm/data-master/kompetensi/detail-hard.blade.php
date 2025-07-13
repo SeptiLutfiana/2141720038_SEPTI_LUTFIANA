@@ -13,7 +13,7 @@
                 <h1>Detail Kompetensi</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.kompetensi.index') }}">Data Kompetensi</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.kompetensi.indexHard') }}">Data Kompetensi</a></div>
                     <div class="breadcrumb-item">Detail Kompetensi</div>
                 </div>
             </div>
@@ -46,7 +46,7 @@
                                 </div>
                             </div>
                             <div class="card-footer text-right">
-                                <a class="btn btn-primary float-right" href="{{ route('adminsdm.data-master.kompetensi.index') }}">Kembali</a>
+                                <a class="btn btn-primary float-right" href="{{ route('adminsdm.data-master.kompetensi.indexHard') }}">Kembali</a>
                             </div>
                         </div>
                     </div>

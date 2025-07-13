@@ -3,7 +3,7 @@
 @section('title', 'Halaman Edit Kompetensi')
 
 @push('style')
-    <link rel="stylesheet" href="{{ asset('library/select2/dist/css/select2.min.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 @endpush
 
 @section('main')
@@ -53,7 +53,7 @@
                             <div class="form-group">
                                 <label>Nama Kompetensi</label>
                                 <input type="text" name="nama_kompetensi"
-                                    class="form-control @if (old('nama_kompetensi')) is-valid @endif @error('nama_kompetensi') is-invalid @enderror"
+                                    class="form-control tom-select @if (old('nama_kompetensi')) is-valid @endif @error('nama_kompetensi') is-invalid @enderror"
                                     value="{{ old('nama_kompetensi', $kompetensi->nama_kompetensi) }}">
                             </div>
 
@@ -61,7 +61,7 @@
                                 <div class="form-group">
                                     <label>Jenjang</label>
                                     <select name="id_jenjang"
-                                        class="form-control select2 @error('id_jenjang') is-invalid @enderror">
+                                        class="tom-select @error('id_jenjang') is-invalid @enderror">
                                         <option value="">-- Pilih Jenjang --</option>
                                         @foreach ($jenjang as $j)
                                             <option value="{{ $j->id_jenjang }}"
@@ -75,7 +75,7 @@
                                 <div class="form-group">
                                     <label>Jabatan</label>
                                     <select name="id_jabatan"
-                                        class="form-control select2 @error('id_jabatan') is-invalid @enderror">
+                                        class="tom-select @error('id_jabatan') is-invalid @enderror">
                                         <option value="">-- Pilih Jabatan --</option>
                                         @foreach ($jabatan as $jbt)
                                             <option value="{{ $jbt->id_jabatan }}"
@@ -111,40 +111,64 @@
     </div>
 @endsection
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('select[name="id_jenjang"]').on('change', function() {
-                var jenjangId = $(this).val();
-                var $jabatanSelect = $('select[name="id_jabatan"]');
-                $jabatanSelect.html('<option>Loading...</option>');
+        document.addEventListener('DOMContentLoaded', function() {
+            new TomSelect('select[name="id_jenjang"]');
+            var jabatanSelect = new TomSelect('select[name="id_jabatan"]');
+
+            // Update jabatan saat jenjang berubah
+            document.querySelector('select[name="id_jenjang"]').addEventListener('change', function() {
+                var jenjangId = this.value;
+                jabatanSelect.clearOptions();
+                jabatanSelect.addOption({
+                    value: '',
+                    text: 'Loading...'
+                });
+                jabatanSelect.refreshOptions(false);
 
                 if (jenjangId) {
-                    $.ajax({
-                        url: '/admin/datamaster/kompetensi/get-jabatan-by-jenjang/' + jenjangId,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function(data) {
-                            $jabatanSelect.empty();
-                            $jabatanSelect.append(
-                                '<option value="">-- Pilih Jabatan --</option>');
-                            $.each(data, function(key, value) {
-                                $jabatanSelect.append('<option value="' + value
-                                    .id_jabatan + '">' + value.nama_jabatan +
-                                    '</option>');
+                    fetch(`/admin/datamaster/kompetensi/get-jabatan-by-jenjang/${jenjangId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            jabatanSelect.clearOptions();
+                            jabatanSelect.addOption({
+                                value: '',
+                                text: '-- Pilih Jabatan --'
                             });
-                        },
-                        error: function() {
-                            $jabatanSelect.html(
-                                '<option value="">-- Gagal memuat jabatan --</option>');
-                        }
-                    });
+                            data.forEach(function(item) {
+                                jabatanSelect.addOption({
+                                    value: item.id_jabatan,
+                                    text: item.nama_jabatan
+                                });
+                            });
+                            jabatanSelect.refreshOptions(false);
+
+                            // Set selected value setelah load
+                            const oldJabatan = @json(old('id_jabatan', $kompetensi->id_jabatan));
+                            if (oldJabatan) {
+                                jabatanSelect.setValue(oldJabatan);
+                            }
+                        }).catch(() => {
+                            jabatanSelect.clearOptions();
+                            jabatanSelect.addOption({
+                                value: '',
+                                text: '-- Gagal memuat jabatan --'
+                            });
+                            jabatanSelect.refreshOptions(false);
+                        });
                 } else {
-                    $jabatanSelect.html('<option value="">-- Pilih Jenjang terlebih dahulu --</option>');
+                    jabatanSelect.clearOptions();
+                    jabatanSelect.addOption({
+                        value: '',
+                        text: '-- Pilih Jenjang terlebih dahulu --'
+                    });
+                    jabatanSelect.refreshOptions(false);
                 }
             });
 
-            // Trigger change on page load agar dropdown jabatan terisi sesuai jenjang yg sudah dipilih
-            $('select[name="id_jenjang"]').trigger('change');
+            // Trigger agar jabatan langsung termuat saat halaman dibuka
+            document.querySelector('select[name="id_jenjang"]').dispatchEvent(new Event('change'));
         });
     </script>
 @endpush

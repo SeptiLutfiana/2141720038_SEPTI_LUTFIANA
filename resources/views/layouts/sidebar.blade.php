@@ -132,13 +132,23 @@
                     <a href="#" class="nav-link has-dropdown"><i class="far fa-file-alt"></i> <span>Data
                             Kompetensi</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('admin/datamaster/kompetensi/soft') ? 'active' : '' }}">
+                        <li
+                            class="{{ Request::is('admin/datamaster/kompetensi/soft') ||
+                            (Request::is('admin/datamaster/kompetensi/*/edit') && request()->query('from') == 'soft') ||
+                            Request::is('admin/datamaster/kompetensi/*/detail/soft')
+                                ? 'active'
+                                : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/kompetensi/soft') }}">Soft
                                 Kompetensi</a>
                         </li>
                     </ul>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('admin/datamaster/kompetensi/hard') ? 'active' : '' }}">
+                        <li
+                            class="{{ Request::is('admin/datamaster/kompetensi/hard') ||
+                            (Request::is('admin/datamaster/kompetensi/*/edit') && request()->query('from') == 'hard') ||
+                            Request::is('admin/datamaster/kompetensi/*/detail/hard')
+                                ? 'active'
+                                : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/kompetensi/hard') }}">Hard
                                 Kompetensi</a>
                         </li>
@@ -154,7 +164,7 @@
                     <a href="#" class="nav-link has-dropdown"><i class="fas fa-tasks"></i> <span>Data
                             IDP</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('admin/datamaster/metode/belajar') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/metode/belajar*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/metode/belajar') }}">Metode Belajar</a>
                         </li>
                     </ul>
@@ -163,7 +173,7 @@
                     <a href="#" class="nav-link has-dropdown"><i class="fas fa-user-tie"></i> <span>Data
                             Supervisor</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('admin/datamaster/supervisor') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/supervisor*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/supervisor') }}">Supervisor</a>
                         </li>
                     </ul>
@@ -173,7 +183,7 @@
                         <span>Data
                             Mentor</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('admin/datamaster/mentor') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/mentor*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/mentor') }}">Mentor</a>
                         </li>
                     </ul>
@@ -182,12 +192,14 @@
                     <a href="#" class="nav-link has-dropdown"><i class="fas fa-clipboard-check"></i> <span>Data
                             Evaluasi</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('admin/datamaster/bank/evaluasi') ? 'active' : '' }}">
+                        <li
+                            class="{{ Request::is('admin/datamaster/bank/evaluasi') || Request::is('admin/datamaster/bank/evaluasi/*/edit') || Request::is('admin/datamaster/bank/evaluasi/*/detail') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/bank/evaluasi') }}">Bank Evaluasi</a>
                         </li>
                     </ul>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('admin/datamaster/bank/evaluasi/pasca/idp') ? 'active' : '' }}">
+                        <li
+                            class="{{ Request::is('admin/datamaster/bank/evaluasi/pasca/idp*') || Request::is('admin/datamaster/bank/evaluasi/*/detail/jawaban') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/bank/evaluasi/pasca/idp') }}">Evaluasi
                                 Pasca IDP</a>
                         </li>

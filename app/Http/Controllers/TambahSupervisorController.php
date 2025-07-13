@@ -39,19 +39,33 @@ class TambahSupervisorController extends Controller
 
     public function create()
     {
+        // Ambil ID masing-masing role sesuai nama yang benar
+        $idSupervisor = Role::where('nama_role', 'Supervisor')->value('id_role');
+        $idMentor = Role::where('nama_role', 'Mentor')->value('id_role');
+        $idAdmin = Role::where('nama_role', 'Admin SDM')->value('id_role');
 
-        $role = Role::where('nama_role', 'supervisor')->first();
+        // Pastikan semua ID ditemukan
+        if (!$idSupervisor || !$idMentor || !$idAdmin) {
+            return back()->with('error', 'Data role belum lengkap. Pastikan ada role Supervisor, Mentor, dan Admin SDM di tabel roles.');
+        }
 
+        // Ambil semua user ID yang sudah memiliki salah satu role yang dilarang
+        $excludedUserIds = UserRole::whereIn('id_role', [
+            $idSupervisor,
+            $idMentor,
+            $idAdmin
+        ])->pluck('id_user')->unique();
 
-        $existingSupervisorIds = UserRole::where('id_role', $role->id_role)->pluck('id_user');
-
-        $supervisor = User::whereNotIn('id', $existingSupervisorIds)
+        // Ambil user yang belum punya role tersebut dan usertype-nya 'karyawan'
+        $users = User::where('id_role', '4')
+            ->whereNotIn('id', $excludedUserIds)
             ->orderBy('name')
+            ->with(['jenjang', 'jabatan', 'divisi', 'penempatan', 'learninggroup']) // jika perlu di dropdown
             ->get();
 
         return view('adminsdm.data-master.supervisor.create', [
             'type_menu' => 'supervisor',
-            'supervisor' => $supervisor,
+            'supervisor' => $users, // Calon supervisor
         ]);
     }
 

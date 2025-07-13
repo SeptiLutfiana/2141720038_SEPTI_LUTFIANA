@@ -23,11 +23,6 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="form-group col-12">
-                                    <label>Id Semester</label>
-                                    <input readonly type="text" class="form-control"
-                                        value="{{ $semester->id_semester }}">
-                                </div>
-                                <div class="form-group col-12">
                                     <label>Nama</label>
                                     <input readonly type="text" class="form-control" value="{{ $semester->nama_semester }}">
                                 </div>

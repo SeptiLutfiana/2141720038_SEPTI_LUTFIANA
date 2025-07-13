@@ -17,93 +17,107 @@ class TambahMentorController extends Controller
     public function index(Request $request)
     {
         $search = $request->query('search');
-    
+
         $mentor = UserRole::with('user') // eager load user
-                        ->where('id_role', 3) // hanya yang berperan sebagai mentor
-                        ->when($search, function ($query, $search) {
-                            $query->whereHas('user', function ($q) use ($search) {
-                                $q->where('name', 'like', "%$search%")
-                                  ->orWhere('npk', 'like', "%$search%");
-                            });
-                        })
-                        ->orderByDesc('id') // bisa juga berdasarkan user.name kalau perlu join
-                        ->paginate(10)
-                        ->withQueryString();
-    
+            ->where('id_role', 3) // hanya yang berperan sebagai mentor
+            ->when($search, function ($query, $search) {
+                $query->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                        ->orWhere('npk', 'like', "%$search%");
+                });
+            })
+            ->orderByDesc('id') // bisa juga berdasarkan user.name kalau perlu join
+            ->paginate(10)
+            ->withQueryString();
+
         return view('adminsdm.data-master.mentor.index', [
             'type_menu' => 'mentor',
             'mentor' => $mentor,
             'search' => $search,
         ]);
     }
-    
+
     public function create()
     {
-        // Ambil role 'mentor' dari tabel roles
-        $role = Role::where('nama_role', 'mentor')->first();
-    
-        // Ambil semua user yang belum memiliki role sebagai mentor
-        $existingMentorIds = UserRole::where('id_role', $role->id_role)->pluck('id_user');
-        
-        $mentor = User::whereNotIn('id', $existingMentorIds)
-                      ->orderBy('name')
-                      ->get();
-    
+        // Ambil ID masing-masing role berdasarkan nama yang sesuai di tabel
+        $idMentor = Role::where('nama_role', 'Mentor')->value('id_role');
+        $idSupervisor = Role::where('nama_role', 'Supervisor')->value('id_role');
+        $idAdmin = Role::where('nama_role', 'Admin SDM')->value('id_role');
+
+        // Validasi jika salah satu role tidak ditemukan
+        if (!$idMentor || !$idSupervisor || !$idAdmin) {
+            return back()->with('error', 'Data role belum lengkap. Pastikan ada role Mentor, Supervisor, dan Admin SDM di tabel roles.');
+        }
+
+        // Ambil semua user ID yang sudah punya salah satu dari role ini
+        $excludedUserIds = UserRole::whereIn('id_role', [
+            $idMentor,
+            $idSupervisor,
+            $idAdmin
+        ])->pluck('id_user')->unique();
+
+        // Ambil user yang belum punya role tersebut
+        $users = User::whereNotIn('id', $excludedUserIds)
+            ->orderBy('name')
+            ->with(['jenjang', 'jabatan', 'divisi', 'penempatan', 'learninggroup']) // kalau ingin ditampilkan di tom-select
+            ->get();
+
         return view('adminsdm.data-master.mentor.create', [
             'type_menu' => 'mentor',
-            'mentor' => $mentor,
+            'mentor' => $users, // Calon mentor yang belum jadi apa-apa
         ]);
     }
-    
+
+
     public function store(Request $request)
     {
         $request->validate([
             'id_user' => 'required|exists:users,id', // Memastikan id_user ada di tabel users
         ]);
-    
+
         // Cek apakah user sudah menjadi mentor
         $mentor = UserRole::where('id_user', $request->id_user)
-                          ->where('id_role', 3) // Pastikan id_role yang digunakan adalah 3
-                          ->first();
-    
+            ->where('id_role', 3) // Pastikan id_role yang digunakan adalah 3
+            ->first();
+
         if ($mentor) {
             return back()->with('error', 'User ini sudah menjadi mentor.');
         }
-    
+
         // Tambahkan role mentor
         UserRole::create([
             'id_user' => $request->id_user,
             'id_role' => 3, // Role ID untuk mentor
         ]);
-    
-        return redirect()->route('adminsdm.data-master.mentor.index')->with('success', 'Mentor berhasil ditambahkan.');
+
+        return redirect()->route('adminsdm.data-master.mentor.index')->with('msg-success', 'Mentor berhasil ditambahkan.');
     }
-    
+
     public function show($id)
     {
         $mentor = UserRole::with('user', 'role')
-                          ->where('id_user', $id) // Gunakan id_user, bukan id
-                          ->where('id_role', 3) // Pastikan menggunakan id_role
-                          ->firstOrFail();
-    
+            ->where('id_user', $id) // Gunakan id_user, bukan id
+            ->where('id_role', 3) // Pastikan menggunakan id_role
+            ->firstOrFail();
+
         return view('adminsdm.data-master.mentor.detail', [
             'mentor' => $mentor,
             'type_menu' => 'mentor',
         ]);
     }
-    
-    
+
+
     public function destroy($id)
     {
         $mentor = UserRole::where('id_user', $id)
-                    ->where('id_role', 3) // Role ID untuk mentor
-                    ->firstOrFail();
-    
+            ->where('id_role', 3) // Role ID untuk mentor
+            ->firstOrFail();
+
         $mentor->delete();
-    
-        return redirect()->route('adminsdm.data-master.mentor.index')->with('success', 'Mentor berhasil dihapus: ' . $mentor->user->name);
+
+        return redirect()->route('adminsdm.data-master.mentor.index')->with('msg-success', 'Mentor berhasil dihapus: ' . $mentor->user->name);
     }
-     public function printPDF()
+    public function printPDF()
     {
         $mentor = UserRole::with('user')
             ->where('id_role', 3)
@@ -163,5 +177,4 @@ class TambahMentorController extends Controller
 
         return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
-    
 }

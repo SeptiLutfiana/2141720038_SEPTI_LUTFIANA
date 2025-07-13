@@ -23,11 +23,6 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="form-group col-12">
-                                    <label>Id Angkatan PSP</label>
-                                    <input readonly type="text" class="form-control"
-                                        value="{{ $angkatanpsp->id_angkatanpsp }}">
-                                </div>
-                                <div class="form-group col-12">
                                     <label>Bulan</label>
                                     <input readonly type="text" class="form-control" value="{{ $angkatanpsp->bulan }}">
                                 </div>

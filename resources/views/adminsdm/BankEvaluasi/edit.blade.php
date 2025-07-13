@@ -41,17 +41,10 @@
                         <div class="card-body">
 
                             <div class="form-group">
-                                <label for="jenis_evaluasi">Jenis Evaluasi</label>
-                                <select name="jenis_evaluasi" id="jenis_evaluasi" class="form-control" required>
-                                    <option value="">-- Pilih Jenis Evaluasi --</option>
-                                    <option value="onboarding"
-                                        {{ $bankEvaluasi->jenis_evaluasi == 'onboarding' ? 'selected' : '' }}>Onboarding
-                                    </option>
-                                    <option value="pasca" {{ $bankEvaluasi->jenis_evaluasi == 'pasca' ? 'selected' : '' }}>
-                                        Pasca</option>
-                                </select>
+                                <label>Jenis Evaluasi</label>
+                                <input type="hidden" name="jenis_evaluasi" value="pasca">
+                                <input type="text" class="form-control" value="Pasca" disabled>
                             </div>
-
                             <div class="form-group">
                                 <label for="untuk_role">Pertanyaan Untuk Role</label>
                                 <select name="untuk_role" id="untuk_role" class="form-control" required>
@@ -73,8 +66,8 @@
                                     <option value="likert"
                                         {{ $bankEvaluasi->tipe_pertanyaan == 'likert' ? 'selected' : '' }}>Likert (Skala)
                                     </option>
-                                    <option value="esai"
-                                        {{ $bankEvaluasi->tipe_pertanyaan == 'esai' ? 'selected' : '' }}>Esai</option>
+                                    <option value="esai" {{ $bankEvaluasi->tipe_pertanyaan == 'esai' ? 'selected' : '' }}>
+                                        Esai</option>
                                 </select>
                             </div>
 
