@@ -36,6 +36,35 @@
                         </div>
                     </div>
                 @endif
+                @if (session('failures'))
+                    <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                        <strong>Gagal mengimpor beberapa baris:</strong>
+                        <ul>
+                            @foreach (session('failures') as $failure)
+                                <li>
+                                    Baris {{ $failure->row() }}:
+                                    @foreach ($failure->errors() as $error)
+                                        {{ $error }}@if (!$loop->last)
+                                            ,
+                                        @endif
+                                    @endforeach
+                                </li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                @endif
+
+                @if (session('msg-error'))
+                    <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+                        {{ session('msg-error') }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                @endif
                 <div class="card">
                     <div class="card-header">
                         <h4>Tambah Data Karyawan</h4>
@@ -211,10 +240,11 @@
                                         accept=".xlsx,.csv">
                                     <small class="form-text text-muted">
                                         Jenis file yang diperbolehkan: <strong>.xlsx</strong>, <strong>.csv</strong>. Ukuran
-                                        maksimal: <strong>10MB</strong>.
+                                        maksimal: <strong>0.5MB</strong>.
                                         <br>
                                         Format Tabel: <strong>no</strong>, <strong>role</strong>, <strong>jenjang</strong>,
-                                        <strong>jabatan</strong>, <strong>angkatanpsp</strong>, <strong>divisi</strong>,
+                                        <strong>jabatan</strong>, <strong>bulan_angkatanpsp</strong>, <strong>tahun_angkatanpsp</strong>,
+                                         <strong>divisi</strong>,
                                         <strong>penempatan</strong>, <strong>lg</strong>,
                                         <strong>semester</strong>,<strong>npk</strong>,
                                         <strong>no_hp</strong>, <strong>name</strong>, <strong>email</strong>,

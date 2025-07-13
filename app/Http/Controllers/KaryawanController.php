@@ -162,23 +162,34 @@ class KaryawanController extends Controller
 
         // Validasi file upload (CSV atau XLSX dengan ukuran maksimal 10MB)
         $request->validate([
-            'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maksimal 10MB
+            'file_import' => 'required|mimes:xlsx,csv|max:512', // Maksimal 10MB
         ], [
             'file_import.required' => 'File harus diupload.',
             'file_import.mimes' => 'File harus berformat .xlsx atau .csv.',
-            'file_import.max' => 'Ukuran file maksimal 10MB.',
+            'file_import.max' => 'Ukuran file maksimal 0.5MB.',
         ]);
 
         try {
             // Proses impor data dari file (gunakan paket Laravel Excel)
-            Excel::import(new UserImport, $request->file('file_import'));
+            $import = new UserImport;
+            Excel::import($import, $request->file('file_import'));
+            $berhasil = $import->baris_berhasil;
+            if (count($import->failures()) > 0) {
+                return redirect()->back()
+                    ->with('failures', $import->failures())
+                    ->with('msg-error', "$berhasil baris berhasil diimpor. " . count($import->failures()) . " baris gagal diimpor. Periksa kembali format atau duplikat NPK/Email.");
+            }
+            // CEK APAKAH TIDAK ADA YANG BERHASIL MASUK
+            if ($import->baris_berhasil === 0) {
+                return redirect()->back()
+                    ->with('msg-error', 'Tidak ada data yang berhasil diimpor. Pastikan format dan isinya sudah benar.');
+            }
 
-            // Redirect ke halaman Data dengan pesan sukses
             return redirect()->route('adminsdm.data-master.karyawan.data-karyawan.index')
-                ->with('msg-success', 'Berhasil mengimpor data karyawan dari file.');
+                ->with('msg-success', 'Berhasil mengimpor ' . $import->baris_berhasil . ' data karyawan dari file.');
         } catch (\Exception $e) {
             // Jika ada error saat mengimpor, tangani dan tampilkan pesan error
-            return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
+            return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file');
         }
 
 
