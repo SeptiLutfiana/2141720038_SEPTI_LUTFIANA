@@ -213,12 +213,14 @@
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                         class="fas fa-columns"></i> <span>Behavior IDP</span></a>
                 <ul class="dropdown-menu">
-                    <li class="{{ Request::is('supervisor/behavior/idp') ? 'active' : '' }}">
+                    <li
+                        class="{{ Request::is('supervisor/behavior/idp') || Request::is('supervisor/behavior/idp/detail/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ url('supervisor/behavior/idp') }}">List Perencanaan IDP</a>
                     </li>
-                    <li class="{{ Request::is('supervisor/behavior/idp/riwayat') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ url('supervisor/behavior/idp/riwayat') }}">Riwayat
-                            Perencanaan IDP</a>
+                    <li
+                        class="{{ Request::is('supervisor/behavior/idp/riwayat') || Request::is('supervisor/behavior/idp/*/riwayat') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ url('supervisor/behavior/idp/riwayat') }}">Riwayat Perencanaan
+                            IDP</a>
                     </li>
                     <li class="{{ Request::is('supervisor/panduan/idp') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ url('supervisor/panduan/idp') }}">Panduan</a>
@@ -230,7 +232,8 @@
                 <a href="#" class="nav-link has-dropdown"><i class="fas fa-poll"></i>
                     <span>Evaluasi</span></a>
                 <ul class="dropdown-menu">
-                    <li class="{{ Request::is('supervisor/evaluasi/idp') ? 'active' : '' }}">
+                    <li
+                        class="{{ Request::is('supervisor/evaluasi/idp') || Request::is('supervisor/evaluasi/idp/create') ? 'active' : '' }}">
                         <a href="{{ url('supervisor/evaluasi/idp') }}">Evaluasi Pasca IDP</a>
                     </li>
                 </ul>
