@@ -246,10 +246,17 @@
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i
                         class="fas fa-columns"></i> <span>Behavior IDP</span></a>
                 <ul class="dropdown-menu">
-                    <li class="{{ Request::is('mentor/behavior/idp') ? 'active' : '' }}">
+                    <li
+                        class="{{ Request::is('mentor/behavior/idp') ||
+                        Request::is('mentor/behavior/idp/detail/*') ||
+                        Request::is('mentor/behavior/idp/verifikasi/*') ||
+                        Request::is('mentor/behavior/idp/penilaian/idp/*')
+                            ? 'active'
+                            : '' }}">
                         <a class="nav-link" href="{{ url('mentor/behavior/idp') }}">List Perencanaan IDP</a>
                     </li>
-                    <li class="{{ Request::is('mentor/behavior/idp/riwayat') ? 'active' : '' }}">
+                    <li
+                        class="{{ Request::is('mentor/behavior/idp/riwayat') || Request::is('mentor/behavior/idp/*/riwayat') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ url('mentor/behavior/idp/riwayat') }}">Riwayat Perencanaan
                             IDP</a>
                     </li>
@@ -263,10 +270,12 @@
                 <a href="#" class="nav-link has-dropdown"><i class="fas fa-poll"></i>
                     <span>Evaluasi</span></a>
                 <ul class="dropdown-menu">
-                    <li class="{{ Request::is('mentor/evaluasi/onboarding/idp') ? 'active' : '' }}">
+                    <li
+                        class="{{ Request::is('mentor/evaluasi/onboarding/idp') || Request::is('mentor/evaluasi/onboarding/idp/create') ? 'active' : '' }}">
                         <a href="{{ url('mentor/evaluasi/onboarding/idp') }}">Evaluasi Onboarding</a>
                     </li>
-                    <li class="{{ Request::is('mentor/bank/evaluasi/idp') ? 'active' : '' }}">
+                    <li
+                        class="{{ Request::is('mentor/bank/evaluasi/idp') || Request::is('mentor/bank/evaluasi/idp/create') ? 'active' : '' }}">
                         <a href="{{ url('mentor/bank/evaluasi/idp') }}">Evaluasi Pasca IDP</a>
                     </li>
                 </ul>
