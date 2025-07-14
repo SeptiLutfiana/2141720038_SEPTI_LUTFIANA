@@ -3,21 +3,56 @@
 namespace App\Imports;
 
 use App\Models\Jenjang;
-use Maatwebsite\Excel\Concerns\ToModel;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Row;
 use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Row;
 
 class JenjangImport implements OnEachRow, WithHeadingRow
 {
+    public int $barisBerhasil = 0;
+    public array $duplikat = [];
+    public bool $headerValid = true;
+
     public function onRow(Row $row)
     {
-        $row = $row->toArray();
+        $data = $row->toArray();
+        $baris = $row->getIndex();
 
-        // Ambil data, abaikan kolom 'no'
+        // ✅ Cek header hanya sekali
+        static $isHeaderChecked = false;
+        if (!$isHeaderChecked) {
+            $expected = ['nama_jenjang', 'keterangan'];
+            $actual = array_keys($data);
+            $missing = array_diff($expected, $actual);
+
+            if (!empty($missing)) {
+                $this->headerValid = false;
+                Log::error("Header tidak sesuai. Kolom hilang: " . implode(', ', $missing));
+                return;
+            }
+            $isHeaderChecked = true;
+        }
+
+        if (!$this->headerValid) {
+            return;
+        }
+
+        if (empty($data['nama_jenjang'])) {
+            $this->duplikat[] = "Baris $baris: Kolom 'nama_jenjang' kosong.";
+            return;
+        }
+
+        if (Jenjang::where('nama_jenjang', $data['nama_jenjang'])->exists()) {
+            $this->duplikat[] = "Baris $baris: Jenjang '{$data['nama_jenjang']}' sudah ada.";
+            return;
+        }
+
         Jenjang::create([
-            'nama_jenjang' => $row['nama_jenjang'] ?? '',
-            'keterangan'  => $row['keterangan'] ?? '',
+            'nama_jenjang' => $data['nama_jenjang'],
+            'keterangan' => $data['keterangan'] ?? '-',
         ]);
+
+        $this->barisBerhasil++;
     }
 }

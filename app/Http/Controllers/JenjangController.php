@@ -39,9 +39,12 @@ class JenjangController extends Controller
     }
     public function store(Request $request)
     {
-        // Cek apakah user menggunakan form input manual
         if ($request->filled('input_manual')) {
-            // Validasi untuk input manual
+            // Cek duplikat manual
+            if (Jenjang::where('nama_jenjang', $request->nama_jenjang)->exists()) {
+                return redirect()->back()->with('msg-error', 'Gagal menambahkan. Jenjang sudah ada di database.');
+            }
+
             $request->validate([
                 'nama_jenjang' => 'required|string',
                 'keterangan' => 'required|string',
@@ -59,32 +62,33 @@ class JenjangController extends Controller
                 ->with('msg-success', 'Berhasil menambahkan data jenjang ' . $request->nama_jenjang);
         }
 
-        // Jika user memilih upload file
-        // if ($request->hasFile('file_import')) {
-            // Validasi file upload (CSV atau XLSX dengan ukuran maksimal 10MB)
-            $request->validate([
-                'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maksimal 10MB
-            ], [
-                'file_import.required' => 'File harus diupload.',
-                'file_import.mimes' => 'File harus berformat .xlsx atau .csv.',
-                'file_import.max' => 'Ukuran file maksimal 10MB.',
-            ]);
+        // Validasi file import
+        $request->validate([
+            'file_import' => 'required|mimes:xlsx,csv|max:512',
+        ], [
+            'file_import.required' => 'File harus diupload.',
+            'file_import.mimes' => 'Format harus .xlsx atau .csv.',
+            'file_import.max' => 'Ukuran maksimal 0.5MB.',
+        ]);
 
-            try {
-                // Proses impor data dari file (gunakan paket Laravel Excel)
-                Excel::import(new JenjangImport, $request->file('file_import'));
+        try {
+            $import = new JenjangImport;
+            Excel::import($import, $request->file('file_import'));
 
-                // Redirect ke halaman Data dengan pesan sukses
-                return redirect()->route('adminsdm.data-master.karyawan.jenjang.index')
-                    ->with('msg-success', 'Berhasil mengimpor data jenjang dari file.');
-            } catch (\Exception $e) {
-                // Jika ada error saat mengimpor, tangani dan tampilkan pesan error
-                return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
+            if (!$import->headerValid) {
+                return redirect()->back()->with('msg-error', 'Gagal impor. Format header tidak sesuai. Kolom wajib: nama_jenjang, keterangan.');
             }
-        // }
 
-        // Kalau tidak dua-duanya
-        return redirect()->back()->with('msg-error', 'Tidak ada data yang dikirim.');
+            if ($import->barisBerhasil === 0) {
+                return redirect()->back()->with('msg-error', 'Tidak ada data yang berhasil diimpor.')->with('duplikat', $import->duplikat);
+            }
+
+            return redirect()->route('adminsdm.data-master.karyawan.jenjang.index')
+                ->with('msg-success', 'Berhasil mengimpor ' . $import->barisBerhasil . ' data jenjang.')
+                ->with('duplikat', $import->duplikat);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor: ' . $e->getMessage());
+        }
     }
 
     public function show($id)
