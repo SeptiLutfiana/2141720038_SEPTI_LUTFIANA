@@ -5,47 +5,47 @@
 @push('style')
     <link rel="stylesheet" href="{{ asset('library/select2/dist/css/select2.min.css') }}">
     <style>
-       .input-option {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 5px 10px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    margin-right: 5px;
-    border-radius: 25px; /* Membuat tombol lonjong */
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    transition: background-color 0.3s ease;
-}
+        .input-option {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 10px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            margin-right: 5px;
+            border-radius: 25px;
+            /* Membuat tombol lonjong */
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
 
-.input-option.active {
-    background-color: #086044;
-    color: #fff;
-}
+        .input-option.active {
+            background-color: #086044;
+            color: #fff;
+        }
 
-.input-option:hover {
-    background-color: #83B92C;
-    color: #fff;
-}
+        .input-option:hover {
+            background-color: #83B92C;
+            color: #fff;
+        }
 
-.input-option .circle {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #fff;
-    opacity: 0;
-    transform: scale(0);
-    transition: transform 0.4s, opacity 0.4s;
-}
+        .input-option .circle {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #fff;
+            opacity: 0;
+            transform: scale(0);
+            transition: transform 0.4s, opacity 0.4s;
+        }
 
-.input-option.active .circle {
-    opacity: 1;
-    transform: scale(1);
-}
-
+        .input-option.active .circle {
+            opacity: 1;
+            transform: scale(1);
+        }
     </style>
 @endpush
 
@@ -56,8 +56,10 @@
                 <h1>Tambah Data Divisi</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.karyawan.divisi.index') }}">Data Divisi</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.karyawan.divisi.create') }}">Tambah Data Divisi</a></div>
+                    <div class="breadcrumb-item active"><a
+                            href="{{ route('adminsdm.data-master.karyawan.divisi.index') }}">Data Divisi</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.karyawan.divisi.create') }}">Tambah
+                            Data Divisi</a></div>
                 </div>
             </div>
 
@@ -76,24 +78,47 @@
                         </div>
                     </div>
                 @endif
+                @if (session('msg-success'))
+                    <div class="alert alert-success">{!! session('msg-success') !!}</div>
+                @endif
+
+                @if (session('msg-error'))
+                    <div class="alert alert-danger">{!! session('msg-error') !!}</div>
+                @endif
+                @if (session('duplikat'))
+                    <div class="alert alert-warning">
+                        <strong>Catatan:</strong> Beberapa data tidak diimpor karena duplikat:
+                        <ul>
+                            @foreach (session('duplikat') as $item)
+                                <li>{{ $item }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <div class="card">
                     <div class="card-header">
                         <h4>Tambah Data Divisi</h4>
                     </div>
-                    <form action="{{ route('adminsdm.data-master.karyawan.divisi.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('adminsdm.data-master.karyawan.divisi.store') }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
                             <div class="form-group">
                                 <label>Metode Input</label><br>
-                                <span class="input-option active" id="manual-option" onclick="toggleInputMethod('manual')">Input Manual</span>
-                                <span class="input-option" id="upload-option" onclick="toggleInputMethod('upload')">Upload File</span>
+                                <span class="input-option active" id="manual-option"
+                                    onclick="toggleInputMethod('manual')">Input Manual</span>
+                                <span class="input-option" id="upload-option" onclick="toggleInputMethod('upload')">Upload
+                                    File</span>
                             </div>
-                            <input type="hidden" id="input-method" name="input_manual" value="1"> {{-- Default: manual --}}
+                            <input type="hidden" id="input-method" name="input_manual" value="1">
+                            {{-- Default: manual --}}
                             <!-- Input Manual -->
                             <div id="input-manual">
                                 <div class="form-group">
                                     <label>Nama Divisi</label>
-                                    <input type="text" name="nama_divisi" class="form-control @error('nama_divisi') is-invalid @enderror" value="{{ old('nama_divisi') }}">
+                                    <input type="text" name="nama_divisi"
+                                        class="form-control @error('nama_divisi') is-invalid @enderror"
+                                        value="{{ old('nama_divisi') }}">
                                 </div>
                                 <div class="form-group">
                                     <label>Keterangan</label>
@@ -105,11 +130,14 @@
                             <div id="input-upload" style="display: none;">
                                 <div class="form-group">
                                     <label>Upload File (CSV/XLSX)</label>
-                                    <input type="file" name="file_import" class="form-control @error('file_import') is-invalid @enderror" accept=".xlsx,.csv">
+                                    <input type="file" name="file_import"
+                                        class="form-control @error('file_import') is-invalid @enderror" accept=".xlsx,.csv">
                                     <small class="form-text text-muted">
-                                        Jenis file yang diperbolehkan: <strong>.xlsx</strong>, <strong>.csv</strong>. Ukuran maksimal: <strong>10MB</strong>.
+                                        Jenis file yang diperbolehkan: <strong>.xlsx</strong>, <strong>.csv</strong>. Ukuran
+                                        maksimal: <strong>0.5MB</strong>.
                                         <br>
-                                        Format Tabel: <strong>no</strong>, <strong>nama_divisi</strong>, <strong>keterangan</strong>.
+                                        Format Tabel: <strong>no</strong>, <strong>nama_divisi</strong>,
+                                        <strong>keterangan</strong>.
                                     </small>
                                 </div>
                             </div>
@@ -139,8 +167,8 @@
                     document.getElementById('input-manual').style.display = 'none';
                     document.getElementById('input-upload').style.display = 'block';
                     document.getElementById('input-method').value = ''; // kosongkan supaya tidak masuk logic manual
-                    }
                 }
+            }
         </script>
     @endpush
 @endsection

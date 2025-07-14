@@ -40,9 +40,8 @@ class DivisiController extends Controller
     }
     public function store(Request $request)
     {
-        // Cek apakah user menggunakan form input manual
+        // ✅ Jika menggunakan input manual
         if ($request->filled('input_manual')) {
-            // Validasi untuk input manual
             $request->validate([
                 'nama_divisi' => 'required|string',
                 'keterangan' => 'required|string',
@@ -51,42 +50,52 @@ class DivisiController extends Controller
                 'keterangan.required' => 'Keterangan harus diisi',
             ]);
 
-            // Simpan data divisi ke dalam database
             Divisi::create([
                 'nama_divisi' => $request->nama_divisi,
                 'keterangan' => $request->keterangan,
             ]);
 
-            // Redirect ke halaman Data Divisi dengan pesan sukses
             return redirect()->route('adminsdm.data-master.karyawan.divisi.index')
                 ->with('msg-success', 'Berhasil menambahkan data Divisi ' . $request->nama_divisi);
         }
 
-        // Jika user memilih upload file
-        // if ($request->hasFile('file_import')) {
-            // Validasi file upload (CSV atau XLSX dengan ukuran maksimal 10MB)
+        // ✅ Jika upload file
+        if ($request->hasFile('file_import')) {
             $request->validate([
-                'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maksimal 10MB
+                'file_import' => 'required|mimes:xlsx,csv|max:512',
             ], [
                 'file_import.required' => 'File harus diupload.',
                 'file_import.mimes' => 'File harus berformat .xlsx atau .csv.',
-                'file_import.max' => 'Ukuran file maksimal 10MB.',
+                'file_import.max' => 'Ukuran file maksimal 0.5MB.',
             ]);
 
             try {
-                // Proses impor data dari file (gunakan paket Laravel Excel)
-                Excel::import(new DivisiImport, $request->file('file_import'));
+                $import = new DivisiImport;
+                Excel::import($import, $request->file('file_import'));
 
-                // Redirect ke halaman Data Divisi dengan pesan sukses
+                if (!$import->headerValid) {
+                    return redirect()->back()->with('msg-error', 'Format header file tidak sesuai. Kolom wajib: nama_divisi, keterangan.');
+                }
+
+                if ($import->barisBerhasil === 0 && count($import->duplikat) > 0) {
+                    return redirect()->back()
+                        ->with('msg-error', 'Semua baris gagal diimpor karena sudah ada di database.')
+                        ->with('duplikat', $import->duplikat);
+                }
+
+                if (count($import->duplikat) > 0) {
+                    return redirect()->route('adminsdm.data-master.karyawan.divisi.index')
+                        ->with('msg-warning', 'Sebagian data berhasil diimpor, namun ada duplikat.')
+                        ->with('duplikat', $import->duplikat);
+                }
+
                 return redirect()->route('adminsdm.data-master.karyawan.divisi.index')
-                    ->with('msg-success', 'Berhasil mengimpor data divisi dari file.');
+                    ->with('msg-success', 'Berhasil mengimpor ' . $import->barisBerhasil . ' data divisi.');
             } catch (\Exception $e) {
-                // Jika ada error saat mengimpor, tangani dan tampilkan pesan error
                 return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
             }
-        // }
+        }
 
-        // Kalau tidak ada data input manual atau upload file
         return redirect()->back()->with('msg-error', 'Tidak ada data yang dikirim.');
     }
 
