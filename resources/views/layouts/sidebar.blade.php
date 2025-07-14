@@ -164,7 +164,7 @@
                     <a href="#" class="nav-link has-dropdown"><i class="fas fa-tasks"></i> <span>Data
                             IDP</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('admin/datamaster/metode/belajar*') ? 'active' : '' }}">
+                        <li class="{{ Request::is('admin/datamaster/metode/belajar*') || Request::is('admin/datamaster/metode/belajar/create*')? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/metode/belajar') }}">Metode Belajar</a>
                         </li>
                     </ul>

@@ -34,21 +34,23 @@ class MetodeBelajarController extends Controller
     public function create()
     {
         return view('adminsdm.data-master.data-idp.metode-belajar.create', [
-            'type_menu' => 'tambah-metode-belajar',
+            'type_menu' => 'metodebelajar',
         ]);
     }
     public function store(Request $request)
     {
-        // Cek apakah user menggunakan form input manual
         if ($request->filled('input_manual')) {
-            // Validasi untuk input manual
             $request->validate([
                 'nama_metodeBelajar' => 'required|string',
                 'keterangan' => 'required|string',
-            ], [
-                'nama_metodeBelajar.required' => 'Nama Metode Belajar harus diisi',
-                'keterangan.required' => 'Keterangan harus diisi',
             ]);
+
+            // Cek duplikat manual
+            $exists = MetodeBelajar::where('nama_metodeBelajar', $request->nama_metodeBelajar)->exists();
+            if ($exists) {
+                return redirect()->back()
+                    ->with('msg-error', 'Data gagal ditambahkan. Metode belajar "' . $request->nama_metodeBelajar . '" sudah ada.');
+            }
 
             MetodeBelajar::create([
                 'nama_metodeBelajar' => $request->nama_metodeBelajar,
@@ -59,33 +61,42 @@ class MetodeBelajarController extends Controller
                 ->with('msg-success', 'Berhasil menambahkan data ' . $request->nama_metodeBelajar);
         }
 
-        // Jika user memilih upload file
-        // if ($request->hasFile('file_import')) {
-            // Validasi file upload (CSV atau XLSX dengan ukuran maksimal 10MB)
-            $request->validate([
-                'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maksimal 10MB
-            ], [
-                'file_import.required' => 'File harus diupload.',
-                'file_import.mimes' => 'File harus berformat .xlsx atau .csv.',
-                'file_import.max' => 'Ukuran file maksimal 10MB.',
-            ]);
+        $request->validate([
+            'file_import' => 'required|mimes:xlsx,csv|max:512', // Maks 0.5MB
+        ], [
+            'file_import.required' => 'File harus diupload.',
+            'file_import.mimes' => 'File harus berformat .xlsx atau .csv.',
+            'file_import.max' => 'Ukuran file maksimal 0.5MB.',
+        ]);
 
-            try {
-                // Proses impor data dari file (gunakan paket Laravel Excel)
-                Excel::import(new MetodeBelajarImport, $request->file('file_import'));
+        try {
+            $import = new MetodeBelajarImport;
+            Excel::import($import, $request->file('file_import'));
 
-                return redirect()->route('adminsdm.data-master.data-idp.metode-belajar.index')
-                    ->with('msg-success', 'Berhasil mengimpor data metode belajar dari file.');
-            } catch (\Exception $e) {
-                // Jika ada error saat mengimpor, tangani dan tampilkan pesan error
-                return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
+            if (!$import->headerValid) {
+                return redirect()->back()
+                    ->with('msg-error', 'Header file tidak sesuai.')
+                    ->with('failures', $import->duplikat);
             }
-        // }
 
-        // Kalau tidak ada data input manual atau upload file
-        return redirect()->back()->with('msg-error', 'Tidak ada data yang dikirim.');
+            if ($import->barisBerhasil === 0) {
+                return redirect()->back()
+                    ->with('msg-error', 'Tidak ada data yang berhasil diimpor.')
+                    ->with('failures', $import->duplikat);
+            }
+
+            if (count($import->duplikat)) {
+                return redirect()->back()
+                    ->with('msg-success', $import->barisBerhasil . ' baris berhasil diimpor.')
+                    ->with('failures', $import->duplikat);
+            }
+
+            return redirect()->route('adminsdm.data-master.data-idp.metode-belajar.index')
+                ->with('msg-success', 'Berhasil mengimpor ' . $import->barisBerhasil . ' data metode belajar.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
+        }
     }
-
 
     public function show($id)
     {
