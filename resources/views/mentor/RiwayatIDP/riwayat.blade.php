@@ -63,15 +63,19 @@
                             <div class="card-header">
                                 <h4>Riwayat Individual Development Plan</h4>
                                 <div class="card-header-action">
-                                    <a href="{{ route('mentor.IDP.RiwayatIDP.cetakFiltered', [
-                                        'search' => request('search'),
-                                        'id_jenjang' => request('id_jenjang'),
-                                        'id_LG' => request('id_LG'),
-                                        'tahun' => request('tahun'),
-                                    ]) }}"
-                                        class="btn btn-icon btn-danger icon-left" target="_blank">
-                                        <i class="fas fa-print"></i> Print PDF
-                                    </a>
+                                    <form id="exportForm" method="GET"
+                                        action="{{ route('mentor.IDP.RiwayatIDP.cetakFiltered') }}" target="_blank"
+                                        class="mb-0">
+                                        <input type="hidden" name="selected" id="selectedIdsInput">
+                                        <input type="hidden" name="select_all" id="selectAllFlag" value="0">
+                                        <input type="hidden" name="search" value="{{ request('search') }}">
+                                        <input type="hidden" name="id_jenjang" value="{{ request('id_jenjang') }}">
+                                        <input type="hidden" name="id_LG" value="{{ request('id_LG') }}">
+                                        <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+                                        <button type="submit" class="btn btn-icon btn-danger icon-left">
+                                            <i class="fas fa-print"></i> Print PDF
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -151,6 +155,7 @@
                 showConfirmButton: false
             });
         });
+
         function initTomSelect() {
             document.querySelectorAll('.tom-select').forEach(function(selectElement) {
                 new TomSelect(selectElement, {
@@ -167,6 +172,44 @@
         // Re-init jika Livewire render ulang (jika perlu)
         Livewire.hook('message.processed', () => {
             initTomSelect();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const exportForm = document.getElementById('exportForm');
+            const selectedInput = document.getElementById('selectedIdsInput');
+
+            exportForm.addEventListener('submit', function(e) {
+                let selected = [];
+                document.querySelectorAll('.idp-checkbox:checked').forEach(function(cb) {
+                    selected.push(cb.value);
+                });
+                selectedInput.value = selected.join(',');
+            });
+
+            // Select All
+            document.getElementById('select-all')?.addEventListener('change', function(e) {
+                const checked = e.target.checked;
+                document.querySelectorAll('.idp-checkbox').forEach(cb => cb.checked = checked);
+            });
+        });
+        document.getElementById('select-all')?.addEventListener('change', function(e) {
+            const checked = e.target.checked;
+            document.querySelectorAll('.idp-checkbox').forEach(cb => cb.checked = checked);
+
+            document.getElementById('selectAllFlag').value = checked ? '1' : '0';
+        });
+
+        document.getElementById('exportForm').addEventListener('submit', function(e) {
+            if (document.getElementById('selectAllFlag').value === '1') {
+                document.getElementById('selectedIdsInput').value = '';
+            } else {
+                let selected = [];
+                document.querySelectorAll('.idp-checkbox:checked').forEach(function(cb) {
+                    selected.push(cb.value);
+                });
+                document.getElementById('selectedIdsInput').value = selected.join(',');
+            }
         });
     </script>
 @endpush

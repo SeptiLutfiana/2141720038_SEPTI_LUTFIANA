@@ -2,6 +2,9 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>
+                    <input type="checkbox" id="select-all" style="width: 12px; height: 12px;">
+                </th>
                 <th class="text-center">No</th>
                 <th class="text-center">Proyeksi Karir</th>
                 <th class="text-center">Nama Karyawan</th>
@@ -17,10 +20,13 @@
             @if ($idps->count())
                 @foreach ($idps as $idp)
                     <tr>
-                        <td class="text-center" style="width: 50px;">
+                        <td>
+                            <input type="checkbox" class="idp-checkbox" value="{{ $idp->id_idp }}" style="width: 12px; height: 12px;">
+                        </td>
+                        <td class="text-center" style="width: 25px;">
                             {{ $loop->iteration + ($idps->currentPage() - 1) * $idps->perPage() }}
                         </td>
-                        <td class="text-center">{{ $idp->proyeksi_karir }}</td>
+                        <td>{{ $idp->proyeksi_karir }}</td>
                         <td class="text-center">{{ optional($idp->karyawan)->name ?? '-' }}</td>
                         {{-- <td class="text-center">{{ optional($idp->mentor)->name ?? '-' }}</td> --}}
                         <td class="text-center">{{ $idp->supervisor->name ?? '-' }}</td>
@@ -64,7 +70,8 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="text-center">{{ $idp->rekomendasis->first()->hasil_rekomendasi ?? 'Menunggu Penilaian' }}</td>
+                        <td class="text-center">
+                            {{ $idp->rekomendasis->first()->hasil_rekomendasi ?? 'Menunggu Penilaian' }}</td>
                         <td class="text-left" style="width: 120px;">
                             <a href="{{ route('mentor.IDP.RiwayatIDP.showRiwayatIdp', $idp->id_idp) }}"
                                 class="btn btn-primary btn-sm mb-1">

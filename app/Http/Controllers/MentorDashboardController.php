@@ -447,7 +447,8 @@ class MentorDashboardController extends Controller
     }
     public function cetakFiltered(Request $request)
     {
-        $user = Auth::user(); // Ambil user yang sedang login
+        $user = Auth::user();
+
         $query = Idp::with([
             'karyawan',
             'jenjang',
@@ -464,9 +465,19 @@ class MentorDashboardController extends Controller
             'idpKompetensis.metodeBelajars',
             'idpKompetensis.pengerjaans.nilaiPengerjaanIdp'
         ])
-            ->where('id_mentor', $user->id); // Ambil IDP hanya milik user login
+            ->where('id_mentor', $user->id);
 
+        // --- FILTER SELECTED IDS ---
+        if ($request->select_all == 1) {
+            // Ambil semua data sesuai filter
+        } else {
+            if ($request->filled('selected')) {
+                $ids = explode(',', $request->selected);
+                $query->whereIn('id_idp', $ids);
+            }
+        }
 
+        // --- FILTER SEARCH ---
         if ($request->filled('search')) {
             $search = $request->search;
 
@@ -486,41 +497,41 @@ class MentorDashboardController extends Controller
                     ->orWhere('proyeksi_karir', 'like', "%$search%");
             });
         }
-        // Filter: Jenjang
+
+        // --- FILTER JENJANG ---
         if ($request->filled('id_jenjang')) {
             $query->whereHas('karyawan', function ($q) use ($request) {
                 $q->where('id_jenjang', $request->id_jenjang);
             });
         }
 
-        // Filter: Learning Group
+        // --- FILTER LEARNING GROUP ---
         if ($request->filled('id_LG')) {
             $query->whereHas('karyawan.learningGroup', function ($q) use ($request) {
                 $q->where('id_LG', $request->id_LG);
             });
         }
 
-        // Filter: Tahun
+        // --- FILTER TAHUN ---
         if ($request->filled('tahun')) {
             $query->whereYear('created_at', $request->tahun);
         }
 
-        // Tambahkan filter wajib hasil_rekomendasi ada
+        // --- WAJIB ADA HASIL REKOMENDASI ---
         $query->whereHas('rekomendasis', function ($q) {
-            $q->whereNotNull('hasil_rekomendasi')->where('hasil_rekomendasi', '!=', '');
+            $q->whereNotNull('hasil_rekomendasi')
+                ->where('hasil_rekomendasi', '!=', '');
         });
-        // Ambil hasil query
+
+        // Eksekusi query
         $idps = $query->get();
 
-        // Jika hasil kosong, bisa diberi feedback (opsional)
         if ($idps->isEmpty()) {
             return redirect()->back()->with('error', 'Data IDP tidak ditemukan.');
         }
 
-        // Waktu cetak
-        $waktuCetak = Carbon::now()->translatedFormat('d F Y H:i');
+        $waktuCetak = now()->translatedFormat('d F Y H:i');
 
-        // Render PDF
         $pdf = Pdf::loadView('mentor.RiwayatIDP.riwayat_pdf', [
             'idps' => $idps,
             'type_menu' => 'mentor',

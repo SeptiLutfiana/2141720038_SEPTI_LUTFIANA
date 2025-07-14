@@ -11,66 +11,91 @@ use App\Models\User;
 class RiwayatIdpMentorTable extends Component
 {
     use WithPagination;
+
     public $search;
     public $jenjang;
     public $lg;
     public $tahun;
+    public $selected = [];
+    public $selectAll = false;
     protected string $paginationTheme = 'bootstrap';
+
     protected $updatesQueryString = ['search', 'jenjang', 'lg', 'tahun'];
 
     public function mount()
     {
-        // Mengambil search query dari URL
         $this->search = request()->query('search');
         $this->tahun = request()->query('tahun');
     }
-    public function deleteId($id)
+
+    public function updatingSearch()
     {
-        if ($user = User::find($id)) {
-            $user->delete();
-            session()->flash('msg-success', 'berhasil dihapus');
+        $this->resetPage();
+    }
+
+    public function updatedSelectAll($value)
+    {
+        if ($value) {
+            $allIdps = IDP::query()
+                ->where('is_template', false)
+                ->where('id_mentor', Auth::id())
+                ->whereHas('rekomendasis', function ($q) {
+                    $q->whereNotNull('hasil_rekomendasi')
+                        ->where('hasil_rekomendasi', '!=', '');
+                })
+                ->when($this->search, function ($query, $search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->whereHas('karyawan', fn($q2) => $q2->where('name', 'like', "%$search%"))
+                            ->orWhereHas('mentor', fn($q2) => $q2->where('name', 'like', "%$search%"))
+                            ->orWhereHas('supervisor', fn($q2) => $q2->where('name', 'like', "%$search%"))
+                            ->orWhereHas('learningGroup', fn($q2) => $q2->where('nama_LG', 'like', "%$search%"))
+                            ->orWhereHas('rekomendasis', fn($q2) => $q2->where('hasil_rekomendasi', 'like', "%$search%"))
+                            ->orWhere('proyeksi_karir', 'like', "%$search%");
+                    });
+                })
+                ->when($this->jenjang, fn($q) => $q->where('id_jenjang', $this->jenjang))
+                ->when($this->lg, fn($q) => $q->where('id_LG', $this->lg))
+                ->when($this->tahun, fn($q) => $q->whereYear('waktu_mulai', $this->tahun))
+                ->pluck('id_idp')
+                ->map(fn($id) => (string)$id)
+                ->toArray();
+
+            $this->selected = $allIdps;
         } else {
-            session()->flash('msg-error', 'tidak ditemukan');
+            $this->selected = [];
         }
     }
 
-    public function render()
+
+    public function getCurrentPageIdps()
     {
-        $user = Auth::user(); // Ambil user yang sedang login
-        $idps = IDP::query()
-            ->where('is_template', false) // Filter utama untuk Bank IDP
-            ->where('id_mentor', $user->id) // Ambil IDP hanya milik user login
+        return IDP::query()
+            ->where('is_template', false)
+            ->where('id_mentor', Auth::id())
             ->whereHas('rekomendasis', function ($q) {
                 $q->whereNotNull('hasil_rekomendasi')
                     ->where('hasil_rekomendasi', '!=', '');
             })
             ->when($this->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
-                    $q->whereHas('karyawan', function ($q2) use ($search) {
-                        $q2->where('name', 'like', "%$search%");
-                    })->orWhereHas('mentor', function ($q2) use ($search) {
-                        $q2->where('name', 'like', "%$search%");
-                    })->orWhereHas('supervisor', function ($q2) use ($search) {
-                        $q2->where('name', 'like', "%$search%");
-                    })->orWhereHas('learningGroup', function ($q2) use ($search) {
-                        $q2->where('nama_LG', 'like', "%$search%");
-                    })->orWhereHas('rekomendasis', function ($q2) use ($search) {
-                        $q2->where('hasil_rekomendasi', 'like', "%$search%");
-                    })->orWhere('proyeksi_karir', 'like', "%$search%");
+                    $q->whereHas('karyawan', fn($q2) => $q2->where('name', 'like', "%$search%"))
+                        ->orWhereHas('mentor', fn($q2) => $q2->where('name', 'like', "%$search%"))
+                        ->orWhereHas('supervisor', fn($q2) => $q2->where('name', 'like', "%$search%"))
+                        ->orWhereHas('learningGroup', fn($q2) => $q2->where('nama_LG', 'like', "%$search%"))
+                        ->orWhereHas('rekomendasis', fn($q2) => $q2->where('hasil_rekomendasi', 'like', "%$search%"))
+                        ->orWhere('proyeksi_karir', 'like', "%$search%");
                 });
             })
-            ->when($this->jenjang, function ($query) {
-                return $query->where('id_jenjang', $this->jenjang);
-            })
-            ->when($this->lg, function ($query) {
-                return $query->where('id_LG', $this->lg);
-            })
-            ->when($this->tahun, function ($query) {
-                return $query->whereYear('waktu_mulai', $this->tahun);
-            })
+            ->when($this->jenjang, fn($q) => $q->where('id_jenjang', $this->jenjang))
+            ->when($this->lg, fn($q) => $q->where('id_LG', $this->lg))
+            ->when($this->tahun, fn($q) => $q->whereYear('waktu_mulai', $this->tahun))
             ->orderBy('waktu_mulai', 'desc')
-            ->paginate(5)
-            ->withQueryString();
+            ->paginate(5);
+    }
+
+    public function render()
+    {
+        $idps = $this->getCurrentPageIdps();
 
         return view('livewire.riwayat-idp-mentor-table', [
             'idps' => $idps,
