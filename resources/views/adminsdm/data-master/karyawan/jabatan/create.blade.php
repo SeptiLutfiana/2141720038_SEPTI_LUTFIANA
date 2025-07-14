@@ -31,6 +31,33 @@
                         </div>
                     </div>
                 @endif
+                @if (session('msg-success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('msg-success') }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Tutup">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                @endif
+
+                @if (session('msg-error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session('msg-error') }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Tutup">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                @endif
+                @if (session('duplikat'))
+                    <div class="alert alert-warning">
+                        <strong>Catatan:</strong> Beberapa data tidak diimpor karena duplikat:
+                        <ul class="mb-0 mt-2">
+                            @foreach (session('duplikat') as $item)
+                                <li>{{ $item }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <div class="card">
                     <div class="card-header">
                         <h4>Tambah Data Jabatan</h4>
@@ -83,9 +110,10 @@
                                         class="form-control @error('file_import') is-invalid @enderror" accept=".xlsx,.csv">
                                     <small class="form-text text-muted">
                                         Jenis file yang diperbolehkan: <strong>.xlsx</strong>, <strong>.csv</strong>. Ukuran
-                                        maksimal: <strong>10MB</strong>.
+                                        maksimal: <strong>0.5MB</strong>.
                                         <br>
                                         Format Tabel: <strong>no</strong>, <strong>nama_jabatan</strong>,
+                                        <strong>jenjang</strong>,
                                         <strong>keterangan</strong>.
                                     </small>
                                 </div>

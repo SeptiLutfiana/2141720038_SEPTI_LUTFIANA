@@ -50,60 +50,64 @@ class JabatanController extends Controller
     }
     public function store(Request $request)
     {
-        // Cek apakah user menggunakan form input manual
+        // Jika menggunakan input manual
         if ($request->filled('input_manual')) {
-            // Validasi untuk input manual
             $request->validate([
-                'nama_jabatan' => 'required|string',
-                'keterangan' => 'required|string',
-                'id_jenjang' => 'required|exists:jenjangs,id_jenjang', // validasi jenjang
-
+                'nama_jabatan' => 'required|string|max:100',
+                'keterangan' => 'required|string|max:255',
+                'id_jenjang' => 'required|exists:jenjangs,id_jenjang',
             ], [
-                'nama_jabatan.required' => 'Nama Jabatan harus diisi',
-                'keterangan.required' => 'Keterangan harus diisi',
-                'id_jenjang.required' => 'Jenjang harus dipilih',
-                'id_jenjang.exists' => 'Jenjang tidak valid',
+                'nama_jabatan.required' => 'Nama Jabatan harus diisi.',
+                'keterangan.required' => 'Keterangan harus diisi.',
+                'id_jenjang.required' => 'Jenjang harus dipilih.',
+                'id_jenjang.exists' => 'Jenjang tidak valid.',
             ]);
 
             Jabatan::create([
                 'nama_jabatan' => $request->nama_jabatan,
                 'keterangan' => $request->keterangan,
                 'id_jenjang' => $request->id_jenjang,
-
             ]);
 
             return redirect()->route('adminsdm.data-master.karyawan.jabatan.index')
                 ->with('msg-success', 'Berhasil menambahkan data Jabatan ' . $request->nama_jabatan);
         }
 
-        // Jika user memilih upload file
-        // if ($request->hasFile('file_import')) {
-            // Validasi file upload (CSV atau XLSX dengan ukuran maksimal 10MB)
+        // Jika menggunakan upload file
+        if ($request->hasFile('file_import')) {
             $request->validate([
-                'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maksimal 10MB
+                'file_import' => 'required|mimes:xlsx,csv|max:512',
             ], [
                 'file_import.required' => 'File harus diupload.',
                 'file_import.mimes' => 'File harus berformat .xlsx atau .csv.',
-                'file_import.max' => 'Ukuran file maksimal 10MB.',
+                'file_import.max' => 'Ukuran file maksimal 0.5MB.',
             ]);
 
             try {
-                // Proses impor data dari file (gunakan paket Laravel Excel)
-                Excel::import(new JabatanImport, $request->file('file_import'));
+                $import = new JabatanImport;
+                Excel::import($import, $request->file('file_import'));
 
-                // Redirect ke halaman Data dengan pesan sukses
+                if ($import->barisBerhasil === 0 && count($import->duplikat) > 0) {
+                    return redirect()->back()
+                        ->with('msg-error', 'Semua baris gagal diimpor karena sudah ada di database.')
+                        ->with('duplikat', $import->duplikat);
+                }
+
+                if (count($import->duplikat) > 0) {
+                    return redirect()->route('adminsdm.data-master.karyawan.jabatan.index')
+                        ->with('msg-warning', 'Sebagian data berhasil diimpor, namun beberapa baris duplikat.')
+                        ->with('duplikat', $import->duplikat);
+                }
                 return redirect()->route('adminsdm.data-master.karyawan.jabatan.index')
-                    ->with('msg-success', 'Berhasil mengimpor data jabatan dari file.');
+                    ->with('msg-success', 'Berhasil mengimpor ' . $import->barisBerhasil . ' data jabatan.');
             } catch (\Exception $e) {
-                // Jika ada error saat mengimpor, tangani dan tampilkan pesan error
-                return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
+                return redirect()->back()->with('msg-error', ' Gagal impor: ' . $e->getMessage());
             }
-        // }
+        }
 
-        // Kalau tidak dua-duanya
+        // Jika tidak memilih input manual maupun upload file
         return redirect()->back()->with('msg-error', 'Tidak ada data yang dikirim.');
     }
-
     public function show($id)
     {
         // Mengambil data Jabatan berdasarkan ID
