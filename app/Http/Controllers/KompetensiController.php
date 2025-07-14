@@ -111,7 +111,7 @@ class KompetensiController extends Controller
 
     public function store(Request $request)
     {
-        // Cek apakah user menggunakan form input manual
+        // Manual Input
         if ($request->filled('input_manual')) {
 
             // Validasi umum
@@ -126,19 +126,28 @@ class KompetensiController extends Controller
                 'keterangan.required' => 'Keterangan harus diisi',
             ]);
 
-            // Validasi tambahan jika jenis adalah Hard Kompetensi
+            // Jika Hard Kompetensi, validasi tambahan
             if ($request->jenis_kompetensi === 'Hard Kompetensi') {
                 $request->validate([
                     'id_jenjang' => 'required|exists:jenjangs,id_jenjang',
                     'id_jabatan' => 'required|exists:jabatans,id_jabatan',
-                ], [
-                    'id_jenjang.required' => 'Jenjang harus dipilih',
-                    'id_jenjang.exists' => 'Jenjang tidak valid',
-                    'id_jabatan.required' => 'Jabatan harus dipilih',
-                    'id_jabatan.exists' => 'Jabatan tidak valid',
                 ]);
             }
 
+            // Cek duplikat (Hard atau Soft)
+            $query = \App\Models\Kompetensi::where('nama_kompetensi', $request->nama_kompetensi)
+                ->where('jenis_kompetensi', $request->jenis_kompetensi);
+
+            if ($request->jenis_kompetensi === 'Hard Kompetensi') {
+                $query->where('id_jenjang', $request->id_jenjang)
+                    ->where('id_jabatan', $request->id_jabatan);
+            }
+
+            if ($query->exists()) {
+                return redirect()->back()->with('msg-error', 'Data Kompetensi tersebut sudah ada.');
+            }
+
+            // Simpan
             $kompetensi = Kompetensi::create([
                 'id_jenjang' => $request->jenis_kompetensi === 'Hard Kompetensi' ? $request->id_jenjang : null,
                 'id_jabatan' => $request->jenis_kompetensi === 'Hard Kompetensi' ? $request->id_jabatan : null,
@@ -147,64 +156,58 @@ class KompetensiController extends Controller
                 'keterangan' => $request->keterangan,
             ]);
 
-            if ($kompetensi->jenis_kompetensi === 'Soft Kompetensi') {
-                return redirect()->route('adminsdm.data-master.kompetensi.indexSoft')
-                    ->with('msg-success', 'Soft Kompetensi ' . $request->nama_kompetensi . ' Berhasil Ditambahkan');
-            } else {
-                return redirect()->route('adminsdm.data-master.kompetensi.indexHard')
-                    ->with('msg-success', 'Hard Kompetensi ' . $request->nama_kompetensi . ' Berhasil Ditambahkan');
-            }
+            $route = $kompetensi->jenis_kompetensi === 'Soft Kompetensi'
+                ? 'adminsdm.data-master.kompetensi.indexSoft'
+                : 'adminsdm.data-master.kompetensi.indexHard';
+
+            return redirect()->route($route)
+                ->with('msg-success', $kompetensi->jenis_kompetensi . ' ' . $request->nama_kompetensi . ' berhasil ditambahkan.');
         }
 
-        // Jika user memilih upload file
-        // if ($request->hasFile('file_import')) {
-            $request->validate([
-        'file_import' => 'required|file|mimes:xlsx,csv|max:10240',
-    ], [
-        'file_import.required' => 'File harus diupload.',
-        'file_import.mimes' => 'File harus berformat .xlsx atau .csv',
-        'file_import.max' => 'Ukuran file maksimal 10MB.',
-    ]);
+        // Upload File
+        $request->validate([
+            'file_import' => 'required|mimes:xlsx,csv|max:512',
+        ], [
+            'file_import.required' => 'File harus diupload.',
+            'file_import.mimes' => 'Format harus .xlsx atau .csv.',
+            'file_import.max' => 'Ukuran maksimal 0.5MB.',
+        ]);
 
-            try {
-                // Ambil data dari file excel tanpa langsung import ke DB
-                $headingRow = (new HeadingRowImport)->toArray($request->file('file_import'))[0][0];
-                $collection = Excel::toCollection(new KompetensiImport, $request->file('file_import'))[0];
-                // Hitung jumlah masing-masing jenis kompetensi
-                $countHard = 0;
-                $countSoft = 0;
-                foreach ($collection as $row) {
-                    $jenisRaw = $row['jenis_kompetensi'] ?? '';
-                    $jenis = ucwords(strtolower(trim($jenisRaw)));
+        try {
+            $import = new \App\Imports\KompetensiImport;
+            $collection = Excel::toCollection($import, $request->file('file_import'))[0];
 
-                    Log::info("Jenis kompetensi dari collection: $jenisRaw -> $jenis");
+            $countHard = 0;
+            $countSoft = 0;
 
-                    if ($jenis === 'Hard Kompetensi') {
-                        $countHard++;
-                    } elseif ($jenis === 'Soft Kompetensi') {
-                        $countSoft++;
-                    }
-                }
-
-
-                // Import data ke DB (gunakan method import biasa)
-                Excel::import(new KompetensiImport, $request->file('file_import'));
-
-                // Tentukan route berdasarkan jumlah terbanyak
-                if ($countHard >= $countSoft) {
-                    return redirect()->route('adminsdm.data-master.kompetensi.indexHard')
-                        ->with('msg-success', 'Berhasil mengimpor data kompetensi');
-                } else {
-                    return redirect()->route('adminsdm.data-master.kompetensi.indexSoft')
-                        ->with('msg-success', 'Berhasil mengimpor data kompetensi');
-                }
-            } catch (\Exception $e) {
-                return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
+            foreach ($collection as $row) {
+                $jenis = ucwords(strtolower(trim($row['jenis_kompetensi'] ?? '')));
+                if ($jenis === 'Hard Kompetensi') $countHard++;
+                elseif ($jenis === 'Soft Kompetensi') $countSoft++;
             }
-        // }
 
-        return redirect()->back()->with('msg-error', 'Tidak ada data yang dikirim.');
+            // Lakukan import ke DB
+            Excel::import($import, $request->file('file_import'));
+
+            // Jika tidak ada data yang berhasil
+            if ($import->barisBerhasil === 0) {
+                return redirect()->back()
+                    ->with('msg-error', 'Tidak ada data yang berhasil diimpor.')
+                    ->with('duplikat', $import->duplikat);
+            }
+
+            $route = $countHard >= $countSoft
+                ? 'adminsdm.data-master.kompetensi.indexHard'
+                : 'adminsdm.data-master.kompetensi.indexSoft';
+
+            return redirect()->route($route)
+                ->with('msg-success', "Berhasil mengimpor {$import->barisBerhasil} data kompetensi.")
+                ->with('duplikat', $import->duplikat);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('msg-error', 'Gagal mengimpor file: ' . $e->getMessage());
+        }
     }
+
     public function showSoft($id)
     {
         $kompetensi = Kompetensi::findOrFail($id);
@@ -397,10 +400,10 @@ class KompetensiController extends Controller
             ->where('jenis_kompetensi', 'Hard Kompetensi')
             ->get() // <= ini penting agar menjadi Collection
             ->sortBy([
-            fn($a, $b) => $a->jenjang->nama_jenjang <=> $b->jenjang->nama_jenjang,
-            fn($a, $b) => $a->jabatan->nama_jabatan <=> $b->jabatan->nama_jabatan,
-            fn($a, $b) => $a->nama_kompetensi <=> $b->nama_kompetensi,
-        ]);
+                fn($a, $b) => $a->jenjang->nama_jenjang <=> $b->jenjang->nama_jenjang,
+                fn($a, $b) => $a->jabatan->nama_jabatan <=> $b->jabatan->nama_jabatan,
+                fn($a, $b) => $a->nama_kompetensi <=> $b->nama_kompetensi,
+            ]);
 
 
         $phpWord = new PhpWord();

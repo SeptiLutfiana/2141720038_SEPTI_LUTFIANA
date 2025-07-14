@@ -9,10 +9,12 @@
                 <h1>Tambah Data Kompetensi</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.kompetensi.indexSoft') }}">Data Soft 
+                    <div class="breadcrumb-item active"><a
+                            href="{{ route('adminsdm.data-master.kompetensi.indexSoft') }}">Data Soft
                             Kompetensi</a></div>
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.kompetensi.indexHard') }}">Data
-                             Hard Kompetensi</a></div>
+                    <div class="breadcrumb-item active"><a
+                            href="{{ route('adminsdm.data-master.kompetensi.indexHard') }}">Data
+                            Hard Kompetensi</a></div>
                     <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.kompetensi.create') }}">Tambah Data
                             Kompetensi</a></div>
                 </div>
@@ -43,6 +45,23 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
+                    </div>
+                @endif
+                @if (session('msg-success'))
+                    <div class="alert alert-success">{!! session('msg-success') !!}</div>
+                @endif
+
+                @if (session('msg-error'))
+                    <div class="alert alert-danger">{!! session('msg-error') !!}</div>
+                @endif
+                @if (session('duplikat'))
+                    <div class="alert alert-warning mt-2">
+                        <strong>Beberapa baris tidak diimpor:</strong>
+                        <ul class="mb-0">
+                            @foreach (session('duplikat') as $fail)
+                                <li>{{ $fail }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 @endif
 
@@ -128,10 +147,10 @@
                                         class="form-control @error('file_import') is-invalid @enderror" accept=".xlsx,.csv">
                                     <small class="form-text text-muted">
                                         Jenis file yang diperbolehkan: <strong>.xlsx</strong>, <strong>.csv</strong>. Ukuran
-                                        maksimal: <strong>10MB</strong>.
+                                        maksimal: <strong>0.5MB</strong>.
                                         <br>
                                         Format Tabel: <strong>no</strong>, <strong>jenis_kompetensi</strong>,
-                                        <strong>jenjang</strong>, <strong>jabatan</strong>, 
+                                        <strong>jenjang</strong>, <strong>jabatan</strong>,
                                         <strong>jenis_kompetensi</strong>, <strong>keterangan</strong>.
                                         <br>
                                         <strong>Catatan: </strong>Untuk Soft Kompetensi, silakan kosongkan bagian Jenjang
