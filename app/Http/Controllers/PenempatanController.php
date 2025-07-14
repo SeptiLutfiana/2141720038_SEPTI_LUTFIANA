@@ -39,9 +39,9 @@ class PenempatanController extends Controller
     }
     public function store(Request $request)
     {
-        // Cek apakah user menggunakan form input manual
+        // Cek apakah user menggunakan input manual
         if ($request->filled('input_manual')) {
-            // Validasi untuk input manual
+            // Validasi form manual
             $request->validate([
                 'nama_penempatan' => 'required|string',
                 'keterangan' => 'required|string',
@@ -50,42 +50,63 @@ class PenempatanController extends Controller
                 'keterangan.required' => 'Keterangan harus diisi',
             ]);
 
+            // Cek duplikat di database
+            $duplikat = Penempatan::where('nama_penempatan', $request->nama_penempatan)->exists();
+            if ($duplikat) {
+                return redirect()->back()->with('msg-error', 'Penempatan dengan nama "' . $request->nama_penempatan . '" sudah ada di database.');
+            }
+
+            // Simpan jika tidak duplikat
             Penempatan::create([
                 'nama_penempatan' => $request->nama_penempatan,
                 'keterangan' => $request->keterangan,
             ]);
 
             return redirect()->route('adminsdm.data-master.karyawan.penempatan.index')
-                ->with('msg-success', 'Berhasil menambahkan data penempatan ' . $request->nama_penempatan);
+                ->with('msg-success', 'Berhasil menambahkan data penempatan: ' . $request->nama_penempatan);
         }
 
         // Jika user memilih upload file
         if ($request->hasFile('file_import')) {
-            // Validasi file upload (CSV atau XLSX dengan ukuran maksimal 10MB)
+            // Validasi file
             $request->validate([
-                'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maksimal 10MB
+                'file_import' => 'required|mimes:xlsx,csv|max:512', // Maks 0.5MB
             ], [
                 'file_import.required' => 'File harus diupload.',
                 'file_import.mimes' => 'File harus berformat .xlsx atau .csv.',
-                'file_import.max' => 'Ukuran file maksimal 10MB.',
+                'file_import.max' => 'Ukuran file maksimal 0.5MB.',
             ]);
 
             try {
-                // Proses impor data dari file (gunakan paket Laravel Excel)
-                Excel::import(new PenempatanImport, $request->file('file_import'));
+                // Gunakan custom import
+                $import = new PenempatanImport;
+                Excel::import($import, $request->file('file_import'));
 
-                // Redirect ke halaman Data dengan pesan sukses
+                if (!$import->headerValid) {
+                    return redirect()->back()->with('msg-error', $import->duplikat[0] ?? 'Format header tidak valid.');
+                }
+                if ($import->barisBerhasil === 0 && count($import->duplikat) > 0) {
+                    return redirect()->back()
+                        ->with('msg-error', 'Semua baris gagal diimpor karena sudah ada di database.')
+                        ->with('duplikat', $import->duplikat);
+                }
+                if (!empty($import->duplikat)) {
+                    return redirect()->back()
+                        ->with('msg-error', "{$import->barisBerhasil} baris berhasil diimpor. Beberapa baris gagal:")
+                        ->with('duplikat', $import->duplikat);
+                }
+
                 return redirect()->route('adminsdm.data-master.karyawan.penempatan.index')
-                    ->with('msg-success', 'Berhasil mengimpor data penempatan dari file.');
+                    ->with('msg-success', 'Berhasil mengimpor ' . $import->barisBerhasil . ' data penempatan.');
             } catch (\Exception $e) {
-                // Jika ada error saat mengimpor, tangani dan tampilkan pesan error
                 return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
             }
         }
 
-        // Kalau tidak dua-duanya
+        // Tidak ada input manual atau file
         return redirect()->back()->with('msg-error', 'Tidak ada data yang dikirim.');
     }
+
 
     public function show($id)
     {
