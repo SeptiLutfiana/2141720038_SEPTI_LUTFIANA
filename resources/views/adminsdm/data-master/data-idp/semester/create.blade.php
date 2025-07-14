@@ -9,8 +9,10 @@
                 <h1>Tambah Data Semester</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('adminsdm.dashboard') }}">Dashboard</a></div>
-                    <div class="breadcrumb-item active"><a href="{{ route('adminsdm.data-master.data-idp.semester.index') }}">Data Semester</a></div>
-                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.data-idp.semester.create') }}">Tambah Data Semester</a></div>
+                    <div class="breadcrumb-item active"><a
+                            href="{{ route('adminsdm.data-master.data-idp.semester.index') }}">Data Semester</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('adminsdm.data-master.data-idp.semester.create') }}">Tambah
+                            Data Semester</a></div>
                 </div>
             </div>
 
@@ -29,24 +31,47 @@
                         </div>
                     </div>
                 @endif
+                @if (session('msg-success'))
+                    <div class="alert alert-success">{!! session('msg-success') !!}</div>
+                @endif
+
+                @if (session('msg-error'))
+                    <div class="alert alert-danger">{!! session('msg-error') !!}</div>
+                @endif
+                @if (session('duplikat'))
+                    <div class="alert alert-warning mt-3">
+                        <strong>Beberapa baris tidak diimpor:</strong>
+                        <ul class="mb-0">
+                            @foreach (session('duplikat') as $fail)
+                                <li>{{ $fail }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <div class="card">
                     <div class="card-header">
                         <h4>Tambah Data Semester</h4>
                     </div>
-                    <form action="{{ route('adminsdm.data-master.data-idp.semester.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('adminsdm.data-master.data-idp.semester.store') }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
                             <div class="form-group">
                                 <label>Metode Input</label><br>
-                                <span class="input-option active" id="manual-option" onclick="toggleInputMethod('manual')">Input Manual</span>
-                                <span class="input-option" id="upload-option" onclick="toggleInputMethod('upload')">Upload File</span>
+                                <span class="input-option active" id="manual-option"
+                                    onclick="toggleInputMethod('manual')">Input Manual</span>
+                                <span class="input-option" id="upload-option" onclick="toggleInputMethod('upload')">Upload
+                                    File</span>
                             </div>
-                            <input type="hidden" id="input-method" name="input_manual" value="1"> {{-- Default: manual --}}
+                            <input type="hidden" id="input-method" name="input_manual" value="1">
+                            {{-- Default: manual --}}
                             <!-- Input Manual -->
                             <div id="input-manual">
                                 <div class="form-group">
                                     <label>Nama Semester</label>
-                                    <input type="text" name="nama_semester" class="form-control @error('nama_semester') is-invalid @enderror" value="{{ old('nama_semester') }}">
+                                    <input type="text" name="nama_semester"
+                                        class="form-control @error('nama_semester') is-invalid @enderror"
+                                        value="{{ old('nama_semester') }}">
                                 </div>
                                 <div class="form-group">
                                     <label>Keterangan</label>
@@ -58,11 +83,14 @@
                             <div id="input-upload" style="display: none;">
                                 <div class="form-group">
                                     <label>Upload File (CSV/XLSX)</label>
-                                    <input type="file" name="file_import" class="form-control @error('file_import') is-invalid @enderror" accept=".xlsx,.csv">
+                                    <input type="file" name="file_import"
+                                        class="form-control @error('file_import') is-invalid @enderror" accept=".xlsx,.csv">
                                     <small class="form-text text-muted">
-                                        Jenis file yang diperbolehkan: <strong>.xlsx</strong>, <strong>.csv</strong>. Ukuran maksimal: <strong>10MB</strong>.
+                                        Jenis file yang diperbolehkan: <strong>.xlsx</strong>, <strong>.csv</strong>. Ukuran
+                                        maksimal: <strong>0.5MB</strong>.
                                         <br>
-                                        Format Tabel: <strong>no</strong>, <strong>nama_semester</strong>, <strong>keterangan</strong>.
+                                        Format Tabel: <strong>no</strong>, <strong>nama_semester</strong>,
+                                        <strong>keterangan</strong>.
                                     </small>
                                 </div>
                             </div>
@@ -92,8 +120,8 @@
                     document.getElementById('input-manual').style.display = 'none';
                     document.getElementById('input-upload').style.display = 'block';
                     document.getElementById('input-method').value = ''; // kosongkan supaya tidak masuk logic manual
-                    }
                 }
+            }
         </script>
     @endpush
 @endsection

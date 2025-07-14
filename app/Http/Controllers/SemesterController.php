@@ -40,9 +40,12 @@ class SemesterController extends Controller
     }
     public function store(Request $request)
     {
-        // Cek apakah user menggunakan form input manual
         if ($request->filled('input_manual')) {
-            // Validasi untuk input manual
+            // Duplikat manual
+            if (Semester::where('nama_semester', $request->nama_semester)->exists()) {
+                return redirect()->back()->with('msg-error', 'Semester dengan nama tersebut sudah ada.');
+            }
+
             $request->validate([
                 'nama_semester' => 'required|string',
                 'keterangan' => 'required|string',
@@ -60,32 +63,37 @@ class SemesterController extends Controller
                 ->with('msg-success', 'Berhasil menambahkan data ' . $request->nama_semester);
         }
 
-        // Jika user memilih upload file
-        if ($request->hasFile('file_import')) {
-            // Validasi file upload (CSV atau XLSX dengan ukuran maksimal 10MB)
-            $request->validate([
-                'file_import' => 'required|mimes:xlsx,csv|max:10240', // Maksimal 10MB
-            ], [
-                'file_import.required' => 'File harus diupload.',
-                'file_import.mimes' => 'File harus berformat .xlsx atau .csv.',
-                'file_import.max' => 'Ukuran file maksimal 10MB.',
-            ]);
+        // Validasi file upload
+        $request->validate([
+            'file_import' => 'required|mimes:xlsx,csv|max:512',
+        ], [
+            'file_import.required' => 'File harus diupload.',
+            'file_import.mimes' => 'File harus .xlsx atau .csv.',
+            'file_import.max' => 'Ukuran maksimal 0.5MB.',
+        ]);
 
-            try {
-                // Proses impor data dari file (gunakan paket Laravel Excel)
-                Excel::import(new SemesterImport, $request->file('file_import'));
+        try {
+            $import = new \App\Imports\SemesterImport;
+            Excel::import($import, $request->file('file_import'));
 
-                return redirect()->route('adminsdm.data-master.data-idp.semester.index')
-                    ->with('msg-success', 'Berhasil mengimpor data semester dari file.');
-            } catch (\Exception $e) {
-                // Jika ada error saat mengimpor, tangani dan tampilkan pesan error
-                return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
+            if (!$import->headerValid) {
+                return redirect()->back()->with('msg-error', 'Format header tidak sesuai. Kolom wajib: nama_semester, keterangan.');
             }
-        }
 
-        // Kalau tidak ada data input manual atau upload file
-        return redirect()->back()->with('msg-error', 'Tidak ada data yang dikirim.');
+            if ($import->barisBerhasil === 0) {
+                return redirect()->back()
+                    ->with('msg-error', 'Tidak ada data yang berhasil diimpor.')
+                    ->with('duplikat', $import->duplikat);
+            }
+
+            return redirect()->route('adminsdm.data-master.data-idp.semester.index')
+                ->with('msg-success', "Berhasil mengimpor {$import->barisBerhasil} data semester.")
+                ->with('duplikat', $import->duplikat);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('msg-error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
+        }
     }
+
 
 
     public function show($id)
