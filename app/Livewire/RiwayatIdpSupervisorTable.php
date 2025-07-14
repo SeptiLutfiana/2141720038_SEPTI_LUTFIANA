@@ -16,6 +16,15 @@ class RiwayatIdpSupervisorTable extends Component
     public $lg;
     public $tahun;
     public $selectedIdps = [];
+
+    protected $listeners = [
+        'refreshTable' => '$refresh',
+    ];
+
+    public function updatedSelectedIdps($value)
+    {
+        $this->emit('selectedUpdated', $this->selectedIdps);
+    }
     protected string $paginationTheme = 'bootstrap';
     protected $updatesQueryString = ['search', 'jenjang', 'lg', 'tahun'];
 

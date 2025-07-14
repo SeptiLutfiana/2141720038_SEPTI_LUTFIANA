@@ -62,13 +62,18 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header">
-                                <h4>Data Individual Development Plan</h4>
-                                <div class="card-header-action">
-                                    <a href="#" class="btn btn-icon btn-danger icon-left" target="_blank">
-                                        <i class="fas fa-print"></i> Print PDF
-                                    </a>
-                                </div>
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4 class="mb-0">Data Individual Development Plan</h4>
+                                <form method="GET" action="{{ route('supervisor.IDP.cetakListProgress') }}"
+                                    target="_blank">
+                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                    <input type="hidden" name="id_jenjang" value="{{ request('id_jenjang') }}">
+                                    <input type="hidden" name="id_LG" value="{{ request('id_LG') }}">
+                                    <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-print"></i> Cetak PDF
+                                    </button>
+                                </form>
                             </div>
                             <div class="card-body">
                                 <form method="GET" action="{{ route('supervisor.IDP.indexSupervisor') }}" class="mb-3">

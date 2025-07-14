@@ -462,7 +462,8 @@ class SupervisorDashboardController extends Controller
     }
     public function cetakFiltered(Request $request)
     {
-        $user = Auth::user(); // Ambil user yang sedang login
+        $user = Auth::user();
+
         $query = Idp::with([
             'karyawan',
             'jenjang',
@@ -479,63 +480,69 @@ class SupervisorDashboardController extends Controller
             'idpKompetensis.metodeBelajars',
             'idpKompetensis.pengerjaans.nilaiPengerjaanIdp'
         ])
-            ->where('id_supervisor', $user->id) // Ambil IDP hanya milik user login
+            ->where('id_supervisor', $user->id)
             ->where('is_template', false);
 
-        if ($request->filled('search')) {
-            $search = $request->search;
+        // Cek apakah ada selected (dari checkbox)
+        if ($request->select_all) {
+            // ambil semua data sesuai filter
+            // tidak perlu filter id_idp
+        } elseif ($request->filled('selected')) {
+            $selectedIds = explode(',', $request->selected);
+            $query->whereIn('id_idp', $selectedIds);
+        } else {
+            // Apply filters jika tidak ada selected
+            if ($request->filled('search')) {
+                $search = $request->search;
 
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('karyawan', function ($q2) use ($search) {
-                    $q2->where('name', 'like', "%$search%");
-                })
-                    ->orWhereHas('supervisor', function ($q2) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('karyawan', function ($q2) use ($search) {
                         $q2->where('name', 'like', "%$search%");
                     })
-                    ->orWhereHas('rekomendasis', function ($q2) use ($search) {
-                        $q2->where('hasil_rekomendasi', 'like', "%$search%");
-                    })
-                    ->orWhereHas('learningGroup', function ($q2) use ($search) {
-                        $q2->where('nama_LG', 'like', "%$search%");
-                    })
-                    ->orWhere('proyeksi_karir', 'like', "%$search%");
-            });
-        }
-        // Filter: Jenjang
-        if ($request->filled('id_jenjang')) {
-            $query->whereHas('karyawan', function ($q) use ($request) {
-                $q->where('id_jenjang', $request->id_jenjang);
-            });
+                        ->orWhereHas('supervisor', function ($q2) use ($search) {
+                            $q2->where('name', 'like', "%$search%");
+                        })
+                        ->orWhereHas('rekomendasis', function ($q2) use ($search) {
+                            $q2->where('hasil_rekomendasi', 'like', "%$search%");
+                        })
+                        ->orWhereHas('learningGroup', function ($q2) use ($search) {
+                            $q2->where('nama_LG', 'like', "%$search%");
+                        })
+                        ->orWhere('proyeksi_karir', 'like', "%$search%");
+                });
+            }
+
+            if ($request->filled('id_jenjang')) {
+                $query->whereHas('karyawan', function ($q) use ($request) {
+                    $q->where('id_jenjang', $request->id_jenjang);
+                });
+            }
+
+            if ($request->filled('id_LG')) {
+                $query->whereHas('karyawan.learningGroup', function ($q) use ($request) {
+                    $q->where('id_LG', $request->id_LG);
+                });
+            }
+
+            if ($request->filled('tahun')) {
+                $query->whereYear('created_at', $request->tahun);
+            }
         }
 
-        // Filter: Learning Group
-        if ($request->filled('id_LG')) {
-            $query->whereHas('karyawan.learningGroup', function ($q) use ($request) {
-                $q->where('id_LG', $request->id_LG);
-            });
-        }
-
-        // Filter: Tahun
-        if ($request->filled('tahun')) {
-            $query->whereYear('created_at', $request->tahun);
-        }
-
-        // Tambahkan filter wajib hasil_rekomendasi ada
+        // Tetap wajib ada rekomendasi
         $query->whereHas('rekomendasis', function ($q) {
-            $q->whereNotNull('hasil_rekomendasi')->where('hasil_rekomendasi', '!=', '');
+            $q->whereNotNull('hasil_rekomendasi')
+                ->where('hasil_rekomendasi', '!=', '');
         });
-        // Ambil hasil query
+
         $idps = $query->get();
 
-        // Jika hasil kosong, bisa diberi feedback (opsional)
         if ($idps->isEmpty()) {
             return redirect()->back()->with('error', 'Data IDP tidak ditemukan.');
         }
 
-        // Waktu cetak
         $waktuCetak = Carbon::now()->translatedFormat('d F Y H:i');
 
-        // Render PDF
         $pdf = Pdf::loadView('supervisor.RiwayatIDP.riwayat_pdf', [
             'idps' => $idps,
             'type_menu' => 'supervisor',
@@ -544,6 +551,7 @@ class SupervisorDashboardController extends Controller
 
         return $pdf->stream('Data-IDP.pdf');
     }
+
     public function showBank($id, Request $request)
     {
         if ($request->has('notification_id')) {
@@ -565,5 +573,91 @@ class SupervisorDashboardController extends Controller
             'idps'    => $idps,
             'type_menu' => 'supervisor',
         ]);
+    }
+    public function cetakListProgress(Request $request)
+    {
+        $supervisorId = Auth::id();
+
+        $subquery = DB::table('idp_kompetensis')
+            ->select('id_idp', DB::raw('COUNT(*) as total'))
+            ->whereExists(function ($q) {
+                $q->select(DB::raw(1))
+                    ->from('idp_kompetensi_pengerjaans')
+                    ->whereRaw('idp_kompetensi_pengerjaans.id_idpKom = idp_kompetensis.id_idpKom')
+                    ->groupBy('idp_kompetensi_pengerjaans.id_idpKom')
+                    ->havingRaw('COUNT(*) = SUM(CASE WHEN status_pengerjaan = "Disetujui Mentor" THEN 1 ELSE 0 END)');
+            })
+            ->groupBy('id_idp');
+
+        $idps = Idp::with([
+            'mentor',
+            'supervisor',
+            'karyawan',
+            'learningGroup',
+            'idpKompetensis.pengerjaans',
+        ])
+            ->select('idps.*')
+            ->joinSub($subquery, 'selesai', function ($join) {
+                $join->on('idps.id_idp', '=', 'selesai.id_idp');
+            })
+            ->where('id_supervisor', $supervisorId)
+            ->doesntHave('rekomendasis');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $idps->where(function ($q) use ($search) {
+                $q->whereHas('karyawan', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%$search%");
+                })
+                    ->orWhereHas('mentor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })
+                    ->orWhereHas('supervisor', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })
+                    ->orWhereHas('learningGroup', function ($q2) use ($search) {
+                        $q2->where('nama_LG', 'like', "%$search%");
+                    })
+                    ->orWhereHas('jenjang', function ($q2) use ($search) {
+                        $q2->where('nama_jenjang', 'like', "%$search%");
+                    })
+                    ->orWhereHas('karyawan', function ($q2) use ($search) {
+                        $q2->where('npk', 'like', "%$search%");
+                    })
+                    ->orWhereHas('mentor', function ($q2) use ($search) {
+                        $q2->where('npk', 'like', "%$search%");
+                    })
+                    ->orWhereHas('supervisor', function ($q2) use ($search) {
+                        $q2->where('npk', 'like', "%$search%");
+                    })
+                    ->orWhereHas('rekomendasis', function ($q2) use ($search) {
+                        $q2->where('hasil_rekomendasi', 'like', "%$search%");
+                    })
+                    ->orWhere('proyeksi_karir', 'like', "%$search%");
+            });
+        }
+
+        if ($request->filled('id_jenjang')) {
+            $idps->where('id_jenjang', $request->id_jenjang);
+        }
+
+        if ($request->filled('id_LG')) {
+            $idps->where('id_LG', $request->id_LG);
+        }
+
+        if ($request->filled('tahun')) {
+            $idps->whereYear('waktu_mulai', $request->tahun);
+        }
+
+        $dataIdps = $idps->get();
+
+        $waktuCetak = now()->translatedFormat('d F Y H:i');
+
+        $pdf = Pdf::loadView('supervisor.IDP.list_progress_pdf', [
+            'idps' => $dataIdps,
+            'waktuCetak' => $waktuCetak,
+        ]);
+
+        return $pdf->stream('List-Progres-IDP.pdf');
     }
 }

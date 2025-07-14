@@ -2,7 +2,8 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th class="text-center">cek</th>
+                <th> <input type="checkbox" id="selectAllCheckbox" style="width: 12px; height: 12px;">
+                </th>
                 <th class="text-center">No</th>
                 <th class="text-center">Proyeksi Karir</th>
                 <th class="text-center">Nama Karyawan</th>
@@ -19,8 +20,9 @@
                 @foreach ($idps as $idp)
                     <tr>
                         <td style="width: 50px;">
-        <input type="checkbox" wire:model="selectedIdps" value="{{ $idp->id }}" style="width: 12px; height: 12px;">
-    </td>
+                            <input type="checkbox" class="idp-checkbox" value="{{ $idp->id_idp }}"
+                                style="width: 12px; height: 12px;">
+                        </td>
                         <td class="text-center" style="width: 50px;">
                             {{ $loop->iteration + ($idps->currentPage() - 1) * $idps->perPage() }}
                         </td>
@@ -68,7 +70,8 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="text-center">{{ $idp->rekomendasis->first()->hasil_rekomendasi ?? 'Menunggu Penilaian' }}</td>
+                        <td class="text-center">
+                            {{ $idp->rekomendasis->first()->hasil_rekomendasi ?? 'Menunggu Penilaian' }}</td>
                         <td class="text-left" style="width: 120px;">
                             <a href="{{ route('supervisor.IDP.RiwayatIDP.showRiwayatIdp', $idp->id_idp) }}"
                                 class="btn btn-primary btn-sm mb-1">

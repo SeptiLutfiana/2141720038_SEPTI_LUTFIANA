@@ -25,7 +25,6 @@
             box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
         }
 
-        /* Biar teks placeholder sama */
         .form-control::placeholder {
             color: #6c757d;
             opacity: 1;
@@ -38,7 +37,6 @@
         <section class="section">
             <div class="section-header">
                 <h1>Riwayat Perencanaan Individual Development Plan</h1>
-
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('supervisor.spv-dashboard') }}">Dashboard</a></div>
                     <div class="breadcrumb-item">Data IDP</div>
@@ -57,23 +55,27 @@
                         </div>
                     </div>
                 @endif
+
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4>Riwayat Individual Development Plan</h4>
-                                <div class="card-header-action">
-                                    <a href="{{ route('supervisor.IDP.RiwayatIDP.cetakFiltered', [
-                                        'search' => request('search'),
-                                        'id_jenjang' => request('id_jenjang'),
-                                        'id_LG' => request('id_LG'),
-                                        'tahun' => request('tahun'),
-                                    ]) }}"
-                                        class="btn btn-icon btn-danger icon-left" target="_blank">
+                                <form id="exportForm" method="GET"
+                                    action="{{ route('supervisor.IDP.RiwayatIDP.cetakFiltered') }}" target="_blank"
+                                    class="mb-0">
+                                    <input type="hidden" name="selected" id="selectedIdsInput">
+                                    <input type="hidden" name="select_all" id="selectAllFlag" value="0">
+                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                    <input type="hidden" name="id_jenjang" value="{{ request('id_jenjang') }}">
+                                    <input type="hidden" name="id_LG" value="{{ request('id_LG') }}">
+                                    <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+                                    <button type="submit" class="btn btn-icon btn-danger icon-left">
                                         <i class="fas fa-print"></i> Print PDF
-                                    </a>
-                                </div>
+                                    </button>
+                                </form>
                             </div>
+
                             <div class="card-body">
                                 <form method="GET" action="{{ route('supervisor.IDP.RiwayatIDP.indexRiwayatIdp') }}"
                                     class="mb-3">
@@ -122,6 +124,7 @@
                                         </div>
                                     </div>
                                 </form>
+
                                 <div class="table-responsive">
                                     @livewire('riwayat-idp-supervisor-table', [
                                         'search' => request('search'),
@@ -134,10 +137,12 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
     </div>
 @endsection
+
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script>
@@ -167,6 +172,49 @@
         // Re-init jika Livewire render ulang (jika perlu)
         Livewire.hook('message.processed', () => {
             initTomSelect();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const exportForm = document.getElementById('exportForm');
+            const selectedInput = document.getElementById('selectedIdsInput');
+
+            exportForm.addEventListener('submit', function(e) {
+                let selected = [];
+
+                document.querySelectorAll('.idp-checkbox:checked').forEach(function(cb) {
+                    selected.push(cb.value);
+                });
+
+                selectedInput.value = selected.join(',');
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAll = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('.idp-checkbox');
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    checkboxes.forEach(cb => {
+                        cb.checked = selectAll.checked;
+                    });
+                });
+            }
+        });
+        document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+            document.getElementById('selectAllFlag').value = this.checked ? 1 : 0;
+        });
+        document.getElementById('exportForm').addEventListener('submit', function(e) {
+            if (document.getElementById('selectAllFlag').value == '1') {
+                // kosongkan selected supaya backend ambil semua data
+                document.getElementById('selectedIdsInput').value = '';
+            } else {
+                let selected = [];
+                document.querySelectorAll('.idp-checkbox:checked').forEach(cb => {
+                    selected.push(cb.value);
+                });
+                document.getElementById('selectedIdsInput').value = selected.join(',');
+            }
         });
     </script>
 @endpush

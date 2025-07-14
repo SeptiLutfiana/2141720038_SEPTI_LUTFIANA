@@ -303,6 +303,7 @@ Route::middleware(['auth', 'karyawan:2,3,4'])->group(function () {
     // IDP
     Route::prefix('supervisor/behavior/idp')->name('supervisor.IDP.')->group(function () {
         Route::get('/', [SupervisorDashboardController::class, 'indexSupervisor'])->name('indexSupervisor');
+        Route::get('/progres/cetak', [SupervisorDashboardController::class, 'cetakListProgress'])->name('cetakListProgress');
         Route::get('/detail/{id}', [SupervisorDashboardController::class, 'showSupervisor'])->name('showSupervisor');
         Route::post('/penilaian/store', [SupervisorDashboardController::class, 'store'])->name('store');
         Route::get('/riwayat', [SupervisorDashboardController::class, 'indexRiwayatIdp'])->name('RiwayatIDP.indexRiwayatIdp');
