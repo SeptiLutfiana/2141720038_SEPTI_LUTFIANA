@@ -472,6 +472,7 @@
     </div>
 @endsection
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
@@ -487,19 +488,14 @@
                 icon.classList.add('bi-chevron-right');
             }
         }
+
         document.addEventListener('DOMContentLoaded', function() {
             const nilaiModal = document.getElementById('nilaiModal');
             const form = document.getElementById('nilaiForm');
-            const modalTitle = nilaiModal.querySelector('.modal-title');
-            const saranInput = document.getElementById('saran');
 
-            const statusRadios = nilaiModal.querySelectorAll('input[name="rating"]');
-
-            // Ketika modal dibuka lewat tombol "Nilai"
             document.querySelectorAll('.btn-nilai').forEach(button => {
                 button.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
-                    const kompetensi = this.getAttribute('data-kompetensi');
                     const rating = this.getAttribute('data-rating');
                     const saran = this.getAttribute('data-saran');
 
@@ -514,59 +510,93 @@
                     document.getElementById('saran').value = saran || '';
                 });
             });
+            // Reset form & error saat modal ditutup
+            $('#nilaiModal').on('hidden.bs.modal', function() {
+                // Reset field input
+                $('#nilaiForm')[0].reset();
 
-        });
-    </script>
-    <script>
-        $(document).ready(function() {
-        $('#nilaiForm').submit(function(e) {
-            e.preventDefault();
+                // Hapus tulisan error
+                $('#error-rating').text('');
+                $('#error-saran').text('');
 
-            // Hapus error sebelumnya
-            $('#error-rating').text('');
-            $('#error-saran').text('');
+                // Hapus class is-invalid
+                $('input[name="rating"]').parent().removeClass('is-invalid');
+                $('#saran').removeClass('is-invalid');
+            });
+            // SUBMIT FORM DENGAN AJAX
+            $('#nilaiForm').submit(function(e) {
+                e.preventDefault();
 
-            var formData = $(this).serialize();
+                // Hapus error sebelumnya
+                $('#error-rating').text('');
+                $('#error-saran').text('');
+                $('input[name="rating"]').parent().removeClass('is-invalid');
+                $('#saran').removeClass('is-invalid');
 
-            $.ajax({
-                        url: $(this).attr('action'),
-                        method: 'POST',
-                        data: formData,
-                        success: function(response) {
-                            $('#nilaiModal').modal('hide'); // Tutup modal
+                let rating = $('input[name="rating"]:checked').val();
+                let saran = $('#saran').val().trim();
 
-                            // Tampilkan alert sukses
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil!',
-                                text: response.message, // ← ini dari controller kamu
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                        }).then(() => {
-                        // Setelah alert selesai → reload halaman
-                        location.reload();
-                    });
-                },
-                error: function(xhr) {
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        if (errors.rating) {
-                            $('#error-rating').text(errors.rating[0]);
-                        }
-                        if (errors.saran) {
-                            $('#error-saran').text(errors.saran[0]);
-                        }
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal!',
-                            text: 'Terjadi kesalahan. Silakan coba lagi.',
-                        });
-                    }
+                let hasError = false;
+
+                if (!rating) {
+                    $('#error-rating').text('Rating wajib diisi.');
+                    $('input[name="rating"]').parent().addClass('is-invalid');
+                    hasError = true;
                 }
-        });
-        });
+
+                if (!saran) {
+                    $('#error-saran').text('Saran wajib diisi.');
+                    $('#saran').addClass('is-invalid');
+                    hasError = true;
+                }
+
+                if (hasError) {
+                    return; // stop AJAX
+                }
+
+                // Kirim AJAX kalau lolos validasi
+                let formData = $(this).serialize();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        $('#nilaiModal').modal('hide');
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+
+                            if (errors.rating) {
+                                $('#error-rating').text(errors.rating[0]);
+                                $('input[name="rating"]').parent().addClass('is-invalid');
+                            }
+
+                            if (errors.saran) {
+                                $('#error-saran').text(errors.saran[0]);
+                                $('#saran').addClass('is-invalid');
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: 'Terjadi kesalahan. Silakan coba lagi.',
+                            });
+                        }
+                    }
+                });
+            });
         });
     </script>
 @endpush
