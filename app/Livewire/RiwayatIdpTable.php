@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\User;
 use App\Models\IDP;
+use Illuminate\Support\Facades\Auth;
 
 class RiwayatIdpTable extends Component
 {
@@ -14,6 +15,17 @@ class RiwayatIdpTable extends Component
     public $jenjang;
     public $lg;
     public $tahun;
+    public $selectedIdps = [];
+
+    protected $listeners = [
+        'refreshTable' => '$refresh',
+    ];
+
+    public function updatedSelectedIdps($value)
+    {
+        $this->emit('selectedUpdated', $this->selectedIdps);
+    }
+
     protected string $paginationTheme = 'bootstrap';
     protected $updatesQueryString = ['search', 'jenjang', 'lg', 'tahun'];
 

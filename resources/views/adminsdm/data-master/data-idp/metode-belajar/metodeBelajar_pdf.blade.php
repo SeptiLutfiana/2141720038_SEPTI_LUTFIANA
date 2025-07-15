@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Data Metode Belajar Perum Perhutani</title>
@@ -20,8 +21,10 @@
         .logo {
             position: absolute;
             left: 0;
-            top: -25;
-            width: 100px;
+            top: 0;
+            width: 140px;
+            /* diperbesar */
+            height: auto;
         }
 
         .title {
@@ -36,7 +39,8 @@
             margin-top: 10px;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid black;
             padding: 6px;
             text-align: center;
@@ -55,6 +59,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="header-container">
         <img src="{{ public_path('./img/logo-perhutani.png') }}" class="logo" alt="Logo Perhutani">
@@ -80,4 +85,5 @@
         </tbody>
     </table>
 </body>
+
 </html>

@@ -65,19 +65,25 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4>Data Individual Development Plan</h4>
-                                <div class="card-header-action">
-                                    <a href="{{ route('adminsdm.BehaviorIDP.cetakFiltered', [
-                                        'search' => request('search'),
-                                        'id_jenjang' => request('id_jenjang'),
-                                        'id_LG' => request('id_LG'),
-                                        'tahun' => request('tahun'),
-                                    ]) }}"
-                                        class="btn btn-icon btn-danger icon-left" target="_blank">
+                                <form id="exportForm" method="GET"
+                                    action="{{ route('adminsdm.BehaviorIDP.RiwayatIDP.cetakFiltered') }}" target="_blank"
+                                    class="mb-0">
+
+                                    <input type="hidden" name="selected" id="selectedIdsInput">
+                                    <input type="hidden" name="select_all" id="selectAllFlag" value="0">
+
+                                    {{-- Jaga-jaga filter dikirim ulang saat export --}}
+                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                    <input type="hidden" name="id_jenjang" value="{{ request('id_jenjang') }}">
+                                    <input type="hidden" name="id_LG" value="{{ request('id_LG') }}">
+                                    <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+
+                                    <button type="submit" class="btn btn-danger btn-icon icon-left">
                                         <i class="fas fa-print"></i> Print PDF
-                                    </a>
-                                </div>
+                                    </button>
+                                </form>
                             </div>
                             <div class="card-body">
                                 <form method="GET" action="{{ route('adminsdm.BehaviorIDP.RiwayatIDP.indexRiwayatIdp') }}"
@@ -172,6 +178,35 @@
         // Re-init jika Livewire render ulang (jika perlu)
         Livewire.hook('message.processed', () => {
             initTomSelect();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAll = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('.idp-checkbox');
+            const exportForm = document.getElementById('exportForm');
+            const selectedInput = document.getElementById('selectedIdsInput');
+            const selectAllFlag = document.getElementById('selectAllFlag');
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    checkboxes.forEach(cb => cb.checked = isChecked);
+                    selectAllFlag.value = isChecked ? '1' : '0';
+                });
+            }
+
+            exportForm.addEventListener('submit', function(e) {
+                if (selectAllFlag.value === '1') {
+                    selectedInput.value = ''; // kosongkan, supaya controller ambil semua data
+                } else {
+                    let selected = [];
+                    checkboxes.forEach(cb => {
+                        if (cb.checked) selected.push(cb.value);
+                    });
+                    selectedInput.value = selected.join(',');
+                }
+            });
         });
     </script>
 @endpush

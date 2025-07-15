@@ -21,8 +21,10 @@
         .logo {
             position: absolute;
             left: 0;
-            top: -25;
-            width: 100px;
+            top: 0;
+            width: 140px;
+            /* diperbesar */
+            height: auto;
         }
 
         .title {
@@ -82,7 +84,7 @@
                     <td>{{ $loop->iteration }}</td>
                     <td class="text-left">{{ $item->user->name }}</td>
                     <td class="text-left">{{ $item->user->npk }}</td>
-                    <td class="text-left">{{ $item->user->no_hp}}</td>
+                    <td class="text-left">{{ $item->user->no_hp }}</td>
                     <td class="text-left">{{ $item->user->jabatan->nama_jabatan }}</td>
                     <td class="text-left">{{ $item->user->penempatan->nama_penempatan }}</td>
                     <td class="text-left">{{ $item->user->divisi->nama_divisi }}</td>

@@ -2,6 +2,8 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th> <input type="checkbox" id="selectAllCheckbox" style="width: 12px; height: 12px;">
+                </th>
                 <th class="text-center">No</th>
                 <th class="text-center">Proyeksi Karir</th>
                 <th class="text-center">Nama Karyawan</th>
@@ -17,6 +19,10 @@
             @if ($idps->count())
                 @foreach ($idps as $idp)
                     <tr>
+                        <td style="width: 50px;">
+                            <input type="checkbox" class="idp-checkbox" value="{{ $idp->id_idp }}"
+                                style="width: 12px; height: 12px;">
+                        </td>
                         <td class="text-center" style="width: 50px;">
                             {{ $loop->iteration + ($idps->currentPage() - 1) * $idps->perPage() }}
                         </td>

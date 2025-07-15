@@ -260,7 +260,7 @@ Route::middleware(['auth', 'karyawan:1,4,2,3'])->group(function () {
         Route::get('/riwayat/idp', [AdminDashboardController::class, 'indexRiwayatIdp'])->name('RiwayatIDP.indexRiwayatIdp');
         Route::get('/{id}/riwayat/idp', [AdminDashboardController::class, 'showRiwayatIDP'])->name('RiwayatIDP.showRiwayatIdp');
         Route::get('/idp/cetak/{id}', [AdminDashboardController::class, 'cetakPDF'])->name('adminsdm.idp.cetak');
-        Route::get('/idp/cetak-filter', [AdminDashboardController::class, 'cetakFiltered'])->name('cetakFiltered');
+        Route::get('/idp/cetak-filter', [AdminDashboardController::class, 'cetakFiltered'])->name('RiwayatIDP.cetakFiltered');
         Route::get('/cetak/pdf', [IdpController::class, 'cetakPdf'])->name('ListIDP.cetakPdf');
         Route::get('/get-soft-kompetensi', [IDPController::class, 'getSoftKompetensi'])->name('getSoftKompetensi');
     });

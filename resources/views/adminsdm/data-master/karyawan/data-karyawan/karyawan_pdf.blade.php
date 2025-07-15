@@ -20,8 +20,10 @@
         .logo {
             position: absolute;
             left: 0;
-            top: -25;
-            width: 100px;
+            top: 0;
+            width: 140px;
+            /* diperbesar */
+            height: auto;
         }
 
         .title {

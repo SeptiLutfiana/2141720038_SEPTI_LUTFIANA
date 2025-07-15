@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Data Divisi Perum Perhutani</title>
@@ -20,9 +21,12 @@
         .logo {
             position: absolute;
             left: 0;
-            top: -55;
-            width: 100px;
+            top: 0;
+            width: 140px;
+            /* diperbesar */
+            height: auto;
         }
+
 
         .title {
             text-align: center;
@@ -36,7 +40,8 @@
             margin-top: 10px;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid black;
             padding: 6px;
             text-align: center;
@@ -55,6 +60,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="header-container">
         <img src="{{ public_path('./img/logo-perhutani.png') }}" class="logo" alt="Logo Perhutani">
@@ -79,8 +85,9 @@
             @endforeach
         </tbody>
     </table>
-     <p style="text-align: right; font-size: 10px; margin-top: 20px;">
+    <p style="text-align: right; font-size: 10px; margin-top: 20px;">
         Dicetak pada: {{ $waktuCetak }}
     </p>
 </body>
+
 </html>

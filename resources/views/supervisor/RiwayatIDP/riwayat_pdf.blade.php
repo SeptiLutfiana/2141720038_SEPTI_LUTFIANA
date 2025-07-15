@@ -27,8 +27,10 @@
         .logo {
             position: absolute;
             left: 0;
-            top: -15px;
-            width: 100px;
+            top: 0;
+            width: 140px;
+            /* diperbesar */
+            height: auto;
         }
 
         .title {
@@ -112,7 +114,7 @@
             </div>
 
             <small class="text-muted d-block mt-1">
-                Nama Lengkap: {{ $idp->karyawan->name  ?? '-'}} <br>
+                Nama Lengkap: {{ $idp->karyawan->name ?? '-' }} <br>
                 NPK: {{ $idp->karyawan->npk ?? '-' }} <br>
                 Jenjang: {{ $idp->jenjang->nama_jenjang ?? '-' }} <br>
                 Jabatan: {{ $idp->jabatan->nama_jabatan ?? '-' }} <br>
@@ -135,11 +137,11 @@
                 </tr>
                 <tr>
                     <td>Mentor</td>
-                    <td colspan="4">{{ $idp->mentor->name ?? '-'}}</td>
+                    <td colspan="4">{{ $idp->mentor->name ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td>Supervisor</td>
-                    <td colspan="4">{{ $idp->supervisor->name ??'-'}}</td>
+                    <td colspan="4">{{ $idp->supervisor->name ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td>Waktu Mulai</td>
@@ -258,14 +260,14 @@
                     @foreach ($kom->pengerjaans as $peng)
                         <tr>
                             <td colspan="4" class="text-left">{{ $peng->keterangan_hasil }}</td>
-                            <td class="text-center">{{ $peng->nilaiPengerjaanIdp->rating ?? ''}}</td>
+                            <td class="text-center">{{ $peng->nilaiPengerjaanIdp->rating ?? '' }}</td>
                         </tr>
                     @endforeach
                 @endforeach
 
                 <tr>
                     <th colspan="4">Nilai Hard Kompetensi</th>
-                    <th class="text-center">{{ $idp->rekomendasis->first()->nilai_akhir_hard ?? ''}}</th>
+                    <th class="text-center">{{ $idp->rekomendasis->first()->nilai_akhir_hard ?? '' }}</th>
                 </tr>
             </table>
 
