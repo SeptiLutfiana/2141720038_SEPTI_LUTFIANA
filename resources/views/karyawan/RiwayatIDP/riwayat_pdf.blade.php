@@ -27,11 +27,10 @@
         .logo {
             position: absolute;
             left: 0;
-            top: 0;
-            width: 140px;
-            /* diperbesar */
-            height: auto;
+            top: -15px;
+            width: 100px;
         }
+
         .title {
             text-align: center;
             font-size: 16px;

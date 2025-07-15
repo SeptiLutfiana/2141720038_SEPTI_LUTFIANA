@@ -21,10 +21,8 @@
         .logo {
             position: absolute;
             left: 0;
-            top: 0;
-            width: 140px;
-            /* diperbesar */
-            height: auto;
+            top: -55px;
+            width: 100px;
         }
 
 
