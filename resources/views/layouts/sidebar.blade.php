@@ -2,7 +2,7 @@
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand text-center py-3">
             @php
-                $dashboardRoute = match (Auth::user()->id_role) {
+                $dashboardRoute = match (session('active_role')) {
                     1 => route('adminsdm.dashboard'),
                     2 => route('supervisor.spv-dashboard'),
                     3 => route('mentor.dashboard-mentor'),
@@ -17,7 +17,7 @@
 
         <div class="sidebar-brand sidebar-brand-sm">
             @php
-                $dashboardRoute = match (Auth::user()->id_role) {
+                $dashboardRoute = match (session('active_role')) {
                     1 => route('adminsdm.dashboard'),
                     2 => route('supervisor.spv-dashboard'),
                     3 => route('mentor.dashboard-mentor'),
@@ -30,25 +30,26 @@
         <ul class="sidebar-menu">
             <li class="menu-header">MENU UTAMA</li>
             <li class="nav-item dropdown {{ $type_menu === 'dashboard' ? 'active' : '' }}">
-                {{-- <a href="{{ url('adminsdm-dashboard') }}" --}}
-                <a href="{{ Auth::user()->id_role == 1
+                <a href="{{ session('active_role') == 1
                     ? route('adminsdm.dashboard')
-                    : (Auth::user()->id_role == 2
+                    : (session('active_role') == 2
                         ? route('supervisor.spv-dashboard')
-                        : (Auth::user()->id_role == 3
+                        : (session('active_role') == 3
                             ? route('mentor.dashboard-mentor')
-                            : (Auth::user()->id_role == 4
+                            : (session('active_role') == 4
                                 ? route('karyawan.dashboard-karyawan')
                                 : '#'))) }}"
-                    class="nav-link"><i
-                        class="fas fa-fire {{ (Auth::user()->id_role == 1 && request()->routeIs('adminsdm.dashboard')) ||
-                        (Auth::user()->id_role == 2 && request()->routeIs('supervisor.spv-dashboard')) ||
-                        (Auth::user()->id_role == 3 && request()->routeIs('mentor.dashboard-mentor')) ||
-                        (Auth::user()->id_role == 4 && request()->routeIs('karyawan.dashboard-karyawan'))
+                    class="nav-link">
+                    <i
+                        class="fas fa-fire {{ (session('active_role') == 1 && request()->routeIs('adminsdm.dashboard')) ||
+                        (session('active_role') == 2 && request()->routeIs('supervisor.spv-dashboard')) ||
+                        (session('active_role') == 3 && request()->routeIs('mentor.dashboard-mentor')) ||
+                        (session('active_role') == 4 && request()->routeIs('karyawan.dashboard-karyawan'))
                             ? 'active'
-                            : '' }}"></i><span>Dashboard</span></a>
+                            : '' }}"></i>
+                    <span>Dashboard</span>
+                </a>
             </li>
-
             {{-- AdminSDM --}}
             @if (session('active_role') == 1)
                 <li class="nav-item dropdown {{ $type_menu === 'idps' ? 'active' : '' }}">
@@ -164,7 +165,8 @@
                     <a href="#" class="nav-link has-dropdown"><i class="fas fa-tasks"></i> <span>Data
                             IDP</span></a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('admin/datamaster/metode/belajar*') || Request::is('admin/datamaster/metode/belajar/create*')? 'active' : '' }}">
+                        <li
+                            class="{{ Request::is('admin/datamaster/metode/belajar*') || Request::is('admin/datamaster/metode/belajar/create*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('admin/datamaster/metode/belajar') }}">Metode Belajar</a>
                         </li>
                     </ul>

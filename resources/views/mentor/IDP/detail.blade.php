@@ -433,19 +433,14 @@
                                                                 </span>
                                                             </td>
                                                             {{-- <td>{{ $peng->saran }}</td> --}}
+                                                            @php
+                                                                $isWaiting =
+                                                                    $peng->status_pengerjaan === 'Menunggu Persetujuan';
+                                                            @endphp
+
                                                             <td class="text-center">
-                                                                @if ($peng->status_pengerjaan === 'Disetujui Mentor')
-                                                                    <button type="button"
-                                                                        class="btn btn-info btn-sm btn-nilai"
-                                                                        data-toggle="modal" data-target="#nilaiModal"
-                                                                        data-id="{{ $peng->id_idpKomPeng }}"
-                                                                        data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
-                                                                        data-status="{{ $peng->status_pengerjaan }}"
-                                                                        data-saran="{{ $peng->saran }}"
-                                                                        data-keterangan="{{ $peng->keterangan_hasil }}">
-                                                                        <i class="bi bi-eye"></i> Detail
-                                                                    </button>
-                                                                @else
+                                                                @if ($isWaiting)
+                                                                    {{-- Selama status masih menunggu, maka bisa dinilai --}}
                                                                     <button type="button"
                                                                         class="btn btn-primary btn-sm btn-nilai"
                                                                         data-toggle="modal" data-target="#nilaiModal"
@@ -453,8 +448,22 @@
                                                                         data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
                                                                         data-status="{{ $peng->status_pengerjaan }}"
                                                                         data-saran="{{ $peng->saran }}"
-                                                                        data-keterangan="{{ $peng->keterangan_hasil }}">
+                                                                        data-keterangan="{{ $peng->keterangan_hasil }}"
+                                                                        data-readonly="false">
                                                                         <i class="bi bi-pencil-square"></i> Nilai
+                                                                    </button>
+                                                                @else
+                                                                    {{-- Jika sudah dinilai, maka hanya bisa dilihat detail --}}
+                                                                    <button type="button"
+                                                                        class="btn btn-info btn-sm btn-nilai"
+                                                                        data-toggle="modal" data-target="#nilaiModal"
+                                                                        data-id="{{ $peng->id_idpKomPeng }}"
+                                                                        data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
+                                                                        data-status="{{ $peng->status_pengerjaan }}"
+                                                                        data-saran="{{ $peng->saran }}"
+                                                                        data-keterangan="{{ $peng->keterangan_hasil }}"
+                                                                        data-readonly="true">
+                                                                        <i class="bi bi-eye"></i> Detail
                                                                     </button>
                                                                 @endif
                                                             </td>
