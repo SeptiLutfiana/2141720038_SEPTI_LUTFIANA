@@ -129,91 +129,93 @@
                                             <p><strong>Sasaran:</strong> <br></span>{!! nl2br(e($kom->sasaran)) !!}</p>
                                             <p><strong>Aksi:</strong> <br> {!! nl2br(e($kom->aksi)) !!}</p>
                                             <p><strong>Riwayat Upload Implementasi (Hasil)</strong></p>
-                                            <table class="table table-bordered table-sm">
-                                                <thead class="table-light">
-                                                    <tr class="text-center">
-                                                        <th width="2%">No</th>
-                                                        <th width="5%">File</th>
-                                                        <th width="28%">Keterangan</th>
-                                                        <th width="10%">Tanggal Upload</th>
-                                                        <th width="15%">Rating Kompetensi</th>
-                                                        <th width="15%">Saran Supervisor</th>
-                                                        <th width="15%">Aksi</th>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-sm">
+                                                    <thead class="table-light">
+                                                        <tr class="text-center">
+                                                            <th width="2%">No</th>
+                                                            <th width="5%">File</th>
+                                                            <th width="28%">Keterangan</th>
+                                                            <th width="10%">Tanggal Upload</th>
+                                                            <th width="15%">Rating Kompetensi</th>
+                                                            <th width="15%">Saran Supervisor</th>
+                                                            <th width="15%">Aksi</th>
 
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($kom->pengerjaans as $index => $peng)
-                                                        @php
-                                                            $ext = strtolower(
-                                                                pathinfo($peng->upload_hasil, PATHINFO_EXTENSION),
-                                                            );
-                                                            $icon = match ($ext) {
-                                                                'pdf' => 'bi bi-file-earmark-pdf-fill text-danger',
-                                                                'doc',
-                                                                'docx'
-                                                                    => 'bi bi-file-earmark-word-fill text-primary',
-                                                                'xls',
-                                                                'xlsx'
-                                                                    => 'bi bi-file-earmark-excel-fill text-success',
-                                                                'jpg',
-                                                                'jpeg',
-                                                                'png'
-                                                                    => 'bi bi-file-earmark-image-fill text-warning',
-                                                                'mp4' => 'bi bi-file-earmark-play-fill text-dark',
-                                                                default => 'bi bi-file-earmark-fill',
-                                                            };
-                                                            $fileUrl = asset('storage/' . $peng->upload_hasil);
-                                                            $isPreviewable = in_array($ext, [
-                                                                'pdf',
-                                                                'jpg',
-                                                                'jpeg',
-                                                                'png',
-                                                                'mp4',
-                                                            ]);
-                                                        @endphp
-                                                        <tr>
-                                                            <td class="text-center">{{ $loop->iteration }}</td>
-                                                            <td class="text-center">
-                                                                @if ($isPreviewable)
-                                                                    {{-- File bisa dibuka langsung --}}
-                                                                    <a href="{{ $fileUrl }}" target="_blank"
-                                                                        title="Lihat file">
-                                                                        <i class="{{ $icon }}"
-                                                                            style="font-size: 1.5rem;"></i>
-                                                                    </a>
-                                                                @else
-                                                                    {{-- File harus didownload --}}
-                                                                    <a href="{{ $fileUrl }}" download
-                                                                        title="Download file">
-                                                                        <i class="{{ $icon }}"
-                                                                            style="font-size: 1.5rem;"></i>
-                                                                    </a>
-                                                                @endif
-                                                            </td>
-                                                            <td>{{ $peng->keterangan_hasil ?? '-' }}</td>
-                                                            <td class="text-center">
-                                                                {{ $peng->created_at->format('d-m-Y') }}</td>
-                                                            <td class="text-center">
-                                                                {{ $peng->nilaiPengerjaanIdp->rating ?? '-' }}</td>
-                                                            <td class="text-center">
-                                                                {{ $peng->nilaiPengerjaanIdp->saran ?? '-' }}</td>
-                                                            <td class="text-center">
-                                                                <button type="button" class="btn btn-primary btn-nilai"
-                                                                    data-toggle="modal" data-target="#nilaiModal"
-                                                                    data-id="{{ $peng->id_idpKomPeng }}"
-                                                                    data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
-                                                                    data-rating="{{ $peng->nilaiPengerjaanIdp->rating ?? '' }}"
-                                                                    data-saran="{{ $peng->nilaiPengerjaanIdp->saran ?? '' }}">
-                                                                    <i class="bi bi-pencil-square"></i> Nilai
-                                                                </button>
-                                                            </td>
                                                         </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($kom->pengerjaans as $index => $peng)
+                                                            @php
+                                                                $ext = strtolower(
+                                                                    pathinfo($peng->upload_hasil, PATHINFO_EXTENSION),
+                                                                );
+                                                                $icon = match ($ext) {
+                                                                    'pdf' => 'bi bi-file-earmark-pdf-fill text-danger',
+                                                                    'doc',
+                                                                    'docx'
+                                                                        => 'bi bi-file-earmark-word-fill text-primary',
+                                                                    'xls',
+                                                                    'xlsx'
+                                                                        => 'bi bi-file-earmark-excel-fill text-success',
+                                                                    'jpg',
+                                                                    'jpeg',
+                                                                    'png'
+                                                                        => 'bi bi-file-earmark-image-fill text-warning',
+                                                                    'mp4' => 'bi bi-file-earmark-play-fill text-dark',
+                                                                    default => 'bi bi-file-earmark-fill',
+                                                                };
+                                                                $fileUrl = asset('storage/' . $peng->upload_hasil);
+                                                                $isPreviewable = in_array($ext, [
+                                                                    'pdf',
+                                                                    'jpg',
+                                                                    'jpeg',
+                                                                    'png',
+                                                                    'mp4',
+                                                                ]);
+                                                            @endphp
+                                                            <tr>
+                                                                <td class="text-center">{{ $loop->iteration }}</td>
+                                                                <td class="text-center">
+                                                                    @if ($isPreviewable)
+                                                                        {{-- File bisa dibuka langsung --}}
+                                                                        <a href="{{ $fileUrl }}" target="_blank"
+                                                                            title="Lihat file">
+                                                                            <i class="{{ $icon }}"
+                                                                                style="font-size: 1.5rem;"></i>
+                                                                        </a>
+                                                                    @else
+                                                                        {{-- File harus didownload --}}
+                                                                        <a href="{{ $fileUrl }}" download
+                                                                            title="Download file">
+                                                                            <i class="{{ $icon }}"
+                                                                                style="font-size: 1.5rem;"></i>
+                                                                        </a>
+                                                                    @endif
+                                                                </td>
+                                                                <td>{{ $peng->keterangan_hasil ?? '-' }}</td>
+                                                                <td class="text-center">
+                                                                    {{ $peng->created_at->format('d-m-Y') }}</td>
+                                                                <td class="text-center">
+                                                                    {{ $peng->nilaiPengerjaanIdp->rating ?? '-' }}</td>
+                                                                <td class="text-center">
+                                                                    {{ $peng->nilaiPengerjaanIdp->saran ?? '-' }}</td>
+                                                                <td class="text-center">
+                                                                    <button type="button" class="btn btn-primary btn-nilai"
+                                                                        data-toggle="modal" data-target="#nilaiModal"
+                                                                        data-id="{{ $peng->id_idpKomPeng }}"
+                                                                        data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
+                                                                        data-rating="{{ $peng->nilaiPengerjaanIdp->rating ?? '' }}"
+                                                                        data-saran="{{ $peng->nilaiPengerjaanIdp->saran ?? '' }}">
+                                                                        <i class="bi bi-pencil-square"></i> Nilai
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            </div>
                                         </div>
-                                    </div>
                                 @endforeach
                             </div>
                             <div class="form-group col-md-12">
@@ -262,93 +264,97 @@
                                             <p><strong>Sasaran:</strong> <br></span>{!! nl2br(e($kom->sasaran)) !!}</p>
                                             <p><strong>Aksi:</strong> <br> {!! nl2br(e($kom->aksi)) !!}</p>
                                             <p><strong>Riwayat Upload Implementasi (Hasil)</strong></p>
-                                            <table class="table table-bordered table-sm">
-                                                <thead class="table-light">
-                                                    <tr class="text-center">
-                                                        <th width="2%">No</th>
-                                                        <th width="5%">File</th>
-                                                        <th width="28%">Keterangan</th>
-                                                        <th width="10%">Tanggal Upload</th>
-                                                        <th width="15%">Rating Kompetensi</th>
-                                                        <th width="15%">Saran Supervisor</th>
-                                                        <th width="15%">Aksi</th>
+                                            <div class="table-responsive">
 
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($kom->pengerjaans as $index => $peng)
-                                                        @php
-                                                            $ext = strtolower(
-                                                                pathinfo($peng->upload_hasil, PATHINFO_EXTENSION),
-                                                            );
-                                                            $icon = match ($ext) {
-                                                                'pdf' => 'bi bi-file-earmark-pdf-fill text-danger',
-                                                                'doc',
-                                                                'docx'
-                                                                    => 'bi bi-file-earmark-word-fill text-primary',
-                                                                'xls',
-                                                                'xlsx'
-                                                                    => 'bi bi-file-earmark-excel-fill text-success',
-                                                                'jpg',
-                                                                'jpeg',
-                                                                'png'
-                                                                    => 'bi bi-file-earmark-image-fill text-warning',
-                                                                'mp4' => 'bi bi-file-earmark-play-fill text-dark',
-                                                                default => 'bi bi-file-earmark-fill',
-                                                            };
-                                                            $fileUrl = asset('storage/' . $peng->upload_hasil);
-                                                            $isPreviewable = in_array($ext, [
-                                                                'pdf',
-                                                                'jpg',
-                                                                'jpeg',
-                                                                'png',
-                                                                'mp4',
-                                                            ]);
-                                                        @endphp
-                                                        <tr>
-                                                            <td class="text-center">{{ $loop->iteration }}</td>
-                                                            <td class="text-center">
-                                                                @if ($isPreviewable)
-                                                                    {{-- File bisa dibuka langsung --}}
-                                                                    <a href="{{ $fileUrl }}" target="_blank"
-                                                                        title="Lihat file">
-                                                                        <i class="{{ $icon }}"
-                                                                            style="font-size: 1.5rem;"></i>
-                                                                    </a>
-                                                                @else
-                                                                    {{-- File harus didownload --}}
-                                                                    <a href="{{ $fileUrl }}" download
-                                                                        title="Download file">
-                                                                        <i class="{{ $icon }}"
-                                                                            style="font-size: 1.5rem;"></i>
-                                                                    </a>
-                                                                @endif
-                                                            </td>
-                                                            <td>{{ $peng->keterangan_hasil ?? '-' }}</td>
-                                                            <td class="text-center">
-                                                                {{ $peng->created_at->format('d-m-Y') }}</td>
-                                                            <td class="text-center"
-                                                                id="rating-{{ $peng->id_idpKomPeng }}">
-                                                                {{ $peng->nilaiPengerjaanIdp->rating ?? 'belum dinilai' }}
-                                                            </td>
-                                                            <td class="text-center"
-                                                                id="saran-{{ $peng->id_idpKomPeng }}">
-                                                                {{ $peng->nilaiPengerjaanIdp->saran ?? 'telum ada saran' }}
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <button type="button" class="btn btn-primary btn-nilai"
-                                                                    data-toggle="modal" data-target="#nilaiModal"
-                                                                    data-id="{{ $peng->id_idpKomPeng }}"
-                                                                    data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
-                                                                    data-rating="{{ $peng->nilaiPengerjaanIdp->rating ?? '' }}"
-                                                                    data-saran="{{ $peng->nilaiPengerjaanIdp->saran ?? '' }}">
-                                                                    <i class="bi bi-pencil-square"></i> Nilai
-                                                                </button>
-                                                            </td>
+                                                <table class="table table-bordered table-sm">
+                                                    <thead class="table-light">
+                                                        <tr class="text-center">
+                                                            <th width="2%">No</th>
+                                                            <th width="5%">File</th>
+                                                            <th width="28%">Keterangan</th>
+                                                            <th width="10%">Tanggal Upload</th>
+                                                            <th width="15%">Rating Kompetensi</th>
+                                                            <th width="15%">Saran Supervisor</th>
+                                                            <th width="15%">Aksi</th>
+
                                                         </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($kom->pengerjaans as $index => $peng)
+                                                            @php
+                                                                $ext = strtolower(
+                                                                    pathinfo($peng->upload_hasil, PATHINFO_EXTENSION),
+                                                                );
+                                                                $icon = match ($ext) {
+                                                                    'pdf' => 'bi bi-file-earmark-pdf-fill text-danger',
+                                                                    'doc',
+                                                                    'docx'
+                                                                        => 'bi bi-file-earmark-word-fill text-primary',
+                                                                    'xls',
+                                                                    'xlsx'
+                                                                        => 'bi bi-file-earmark-excel-fill text-success',
+                                                                    'jpg',
+                                                                    'jpeg',
+                                                                    'png'
+                                                                        => 'bi bi-file-earmark-image-fill text-warning',
+                                                                    'mp4' => 'bi bi-file-earmark-play-fill text-dark',
+                                                                    default => 'bi bi-file-earmark-fill',
+                                                                };
+                                                                $fileUrl = asset('storage/' . $peng->upload_hasil);
+                                                                $isPreviewable = in_array($ext, [
+                                                                    'pdf',
+                                                                    'jpg',
+                                                                    'jpeg',
+                                                                    'png',
+                                                                    'mp4',
+                                                                ]);
+                                                            @endphp
+                                                            <tr>
+                                                                <td class="text-center">{{ $loop->iteration }}</td>
+                                                                <td class="text-center">
+                                                                    @if ($isPreviewable)
+                                                                        {{-- File bisa dibuka langsung --}}
+                                                                        <a href="{{ $fileUrl }}" target="_blank"
+                                                                            title="Lihat file">
+                                                                            <i class="{{ $icon }}"
+                                                                                style="font-size: 1.5rem;"></i>
+                                                                        </a>
+                                                                    @else
+                                                                        {{-- File harus didownload --}}
+                                                                        <a href="{{ $fileUrl }}" download
+                                                                            title="Download file">
+                                                                            <i class="{{ $icon }}"
+                                                                                style="font-size: 1.5rem;"></i>
+                                                                        </a>
+                                                                    @endif
+                                                                </td>
+                                                                <td>{{ $peng->keterangan_hasil ?? '-' }}</td>
+                                                                <td class="text-center">
+                                                                    {{ $peng->created_at->format('d-m-Y') }}</td>
+                                                                <td class="text-center"
+                                                                    id="rating-{{ $peng->id_idpKomPeng }}">
+                                                                    {{ $peng->nilaiPengerjaanIdp->rating ?? 'belum dinilai' }}
+                                                                </td>
+                                                                <td class="text-center"
+                                                                    id="saran-{{ $peng->id_idpKomPeng }}">
+                                                                    {{ $peng->nilaiPengerjaanIdp->saran ?? 'telum ada saran' }}
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <button type="button"
+                                                                        class="btn btn-primary btn-nilai"
+                                                                        data-toggle="modal" data-target="#nilaiModal"
+                                                                        data-id="{{ $peng->id_idpKomPeng }}"
+                                                                        data-kompetensi="{{ $peng->idpKompetensi->kompetensi->nama_kompetensi }}"
+                                                                        data-rating="{{ $peng->nilaiPengerjaanIdp->rating ?? '' }}"
+                                                                        data-saran="{{ $peng->nilaiPengerjaanIdp->saran ?? '' }}">
+                                                                        <i class="bi bi-pencil-square"></i> Nilai
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
