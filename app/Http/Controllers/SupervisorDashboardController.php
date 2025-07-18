@@ -317,11 +317,12 @@ class SupervisorDashboardController extends Controller
                 'rating' => $validated['rating'],
                 'saran' => $validated['saran'],
             ]);
-
             // Baru ambil IDP setelah simpan nilai
             $idpKomPeng = $nilai->idpKompetensiPengerjaan;
             $idp = $idpKomPeng->idpKompetensi->idp;
-
+            // Update status pengerjaan IDP menjadi "Selesai"
+            $idp->status_pengerjaan = 'Selesai';
+            $idp->save();
             $idp->refresh();
             // Hitung total dan yang sudah dinilai
             $total = 0;

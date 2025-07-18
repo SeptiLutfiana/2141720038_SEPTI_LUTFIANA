@@ -37,15 +37,14 @@ class IdpRekomendasiService
 
                 foreach ($idpKomp->pengerjaans as $pengerjaan) {
                     $ratings = $ratings->merge(
-    $pengerjaan->nilaiPengerjaanIdp()
-        ->whereHas('idpKompetensiPengerjaan.idpKompetensi', function ($query) use ($idp) {
-            $query->where('id_idp', $idp->id_idp);
-        })
-        ->pluck('rating')
-        ->filter()
-        ->map(fn($r) => (float) $r)
-);
-
+                        $pengerjaan->nilaiPengerjaanIdp()
+                            ->whereHas('idpKompetensiPengerjaan.idpKompetensi', function ($query) use ($idp) {
+                                $query->where('id_idp', $idp->id_idp);
+                            })
+                            ->pluck('rating')
+                            ->filter()
+                            ->map(fn($r) => (float) $r)
+                    );
                 }
 
                 if ($ratings->isEmpty()) {
@@ -326,24 +325,20 @@ class IdpRekomendasiService
      */
     private function tentukanHasilFinal($hasilSoft, $hasilHard)
     {
-        $soft = $hasilSoft['hasil'];
-        $hard = $hasilHard['hasil'];
-        // Tambahkan log debug di sini
-        Log::debug('🔍 Debug kombinasi hasil untuk matrix final', [
-            'soft' => $soft,
-            'hard' => $hard,
-            'soft_original' => $hasilSoft,
-            'hard_original' => $hasilHard,
-            'matrix_key_exists' => isset($matrix[$soft][$hard]) ? '✅ YES' : '❌ NO',
-        ]);
+        $soft = $hasilSoft['hasil'] ?? 'Menunggu Hasil';
+        $hard = $hasilHard['hasil'] ?? 'Menunggu Hasil';
+
         // Jika salah satu masih menunggu hasil
-        if ($soft === 'Menunggu Hasil' || $hard === 'Menunggu Hasil') {
+        if ($soft === 'Menunggu Hasil' && $hard !== 'Menunggu Hasil') {
+            return $hasilHard;
+        } elseif ($hard === 'Menunggu Hasil' && $soft !== 'Menunggu Hasil') {
+            return $hasilSoft;
+        } elseif ($soft === 'Menunggu Hasil' && $hard === 'Menunggu Hasil') {
             return [
                 'hasil' => 'Menunggu Hasil',
-                'deskripsi' => 'Menunggu hasil kompetensi lengkap.'
+                'deskripsi' => 'Belum ada kompetensi yang bisa dievaluasi.'
             ];
         }
-
         // Matrix keputusan
         $matrix = [
             'Tidak Disarankan' => [
@@ -362,7 +357,13 @@ class IdpRekomendasiService
                 'Disarankan' => ['Disarankan', 'Kemampuan teknis dan perilaku memenuhi standar.']
             ]
         ];
-
+        Log::debug('🔍 Debug kombinasi hasil untuk matrix final', [
+            'soft' => $soft,
+            'hard' => $hard,
+            'soft_original' => $hasilSoft,
+            'hard_original' => $hasilHard,
+            'matrix_key_exists' => isset($matrix[$soft][$hard]) ? '✅ YES' : '❌ NO',
+        ]);
         if (isset($matrix[$soft][$hard])) {
             return [
                 'hasil' => $matrix[$soft][$hard][0],
