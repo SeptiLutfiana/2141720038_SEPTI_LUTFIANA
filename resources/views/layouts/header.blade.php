@@ -11,10 +11,26 @@
         <li class="dropdown dropdown-list-toggle position-relative">
             <a href="#" data-toggle="dropdown" class="nav-link nav-link-lg position-relative">
                 <i class="far fa-bell fa-lg"></i>
-                @if (auth()->user()->unreadNotifications->count() > 0)
+                @php
+                    $activeRole = session('active_role');
+                    $currentRoleKey = match ($activeRole) {
+                        1 => 'adminsdm',
+                        2 => 'supervisor',
+                        3 => 'mentor',
+                        4 => 'karyawan',
+                        default => 'karyawan',
+                    };
+                    $filteredNotifications = auth()
+                        ->user()
+                        ->unreadNotifications->filter(function ($notif) use ($currentRoleKey) {
+                            return isset($notif->data['untuk_role']) && $notif->data['untuk_role'] === $currentRoleKey;
+                        });
+                @endphp
+
+                @if ($filteredNotifications->count() > 0)
                     <span class="badge badge-danger position-absolute"
                         style="top: -6px; right: -6px; font-size: 0.65rem; padding: 2px 4px; border-radius: 999px;">
-                        {{ auth()->user()->unreadNotifications->count() }}
+                        {{ $filteredNotifications->count() }}
                     </span>
                 @endif
             </a>

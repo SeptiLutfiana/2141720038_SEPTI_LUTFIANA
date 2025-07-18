@@ -13,6 +13,7 @@ class GivenIDPNotification extends Notification
     use Queueable;
 
     protected $id_idp;
+    protected $untuk_role;
 
     /**
      * Create a new notification instance.
@@ -47,6 +48,7 @@ class GivenIDPNotification extends Notification
             'title' => 'Rencana Pengembangan Karir Telah Dibuat',
             'message' => 'Admin telah membuatkan IDP (Individual Development Plan) untuk Anda. Silakan tinjau dan mulai perjalanan pengembangan Anda.',
             'id_idp' => $this->id_idp,
+            'untuk_role' => $this->untuk_role,
             'link' => route('karyawan.IDP.indexKaryawan'), // Atau route detail jika ingin langsung ke IDP tertentu
         ]);
     }
