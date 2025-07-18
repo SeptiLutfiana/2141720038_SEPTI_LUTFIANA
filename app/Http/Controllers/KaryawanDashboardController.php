@@ -29,7 +29,7 @@ use FFI\Exception;
 use App\Models\EvaluasiIdp;
 use App\Notifications\KaryawanMemilihMentor;
 use App\Notifications\IDPBaruDibuatNotification;
-
+use App\Notifications\UpdateIDPNotification;
 class KaryawanDashboardController extends Controller
 {
     public function index(Request $request)
@@ -1189,7 +1189,13 @@ class KaryawanDashboardController extends Controller
                 }
                 Log::debug('Transaksi database akan di-commit.');
             }); // Akhir DB::transaction
-
+            // Kirim notifikasi ke mentor
+            if ($idp->id_mentor) {
+                $mentor = \App\Models\User::find($idp->id_mentor);
+                if ($mentor) {
+                    $mentor->notify(new UpdateIDPNotification($idp->id_idp, 'mentor'));
+                }
+            }
             return redirect()->route('karyawan.IDP.indexKaryawan')
                 ->with('msg-success', 'Data IDP berhasil diperbarui.');
         } catch (Exception $e) {
@@ -1200,5 +1206,4 @@ class KaryawanDashboardController extends Controller
                 ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
         }
     }
-    
 }

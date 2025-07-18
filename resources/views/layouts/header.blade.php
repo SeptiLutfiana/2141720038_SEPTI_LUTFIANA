@@ -13,17 +13,18 @@
                 <i class="far fa-bell fa-lg"></i>
                 @php
                     $activeRole = session('active_role');
-                    $currentRoleKey = match ($activeRole) {
+                    $userRole = match ($activeRole) {
                         1 => 'adminsdm',
                         2 => 'supervisor',
                         3 => 'mentor',
                         4 => 'karyawan',
                         default => 'karyawan',
                     };
+
                     $filteredNotifications = auth()
                         ->user()
-                        ->unreadNotifications->filter(function ($notif) use ($currentRoleKey) {
-                            return isset($notif->data['untuk_role']) && $notif->data['untuk_role'] === $currentRoleKey;
+                        ->unreadNotifications->filter(function ($notif) use ($userRole) {
+                            return isset($notif->data['untuk_role']) && $notif->data['untuk_role'] === $userRole;
                         });
                 @endphp
 
@@ -48,32 +49,6 @@
                 </div>
 
                 <div class="dropdown-list-content dropdown-list-icons">
-                    @php
-                        // Ambil ID role aktif dari session
-                        $activeRole = session('active_role');
-
-                        // Tentukan nama peran
-                        $userRole = match ($activeRole) {
-                            1 => 'adminsdm',
-                            2 => 'supervisor',
-                            3 => 'mentor',
-                            4 => 'karyawan',
-                            default => 'karyawan',
-                        };
-                        $currentRoleKey = $roleMap[$activeRole] ?? 'karyawan';
-                        $filteredNotifications = auth()
-                            ->user()
-                            ->unreadNotifications->filter(function ($notif) use ($currentRoleKey) {
-                                return isset($notif->data['untuk_role']) &&
-                                    $notif->data['untuk_role'] === $currentRoleKey;
-                            });
-                    @endphp
-                    @if ($filteredNotifications->count() > 0)
-                        <span class="badge badge-danger position-absolute"
-                            style="top: -6px; right: -6px; font-size: 0.65rem; padding: 2px 4px; border-radius: 999px;">
-                            {{ $filteredNotifications->count() }}
-                        </span>
-                    @endif
                     <div class="dropdown-list-content dropdown-list-icons" style="max-height: 400px; overflow-y: auto;">
                         @if ($filteredNotifications->count() > 0)
                             @foreach (auth()->user()->unreadNotifications->where('data.untuk_role', $userRole) as $notification)
@@ -85,19 +60,19 @@
                                     // Tentukan nama dan rute berdasarkan peran aktif
                                     switch ($userRole) {
                                         case 'mentor':
-                                            $nama = $notification->data['nama_karyawan'] ?? 'Karyawan';
+                                            $nama = $notification->data['nama_karyawan'] ?? '';
                                             $routeName = 'mentor.IDP.mentor.idp.show';
                                             break;
                                         case 'supervisor':
-                                            $nama = $notification->data['nama_karyawan'] ?? 'Supervisor';
+                                            $nama = $notification->data['nama_karyawan'] ?? '';
                                             $routeName = 'supervisor.IDP.showSupervisor';
                                             break;
                                         case 'karyawan':
-                                            $nama = $notification->data['nama_mentor'] ?? 'Mentor';
+                                            $nama = $notification->data['nama_karyawan'] ?? '';
                                             $routeName = 'karyawan.IDP.showKaryawan';
                                             break;
                                         case 'adminsdm':
-                                            $nama = $notification->data['nama_user'] ?? 'Mentor';
+                                            $nama = $notification->data['nama_user'] ?? '';
                                             $routeName = 'adminsdm.dashboard';
                                             break;
                                     }

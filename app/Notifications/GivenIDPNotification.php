@@ -20,11 +20,11 @@ class GivenIDPNotification extends Notification
      *
      * @param int $id_idp ID dari IDP yang baru dibuat
      */
-    public function __construct($id_idp)
+    public function __construct($id_idp, $untuk_role = 'karyawan') // default 'karyawan'
     {
         $this->id_idp = $id_idp;
+        $this->untuk_role = $untuk_role;
     }
-
     /**
      * Get the notification's delivery channels.
      *

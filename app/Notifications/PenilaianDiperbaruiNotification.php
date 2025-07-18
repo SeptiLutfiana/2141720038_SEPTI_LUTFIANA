@@ -32,7 +32,7 @@ class PenilaianDiperbaruiNotification extends Notification
             'status' => $this->data['status'],
             'saran' => $this->data['saran'],
             'nama_mentor' => $this->data['nama_mentor'],
-            'untuk_mentor' =>$this->data['untuk_role'],
+            'untuk_role' =>$this->data['untuk_role'],
             'message' => $this->data['message'],
         ]);
     }

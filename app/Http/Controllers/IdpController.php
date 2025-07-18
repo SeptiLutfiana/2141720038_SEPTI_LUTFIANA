@@ -294,7 +294,7 @@ class IdpController extends Controller
 
             foreach ($users as $user) {
                 if (isset($createdIdps[$user->id])) {
-                    $user->notify(new GivenIDPNotification($createdIdps[$user->id]->id_idp));
+                    $user->notify(new GivenIDPNotification($createdIdps[$user->id]->id_idp, 'karyawan'));
                     // Notifikasi ke mentor (jika dipilih)
                     if ($request->id_mentor) {
                         $mentor = User::find($request->id_mentor);
@@ -315,7 +315,7 @@ class IdpController extends Controller
                         $supervisor->notify(new IDPBaruDibuatNotification([
                             'id_idp' => $createdIdps[$user->id]->id_idp,
                             'nama_karyawan' => $user->name,
-                            'peran' => 'Supervisor',
+                            'peran' => 'supervisor',
                             'untuk_role' => 'supervisor',
                             'link' => route('supervisor.IDP.showSupervisor', $createdIdps[$user->id]->id_idp),
                         ]));
