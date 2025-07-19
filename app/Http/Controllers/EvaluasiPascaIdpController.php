@@ -58,7 +58,7 @@ class EvaluasiPascaIdpController extends Controller
     public function indexKaryawan(Request $request)
     {
         $search = $request->query('search');
-        $jenisEvaluasi = $request->query('jenis_evaluasi');
+        $jenisEvaluasi = $request->query('jenis_evaluasi', 'pasca');
         $tipePertanyaan = $request->query('tipe_pertanyaan');
 
         $evaluasiPasca = EvaluasiIdp::when($search, function ($query, $search) {

@@ -128,7 +128,7 @@ class KaryawanDashboardController extends Controller
             ->take(5)
             ->get();
 
-        $totalBelumEvaluasiPasca = IDP::where('id_user', $karyawanId)
+        $totalBelumEvaluasiPasca = IDP::where('id_user', $user->id)
             ->whereYear('waktu_mulai', $tahunDipilih)
             ->whereHas('rekomendasis', function ($query) {
                 $query->whereIn('hasil_rekomendasi', ['Disarankan', 'Disarankan dengan Pengembangan']);
