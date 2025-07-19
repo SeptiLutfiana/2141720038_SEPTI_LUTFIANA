@@ -19,7 +19,7 @@ class IdpKompetensiPengerjaan extends Model
     ];
     public function idpKompetensi()
     {
-        return $this->belongsTo(IdpKompetensi::class, 'id_idpKom');
+        return $this->belongsTo(IdpKompetensi::class, 'id_idpKom', 'id_idpKom');
     }
      public function nilaiPengerjaanIdp()
     {

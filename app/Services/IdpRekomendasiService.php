@@ -75,7 +75,22 @@ class IdpRekomendasiService
 
             $hasilSoft = $this->hitungHasilSoftKompetensi($softs);
             $hasilHard = $this->hitungHasilHardKompetensi($hards);
-            $finalHasil = $this->tentukanHasilFinal($hasilSoft, $hasilHard);
+            if (!empty($softs) && empty($hards)) {
+    // Hanya ada soft kompetensi
+    $finalHasil = $hasilSoft;
+} elseif (empty($softs) && !empty($hards)) {
+    // Hanya ada hard kompetensi
+    $finalHasil = $hasilHard;
+} elseif (!empty($softs) && !empty($hards)) {
+    // Gabungan soft dan hard → pakai matriks gabungan
+    $finalHasil = $this->tentukanHasilFinal($hasilSoft, $hasilHard);
+} else {
+    // Tidak ada data
+    $finalHasil = [
+        'hasil' => 'Menunggu Hasil',
+        'deskripsi' => 'Belum ada kompetensi yang bisa dievaluasi.'
+    ];
+}
 
             $nilaiSoft = $this->hitungNilaiAkhirSoft($idp);
             $nilaiHard = $this->hitungNilaiAkhirHard($idp);
@@ -96,8 +111,7 @@ class IdpRekomendasiService
                     'nilai_akhir_hard' => $nilaiHard,
                 ]
             );
-
-            Log::info('=== Selesai proses perhitungan rekomendasi IDP ===', ['id_idp' => $idp->id_idp]);
+                Log::info('=== Selesai proses perhitungan rekomendasi IDP ===', ['id_idp' => $idp->id_idp]);
         } catch (\Exception $e) {
             Log::error('ERROR saat menghitung rekomendasi', [
                 'id_idp' => $idp->id_idp,
@@ -110,6 +124,10 @@ class IdpRekomendasiService
 
     private function hitungHasilSoftKompetensi($softs)
     {
+        if (empty($softs)) {
+        Log::info('⛔ Lewati analisis soft kompetensi karena tidak ada data');
+        return null; // atau return default seperti ['hasil' => null, 'deskripsi' => 'Tidak ada soft kompetensi']
+    }
         $ratings = [];
         $totalKompetensi = count($softs);
         $utamaKurang3 = false;

@@ -15,16 +15,34 @@
             </div>
 
             <div class="section-body">
-                <div class="card" style="border-left: 5px solid #28a745; background-color: #e6f9d7;">
-                    <div class="card-body" style="color: #212529;">
-                        Isilah form dibawah ini dengan baik dan benar. Semua data yang anda inputkan pada form ini haruslah
-                        asli dan bukan rekayasa serta benar-benar dapat dipertanggungjawabkan. Refleksi personal adalah
-                        proses merenung dan mengevaluasi diri sendiri terhadap pengalaman, tindakan, dan pemikiran yang
-                        telah kita lakukan. Ini seperti "mencerminkan" diri sendiri untuk memahami diri lebih dalam,
-                        mengidentifikasi kekuatan dan kelemahan, serta belajar dari pengalaman.
+                @if ($idps->status_pengerjaan === 'Selesai' && $idps->rekomendasis)
+                    <div class="card" style="border-left: 5px solid #28a745; background-color: #e6f9d7;">
+                        <div class="card-body" style="color: #212529;">
+                            <h5 class="mb-3"><i class="fas fa-check-circle text-success"></i> Hasil Rekomendasi</h5>
+                            <ul class="mb-0">
+                                <li><strong>Nilai Rata-rata Rating Soft Kompetensi:</strong>
+                                    {{ $idps->rekomendasis->first()->nilai_akhir_soft ?? '' }}</li>
+                                <li><strong>Nilai Rata-rata Rating Hard Kompetensi:</strong>
+                                    {{ $idps->rekomendasis->first()->nilai_akhir_hard ?? '' }}</li>
+                                <li><strong>Hasil Rekomendasi:</strong>
+                                    {{ $idps->rekomendasis->first()->hasil_rekomendasi ?? '' }}</li>
+                                <li><strong>Deskripsi:</strong>
+                                    {{ $idps->rekomendasis->first()->deskripsi_rekomendasi ?? '' }}</li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-
+                @else
+                    <div class="card" style="border-left: 5px solid #28a745; background-color: #e6f9d7;">
+                        <div class="card-body" style="color: #212529;">
+                            Isilah form dibawah ini dengan baik dan benar. Semua data yang anda inputkan pada form ini
+                            haruslah
+                            asli dan bukan rekayasa serta benar-benar dapat dipertanggungjawabkan. Refleksi personal adalah
+                            proses merenung dan mengevaluasi diri sendiri terhadap pengalaman, tindakan, dan pemikiran yang
+                            telah kita lakukan. Ini seperti "mencerminkan" diri sendiri untuk memahami diri lebih dalam,
+                            mengidentifikasi kekuatan dan kelemahan, serta belajar dari pengalaman.
+                        </div>
+                    </div>
+                @endif
                 <div class="card">
                     <div class="card-header">
                         <h4>Informasi IDP - {{ $idps->karyawan->name }}</h4>
@@ -139,53 +157,56 @@
                                             <p><strong>Aksi:</strong> <br> {!! nl2br(e($kom->aksi)) !!}</p>
 
                                             {{-- BAGIAN FORM UPLOAD --}}
-                                            <p><strong>Implementasi (Hasil)</strong></p>
-                                            <form
-                                                action="{{ route('karyawan.IDP.storeImplementasiSoft', ['id_idpKom' => $kom->id_idpKom]) }}"
-                                                method="POST" enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="dashed-border-container p-4 mt-4 mb-4"
-                                                    style="border: 2px dashed #ddd; border-radius: 8px;">
-                                                    <div class="form-group col-md-12 mb-3">
-                                                        <div class="border p-4 text-center"
-                                                            style="background-color: #f8f9fa;">
-                                                            <div
-                                                                class="d-flex justify-content-center align-items-center mb-3">
-                                                                <i class="fas fa-cloud-upload-alt fa-2x text-muted"></i>
+                                            @if ($kom->idp->status_pengerjaan !== 'Selesai')
+                                                <p><strong>Implementasi (Hasil)</strong></p>
+                                                <form
+                                                    action="{{ route('karyawan.IDP.storeImplementasiSoft', ['id_idpKom' => $kom->id_idpKom]) }}"
+                                                    method="POST" enctype="multipart/form-data">
+                                                    @csrf
+                                                    <div class="dashed-border-container p-4 mt-4 mb-4"
+                                                        style="border: 2px dashed #ddd; border-radius: 8px;">
+                                                        <div class="form-group col-md-12 mb-3">
+                                                            <div class="border p-4 text-center"
+                                                                style="background-color: #f8f9fa;">
+                                                                <div
+                                                                    class="d-flex justify-content-center align-items-center mb-3">
+                                                                    <i class="fas fa-cloud-upload-alt fa-2x text-muted"></i>
+                                                                </div>
+                                                                <p>Choose a file</p>
+                                                                <p class="text-muted">Format
+                                                                    pdf,doc,docx,xlsx,jpg,jpeg,png,csv
+                                                                    , ukuran file
+                                                                    5MB</p>
+                                                                <input type="file" name="upload_hasil"
+                                                                    id="fileImplementasiSoft_{{ $kom->id_idpKom }}"
+                                                                    style="display: none;"
+                                                                    onchange="displaySelectedFile(this, 'fileNameSoft_{{ $kom->id_idpKom }}', 'fileErrorHard_{{ $kom->id_idpKom }}')">
+                                                                <button type="button" class="btn btn-outline-secondary"
+                                                                    onclick="document.getElementById('fileImplementasiSoft_{{ $kom->id_idpKom }}').click()">
+                                                                    Browse File
+                                                                </button>
+                                                                <div id="fileNameSoft_{{ $kom->id_idpKom }}"
+                                                                    class="mt-2 text-primary" style="display: none;"></div>
+                                                                <div id="fileErrorHard_{{ $kom->id_idpKom }}"
+                                                                    class="mt-2 text-danger" style="display: none;"></div>
                                                             </div>
-                                                            <p>Choose a file</p>
-                                                            <p class="text-muted">Format pdf,doc,docx,xlsx,jpg,jpeg,png,csv
-                                                                , ukuran file
-                                                                5MB</p>
-                                                            <input type="file" name="upload_hasil"
-                                                                id="fileImplementasiSoft_{{ $kom->id_idpKom }}"
-                                                                style="display: none;"
-                                                                onchange="displaySelectedFile(this, 'fileNameSoft_{{ $kom->id_idpKom }}', 'fileErrorHard_{{ $kom->id_idpKom }}')">
-                                                            <button type="button" class="btn btn-outline-secondary"
-                                                                onclick="document.getElementById('fileImplementasiSoft_{{ $kom->id_idpKom }}').click()">
-                                                                Browse File
+                                                        </div>
+
+                                                        <div class="form-group col-md-12 mb-3">
+                                                            <label
+                                                                for="keterangan_hasil_implementasi_soft_{{ $kom->id_idpKom }}">Keterangan</label>
+                                                            <textarea class="form-control" id="keterangan_hasil_implementasi_soft_{{ $kom->id_idpKom }}" style="height:6rem;"
+                                                                name="keterangan_hasil" rows="3" placeholder="Ketikkan pencapaian atau hasil implementasi..."></textarea>
+                                                        </div>
+
+                                                        <div class="d-flex justify-content-end mt-4">
+                                                            <button type="submit" class="btn btn-primary me-2">
+                                                                <i class="fas fa-save me-1"></i> Simpan
                                                             </button>
-                                                            <div id="fileNameSoft_{{ $kom->id_idpKom }}"
-                                                                class="mt-2 text-primary" style="display: none;"></div>
-                                                            <div id="fileErrorHard_{{ $kom->id_idpKom }}"
-                                                                class="mt-2 text-danger" style="display: none;"></div>
                                                         </div>
                                                     </div>
-
-                                                    <div class="form-group col-md-12 mb-3">
-                                                        <label
-                                                            for="keterangan_hasil_implementasi_soft_{{ $kom->id_idpKom }}">Keterangan</label>
-                                                        <textarea class="form-control" id="keterangan_hasil_implementasi_soft_{{ $kom->id_idpKom }}" style="height:6rem;"
-                                                            name="keterangan_hasil" rows="3" placeholder="Ketikkan pencapaian atau hasil implementasi..."></textarea>
-                                                    </div>
-
-                                                    <div class="d-flex justify-content-end mt-4">
-                                                        <button type="submit" class="btn btn-primary me-2">
-                                                            <i class="fas fa-save me-1"></i> Simpan
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </form>
+                                                </form>
+                                            @endif
                                             <p><strong>Riwayat Upload Implementasi (Hasil)</strong></p>
                                             <table class="table table-bordered table-sm">
                                                 <thead class="table-light">
@@ -367,54 +388,58 @@
                                             <p><strong>Aksi:</strong> <br> {!! nl2br(e($kom->aksi)) !!}</p>
 
                                             {{-- BAGIAN FORM UPLOAD --}}
-                                            <p><strong>Implementasi (Hasil)</strong></p>
-                                            <form
-                                                action="{{ route('karyawan.IDP.storeImplementasiHard', ['id_idpKom' => $kom->id_idpKom]) }}"
-                                                method="POST" enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="dashed-border-container p-4 mt-4 mb-4"
-                                                    style="border: 2px dashed #ddd; border-radius: 8px;">
-                                                    <div class="form-group col-md-12 mb-3">
-                                                        <div class="border p-4 text-center"
-                                                            style="background-color: #f8f9fa;">
-                                                            <div
-                                                                class="d-flex justify-content-center align-items-center mb-3">
-                                                                <i class="fas fa-cloud-upload-alt fa-2x text-muted"></i>
+                                            @if ($kom->idp->status_pengerjaan !== 'Selesai')
+                                                <p><strong>Implementasi (Hasil)</strong></p>
+                                                <form
+                                                    action="{{ route('karyawan.IDP.storeImplementasiHard', ['id_idpKom' => $kom->id_idpKom]) }}"
+                                                    method="POST" enctype="multipart/form-data">
+                                                    @csrf
+                                                    <div class="dashed-border-container p-4 mt-4 mb-4"
+                                                        style="border: 2px dashed #ddd; border-radius: 8px;">
+                                                        <div class="form-group col-md-12 mb-3">
+                                                            <div class="border p-4 text-center"
+                                                                style="background-color: #f8f9fa;">
+                                                                <div
+                                                                    class="d-flex justify-content-center align-items-center mb-3">
+                                                                    <i
+                                                                        class="fas fa-cloud-upload-alt fa-2x text-muted"></i>
+                                                                </div>
+                                                                <p>Choose a file or drag & drop it here</p>
+                                                                <p class="text-muted">>Format
+                                                                    pdf,doc,docx,xlsx,jpg,jpeg,png,csv
+                                                                    , ukuran file
+                                                                    5MB</p>
+                                                                <input type="file" name="upload_hasil"
+                                                                    id="fileImplementasiHard_{{ $kom->id_idpKom }}"
+                                                                    style="display: none;"
+                                                                    onchange="displaySelectedFile(this, 'fileNameHard_{{ $kom->id_idpKom }}','fileErrorHard_{{ $kom->id_idpKom }}')">
+                                                                <button type="button" class="btn btn-outline-secondary"
+                                                                    onclick="document.getElementById('fileImplementasiHard_{{ $kom->id_idpKom }}').click()">
+                                                                    Browse File
+                                                                </button>
+                                                                <div id="fileNameHard_{{ $kom->id_idpKom }}"
+                                                                    class="mt-2 text-primary" style="display: none;">
+                                                                </div>
+                                                                <div id="fileErrorHard_{{ $kom->id_idpKom }}"
+                                                                    class="mt-2 text-danger" style="display: none;"></div>
                                                             </div>
-                                                            <p>Choose a file or drag & drop it here</p>
-                                                            <p class="text-muted">>Format
-                                                                pdf,doc,docx,xlsx,jpg,jpeg,png,csv
-                                                                , ukuran file
-                                                                5MB</p>
-                                                            <input type="file" name="upload_hasil"
-                                                                id="fileImplementasiHard_{{ $kom->id_idpKom }}"
-                                                                style="display: none;"
-                                                                onchange="displaySelectedFile(this, 'fileNameHard_{{ $kom->id_idpKom }}','fileErrorHard_{{ $kom->id_idpKom }}')">
-                                                            <button type="button" class="btn btn-outline-secondary"
-                                                                onclick="document.getElementById('fileImplementasiHard_{{ $kom->id_idpKom }}').click()">
-                                                                Browse File
+                                                        </div>
+
+                                                        <div class="form-group col-md-12 mb-3">
+                                                            <label
+                                                                for="keterangan_hasil_implementasi_hard_{{ $kom->id_idpKom }}">Keterangan</label>
+                                                            <textarea class="form-control" id="keterangan_hasil_implementasi_hard_{{ $kom->id_idpKom }}" style="height:6rem;"
+                                                                name="keterangan_hasil" rows="3" placeholder="Ketikkan pencapaian atau hasil implementasi..."></textarea>
+                                                        </div>
+
+                                                        <div class="d-flex justify-content-end mt-4">
+                                                            <button type="submit" class="btn btn-primary me-2">
+                                                                <i class="fas fa-save me-1"></i> Simpan
                                                             </button>
-                                                            <div id="fileNameHard_{{ $kom->id_idpKom }}"
-                                                                class="mt-2 text-primary" style="display: none;"></div>
-                                                            <div id="fileErrorHard_{{ $kom->id_idpKom }}"
-                                                                class="mt-2 text-danger" style="display: none;"></div>
                                                         </div>
                                                     </div>
-
-                                                    <div class="form-group col-md-12 mb-3">
-                                                        <label
-                                                            for="keterangan_hasil_implementasi_hard_{{ $kom->id_idpKom }}">Keterangan</label>
-                                                        <textarea class="form-control" id="keterangan_hasil_implementasi_hard_{{ $kom->id_idpKom }}" style="height:6rem;"
-                                                            name="keterangan_hasil" rows="3" placeholder="Ketikkan pencapaian atau hasil implementasi..."></textarea>
-                                                    </div>
-
-                                                    <div class="d-flex justify-content-end mt-4">
-                                                        <button type="submit" class="btn btn-primary me-2">
-                                                            <i class="fas fa-save me-1"></i> Simpan
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </form>
+                                                </form>
+                                            @endif
                                             <p><strong>Riwayat Upload Implementasi (Hasil)</strong></p>
                                             <table class="table table-bordered table-sm">
                                                 <thead class="table-light">
@@ -616,6 +641,7 @@
                 icon.classList.add('bi-chevron-right');
             }
         }
+
         function displaySelectedFile(input, displayId, errorId) {
             const displayElement = document.getElementById(displayId);
             const errorElement = document.getElementById(errorId);

@@ -18,7 +18,9 @@ use Illuminate\Support\Facades\DB;
 use App\Models\IdpRekomendasi;
 use App\Notifications\IDPBaruDibuatNotification;
 use Illuminate\Notifications\DatabaseNotification;
-
+use \App\Notifications\HasilRekomendasiNotification;
+use Illuminate\Support\Facades\Notification;
+use App\Models\User;
 class SupervisorDashboardController extends Controller
 {
     public function index(Request $request)
@@ -318,11 +320,8 @@ class SupervisorDashboardController extends Controller
                 'saran' => $validated['saran'],
             ]);
             // Baru ambil IDP setelah simpan nilai
-            $idpKomPeng = $nilai->idpKompetensiPengerjaan;
+            $idpKomPeng = IdpKompetensiPengerjaan::with('idpKompetensi.idp.idpKompetensis.pengerjaans.nilaiPengerjaanIdp')->find($nilai->id_idpKomPeng);
             $idp = $idpKomPeng->idpKompetensi->idp;
-            // Update status pengerjaan IDP menjadi "Selesai"
-            $idp->status_pengerjaan = 'Selesai';
-            $idp->save();
             $idp->refresh();
             // Hitung total dan yang sudah dinilai
             $total = 0;
@@ -345,9 +344,31 @@ class SupervisorDashboardController extends Controller
 
             // Jalankan rekomendasi jika terpenuhi
             if ($total > 0 && $dinilai === $total) {
+                Log::info('🚀 Sebelum hitungRekomendasi', ['id_idp' => $idp->id_idp]);
                 Log::info('🚀 Menjalankan perhitungan rekomendasi', ['id_idp' => $idp->id_idp]);
                 $this->rekomendasiService->hitungRekomendasi($idp);
+                $idp->status_pengerjaan = 'Selesai';
+                $idp->save();
                 Log::info('✅ Perhitungan rekomendasi selesai', ['id_idp' => $idp->id_idp]);
+                // Kirim notifikasi ke karyawan
+$karyawan = User::find($idp->id_user);
+if ($karyawan) {
+    $karyawan->notify(new HasilRekomendasiNotification([
+    'id_idp' => $idp->id_idp,
+    'proyeksi_karir' => $idp->proyeksi_karir,
+    'untuk_role' => 'karyawan',
+]));
+}
+
+// Kirim notifikasi ke mentor
+$mentor = User::find($idp->id_mentor);
+if ($mentor) {
+    $mentor->notify(new HasilRekomendasiNotification([
+    'id_idp' => $idp->id_idp,
+    'proyeksi_karir' => $idp->proyeksi_karir,
+    'untuk_role' => 'mentor',
+]));
+}
             } else {
                 Log::info('❌ Belum semua dinilai, rekomendasi belum dihitung', [
                     'sisa' => $total - $dinilai
@@ -375,7 +396,7 @@ class SupervisorDashboardController extends Controller
             if ($request->ajax()) {
                 return response()->json([
                     'message' => 'Terjadi kesalahan saat menyimpan penilaian.',
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ], 500);
             }
 

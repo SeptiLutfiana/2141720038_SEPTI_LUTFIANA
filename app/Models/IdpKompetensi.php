@@ -21,7 +21,7 @@ class IdpKompetensi extends Model
     ];
     public function idp()
     {
-        return $this->belongsTo(IDP::class, 'id_idp');
+        return $this->belongsTo(IDP::class, 'id_idp', 'id_idp');
     }
     public function kompetensi()
     {

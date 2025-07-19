@@ -139,7 +139,7 @@
                                             @endif
                                         </td>
                                         <td colspan="2" class="text-left">{{ $peng->keterangan_hasil }}</td>
-                                        <td class="text-center">{{ $peng->nilaiPengerjaanIdp->rating }}</td>
+                                        <td class="text-center">{{ $peng->nilaiPengerjaanIdp->rating ?? '' }}</td>
                                 @endforeach
                                 </tr>
                             @endforeach
@@ -147,7 +147,7 @@
                                 <th colspan="3" style="background-color: #688509; color: #fff; font-weight: bold;">Nilai
                                     Soft Kompetensi</th>
                                 <th class="text-center" style="background-color: #688509; color: #fff; font-weight: bold;">
-                                    {{ $idps->rekomendasis->first()->nilai_akhir_soft }}</th>
+                                    {{ $idps->rekomendasis->first()->nilai_akhir_soft ?? '' }}</th>
                             </tr>
                             <tr>
                                 <th colspan="4" style="background-color: #a6c73a; color: #fff; font-weight: bold;">Hard
@@ -211,7 +211,7 @@
                                             @endif
                                         </td>
                                         <td colspan="2" class="text-left">{{ $peng->keterangan_hasil }}</td>
-                                        <td class="text-center">{{ $peng->nilaiPengerjaanIdp->rating }}</td>
+                                        <td class="text-center">{{ $peng->nilaiPengerjaanIdp->rating ?? '' }}</td>
                                 @endforeach
                                 </tr>
                             @endforeach
@@ -219,7 +219,7 @@
                                 <th colspan="3" style="background-color: #688509; color: #fff; font-weight: bold;">Nilai
                                     Hard Kompetensi</th>
                                 <th class="text-center" style="background-color: #688509; color: #fff; font-weight: bold;">
-                                    {{ $idps->rekomendasis->first()->nilai_akhir_hard }}</th>
+                                    {{ $idps->rekomendasis->first()->nilai_akhir_hard ?? '' }}</th>
                             </tr>
                         </table>
 
