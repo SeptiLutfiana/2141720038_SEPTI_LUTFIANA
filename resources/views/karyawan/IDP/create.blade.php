@@ -456,6 +456,7 @@
 
                 // Kosongkan input hidden sebelumnya
                 document.querySelectorAll('input[name^="kompetensi["]').forEach(el => el.remove());
+    let globalIndex = 0;
 
                 // Render tabel Hard Kompetensi
                 daftarHard.forEach((item, index) => {
@@ -476,7 +477,7 @@
         `;
 
                     // Tambahkan input hidden untuk data kompetensi
-                    addHiddenInputs(item, index);
+        addHiddenInputs(item, globalIndex++);
                 });
 
                 // Render tabel Soft Kompetensi
@@ -499,7 +500,7 @@
         `;
 
                     // Tambahkan input hidden untuk data kompetensi
-                    addHiddenInputs(item, index);
+        addHiddenInputs(item, globalIndex++);
                 });
             }
             // Fungsi untuk menambahkan input hidden ke dalam form
