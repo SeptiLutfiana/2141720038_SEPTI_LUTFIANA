@@ -26,7 +26,6 @@ class EvaluasiPascaIdpKaryawanTable extends Component
             })
             ->whereDoesntHave('evaluasiIdp', function ($q) use ($user) {
                 $q->where('jenis_evaluasi', 'pasca')
-                ->where('id_user', $user->id)
  ->whereHas('jawaban.bankEvaluasi', function ($sub) {
                         $sub->where('untuk_role', 'karyawan');
                     });
