@@ -25,9 +25,11 @@ class EvaluasiPascaIdpKaryawanTable extends Component
                 $q->whereIn('hasil_rekomendasi', ['Disarankan', 'Disarankan dengan Pengembangan']);
             })
             ->whereDoesntHave('evaluasiIdp', function ($q) use ($user) {
-                $q->where('jenis_evaluasi', $this->jenisEvaluasi)
-                ->where('sebagai_role', 'karyawan');
-
+                $q->where('jenis_evaluasi', 'pasca')
+                ->where('id_user', $user->id)
+ ->whereHas('jawaban.bankEvaluasi', function ($sub) {
+                        $sub->where('untuk_role', 'karyawan');
+                    });
             })
             ->paginate(10);
 
