@@ -135,9 +135,11 @@ class KaryawanDashboardController extends Controller
             })
             ->whereDoesntHave('evaluasiIdp', function ($query) {
                 $query->where('jenis_evaluasi', 'pasca')
-                    ->where('sebagai_role', 'karyawan');
-            })
-            ->count();
+                ->whereHas('jawaban.bankEvaluasi', function($sub){
+                    $sub->where('untuk_role', 'karyawan');
+            });
+        })
+        ->count();
 
         $evaluasiOnboarding = EvaluasiIdp::whereIn('id_idp', $idpIds)
             ->where('jenis_evaluasi', 'onboarding')
