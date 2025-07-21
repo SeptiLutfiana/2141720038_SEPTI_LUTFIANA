@@ -148,6 +148,18 @@
                                 <div class="card-header">
                                     <h4>Daftar Soft Kompetensi</h4>
                                 </div>
+                                <div class="card" style="border-left: 5px solid #28a745; background-color: #e6f9d7;">
+                                    <div class="card-body" style="color: #212529;">
+                                        Soft Kompetensi Terdiri dari 3 (tiga) aspek yaitu: <br>
+                                        <strong> 1 Kompetensi Umum </strong> - kompetensi yang harus dimiliki oleh semua
+                                        karyawan pada semua lavel direktorat, jenjang atau jabatan <br>
+                                        <strong> 1 Kompetensi Kunci </strong> - kompetensi penting yang harus dimiliki oleh
+                                        semua karyawan berdasarkan direktorat (kunci_enable atau kunci_core atau
+                                        kunci_business) <br>
+                                        <strong> Kompetensi Utama </strong> - kompetensi yang secara khhusus harus dimiliki
+                                        oleh karyawan pada semua rumpun direktorat, jenjang atau jabatan
+                                    </div>
+                                </div>
                                 <div class="card-header">
                                     <div class="table-responsive">
                                         <table class="table table-bordered table-hover" id="tabel-soft">
@@ -224,6 +236,7 @@
                                 <div class="form-group col-md-6">
                                     <label>Kompetensi</label>
                                     <select class="tom-select kompetensi-dropdown" id="modalKompetensiDropdown">
+                                        <option value="">Pilih Kompetensi</option>
                                         <!-- Opsi akan diisi oleh JS -->
                                     </select>
                                 </div>
@@ -398,6 +411,18 @@
                     alert("Harap pilih kompetensi, metode belajar, sasaran, dan aksi.");
                     return;
                 }
+                if (jenis === 'Soft Kompetensi') {
+                    const kunciTypes = ['kunci_enabler', 'kunci_core', 'kunci_bisnis'];
+                    const isKunci = kunciTypes.includes(peran);
+
+                    if (isKunci) {
+                        const alreadyExists = daftarSoft.some(item => kunciTypes.includes(item.peran));
+                        if (alreadyExists) {
+                            alert('Hanya boleh satu Soft Kompetensi dengan peran Kunci (Enabler/Core/Business).');
+                            return;
+                        }
+                    }
+                }
 
                 // Menambahkan kompetensi ke dalam daftar berdasarkan jenis kompetensi
                 const newCompetency = {
@@ -430,10 +455,24 @@
 
                 // Cek apakah ada minimal 3 kompetensi pada hard atau soft
                 if (totalHardCompetencies < 3 && totalSoftCompetencies < 3) {
-                    alert("Anda harus memilih minimal 3 Kompetensi Hard atau 3 Kompetensi Soft.");
+                    alert(
+                        "Anda harus memilih minimal 3 Kompetensi Hard atau 3 Kompetensi Soft (Kompetensi Utama, Kompetensi Umum, dan Kompetensi Kunci)."
+                    );
                     return false; // Menghentikan submit
                 }
-
+                // Validasi harus ada 1 peran 'utama' (boleh dari hard atau soft)
+                const totalUtama = [...daftarHard, ...daftarSoft].filter(item => item.peran === 'utama').length;
+                if (totalUtama !== 1) {
+                    alert("Harus memilih tepat **1 Kompetensi** dengan peran 'Utama'.");
+                    return false;
+                }
+                // Validasi: harus ada satu peran kunci (enabler/core/business) di soft kompetensi
+                const kunciTypes = ['kunci_enabler', 'kunci_core', 'kunci_bisnis'];
+                const kunciFound = daftarSoft.some(item => kunciTypes.includes(item.peran));
+                if (!kunciFound) {
+                    alert('Minimal satu Soft Kompetensi harus memiliki peran: Kunci Enabler, Kunci Core, atau Kunci Business.');
+                    return false;
+                }
                 return true; // Lanjutkan submit jika validasi lulus
             }
 
@@ -456,7 +495,7 @@
 
                 // Kosongkan input hidden sebelumnya
                 document.querySelectorAll('input[name^="kompetensi["]').forEach(el => el.remove());
-    let globalIndex = 0;
+                let globalIndex = 0;
 
                 // Render tabel Hard Kompetensi
                 daftarHard.forEach((item, index) => {
@@ -477,7 +516,7 @@
         `;
 
                     // Tambahkan input hidden untuk data kompetensi
-        addHiddenInputs(item, globalIndex++);
+                    addHiddenInputs(item, globalIndex++);
                 });
 
                 // Render tabel Soft Kompetensi
@@ -500,7 +539,7 @@
         `;
 
                     // Tambahkan input hidden untuk data kompetensi
-        addHiddenInputs(item, globalIndex++);
+                    addHiddenInputs(item, globalIndex++);
                 });
             }
             // Fungsi untuk menambahkan input hidden ke dalam form
@@ -794,6 +833,18 @@
                         });
 
                         modalDropdownsInitialized = true;
+                    }
+                    if (jenis === 'Soft Kompetensi') {
+                        const kunciTypes = ['kunci_enabler', 'kunci_core', 'kunci_bisnis'];
+                        const alreadyExists = daftarSoft.some(item => kunciTypes.includes(item.peran));
+
+                        if (alreadyExists) {
+                            alert(
+                                'Soft Kompetensi dengan peran Kunci sudah dipilih. Tidak bisa menambah lagi.'
+                            );
+                            e.preventDefault();
+                            return false;
+                        }
                     }
                 });
             });
