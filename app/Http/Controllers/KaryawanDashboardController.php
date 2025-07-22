@@ -541,7 +541,9 @@ class KaryawanDashboardController extends Controller
 
         $listJenjang = Jenjang::all();
         $listLG = LearingGroup::all();
-        $mentors = User::whereHas('roles', fn($q) => $q->where('user_roles.id_role', 3))->get();
+        $mentors = User::whereHas('roles', fn($q) => $q->where('user_roles.id_role', 3))
+        ->where('id', '!=', $user->id)
+        ->get();
 
         $idps = IDP::with([
             'jenjang',
@@ -850,14 +852,20 @@ class KaryawanDashboardController extends Controller
     }
     public function create()
     {
+        $currentUserId = Auth::id();
+
         // Ambil data user berdasarkan role
         $mentors = User::whereHas('roles', function ($query) {
             $query->where('user_roles.id_role', 3); // Role mentor
-        })->get();
+        })
+        ->where('id', '!=', $currentUserId)
+        ->get();
 
         $supervisors = User::whereHas('roles', function ($query) {
             $query->where('user_roles.id_role', 2); // Role supervisor
-        })->get();
+        })
+        ->where('id', '!=', $currentUserId)
+        ->get();
 
         $karyawans = User::whereHas('roles', function ($query) {
             $query->where('user_roles.id_role', 4); // Role karyawan

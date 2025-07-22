@@ -21,6 +21,11 @@
                 </div>
 
                 <div class="section-body">
+                    @if (session('msg-error'))
+                        <div class="alert alert-danger">
+                            {{ session('msg-error') }}
+                        </div>
+                    @endif
                     @if ($errors->any())
                         <div class="alert alert-danger">
                             <ul>
@@ -718,17 +723,21 @@
                     return false; // Menghentikan submit
                 }
                 // Validasi harus ada 1 peran 'utama' (boleh dari hard atau soft)
-                const totalUtama = [...daftarHard, ...daftarSoft].filter(item => item.peran === 'utama').length;
-                if (totalUtama !== 1) {
-                    alert("Harus memilih tepat **1 Kompetensi** dengan peran 'Utama'.");
-                    return false;
-                }
-                // Validasi: harus ada satu peran kunci (enabler/core/business) di soft kompetensi
-                const kunciTypes = ['kunci_enabler', 'kunci_core', 'kunci_bisnis'];
-                const kunciFound = daftarSoft.some(item => kunciTypes.includes(item.peran));
-                if (!kunciFound) {
-                    alert('Minimal satu Soft Kompetensi harus memiliki peran: Kunci Enabler, Kunci Core, atau Kunci Business.');
-                    return false;
+                // Jika user mengisi soft kompetensi, baru cek peran 'utama' dan peran kunci
+                if (totalSoftCompetencies >= 3) {
+                    const totalUtama = daftarSoft.filter(item => item.peran === 'utama').length;
+                    if (totalUtama !== 1) {
+                        alert("Jika memilih Soft Kompetensi, wajib memilih tepat 1 kompetensi dengan peran 'Utama'.");
+                        return false;
+                    }
+
+                    const kunciTypes = ['kunci_enabler', 'kunci_core', 'kunci_bisnis'];
+                    const kunciFound = daftarSoft.some(item => kunciTypes.includes(item.peran));
+                    if (!kunciFound) {
+                        alert(
+                            'Soft Kompetensi harus memiliki minimal satu dengan peran: Kunci Enabler, Kunci Core, atau Kunci Business.');
+                        return false;
+                    }
                 }
                 return true; // Lanjutkan submit jika validasi lulus
             }

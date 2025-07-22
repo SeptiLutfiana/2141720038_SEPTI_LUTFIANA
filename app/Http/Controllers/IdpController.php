@@ -282,6 +282,13 @@ class IdpController extends Controller
             $userIds = $request->id_user;
             $users = User::whereIn('id', $userIds)->get();
             $userNames = $users->pluck('name')->implode(', '); // Get names and join them with a comma
+            // 🔒 VALIDASI: Jangan izinkan karyawan jadi mentor/supervisor dirinya sendiri
+            foreach ($userIds as $idUser) {
+                if ($idUser == $request->id_mentor || $idUser == $request->id_supervisor) {
+                    $user = $users->firstWhere('id', $idUser);
+                    return back()->with('msg-error', 'Karyawan "' . $user->name . '" tidak boleh menjadi mentor atau supervisornya sendiri.');
+                }
+            }
 
             $createdIdps = [];
 
